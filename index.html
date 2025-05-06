@@ -79,6 +79,7 @@
 <body class="bg-gray-100">
     
     <div class="container">
+        <p id="videoTitle">Video 1.mp4</p>
         <div class="video-container">
             <!--
             <iframe
@@ -123,6 +124,7 @@
     </div>
 
     <script>
+        const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
         const videoSelect = document.getElementById('videoSelect');
         const getTimestampButton = document.getElementById("getTimestamp");
@@ -133,9 +135,42 @@
 
         let opinions = []; // Array to store opinions
 
+        // function to fetch the list of video files
+        const fetchFilesInFolder = async () => {
+          const owner = "VictorS-67"; // GitHub username
+          const repo = "movement-to-onomatopea"; // Repository name
+          const folder = "videos"; // Folder path
+        
+          const url = `https://api.github.com/repos/${owner}/${repo}/contents/${folder}`;
+        
+          try {
+            const response = await fetch(url, {
+              headers: {
+                Accept: "application/vnd.github.v3+json",
+              },
+            });
+        
+            if (!response.ok) {
+              throw new Error(`Failed to fetch files: ${response.statusText}`);
+            }
+        
+            const files = await response.json();
+        
+            // Filter and return the files as an array of filenames
+            const fileList = files
+              .filter(file => file.type === "file")
+              .map(file => file.name); // Extract only the file names
+        
+            return fileList; // Return the list of files
+          } catch (error) {
+            console.error("Error:", error.message);
+            return []; // Return an empty array in case of error
+          }
+        };
 
          // List of videos fetched from the repository
-        const videos = [
+        const videos = fetchFilesInFolder()
+        /*const videos = [
             "1.mp4",
             "10.mp4",
             "100.mp4",
@@ -143,7 +178,7 @@
             "102.mp4",
             "103.mp4",
             // Add all filenames here based on fetched content
-        ];
+        ];*/
     
         // Populate the dropdown dynamically
         videos.forEach(video => {
@@ -157,6 +192,7 @@
         videoSelect.addEventListener("change", () => {
             videoPlayer.src = videoSelect.value;
             videoPlayer.load();
+            videoTitle.textContent = `Video: ${videoSelect.value}`;
         });
 
         
