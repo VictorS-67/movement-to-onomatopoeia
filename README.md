@@ -1,2 +1,2 @@
 # movement-to-onomatopea
-movement description using onomatopea
+movement description using onomatopoeia
