@@ -78,9 +78,7 @@
     
 <body class="bg-gray-100">
     
-    <div class="container">
-        <div id="message" class="mt-4 text-gray-700"></div>
-        
+    <div class="container">        
         <p id="videoTitle">Video 1.mp4</p>
         <div class="video-container">
             <!--
@@ -112,24 +110,27 @@
             </select>
         </div>
 
+        <div id="message" class="mt-4 text-gray-700"></div>
+
         <!-- Onomatopea -->
         <div class="input-group">
-            <label for="onomatopea">Onomatopea 1:</label>
-            <textarea id="onomatopea" name="onomatopea" placeholder="Write your onomatopea"></textarea>
+            <label for="onomatopeaInput">Onomatopea 1:</label>
+            <textarea id="onomatopeaInput" name="onomatopeaInput" placeholder="Write your onomatopea"></textarea>
         </div>
 
         <button id="getStart" class="button">Get starting time</button>
         <p>Onomatopea Start Time:</p>
-        <p id="startDisplay">--:--</p>
+        <p id="startDisplay">-.--</p>
 
         <button id="getEnd" class="button">Get ending time</button>
         <p>Onomatopea End Time:</p>
-        <p id="endDisplay">--:--</p>
+        <p id="endDisplay">-.--</p>
 
-        <button id="saveOpinion" class="button">Save Onomatopea and add another one for the same video</button>
+        <button id="saveOnomatopea" class="button">Save Onomatopea</button>
         <!-- With this one, we want to save the onomatopea, start time and end time (in csv ?) and reset those values
         Also want to display message like onomatopea "..." 1:3 -> 2:4 saved correctly 
         Also put videoPlayer back to 0-->
+
 
     </div>
 
@@ -141,8 +142,8 @@
         const startDisplay = document.getElementById("startDisplay");
         const getEnd = document.getElementById("getEnd");
         const endDisplay = document.getElementById("endDisplay");
-        const opinionInput = document.getElementById("opinion");
-        const saveOpinionButton = document.getElementById("saveOpinion");
+        const onomatopeaInput = document.getElementById("onomatopeaInput");
+        const saveOnomatopeaButton = document.getElementById("saveOnomatopea");
         const messageDisplay = document.getElementById("message");
 
         let opinions = []; // Array to store opinions
@@ -211,17 +212,13 @@
             endDisplay.textContent = `aaa ${currentTime.toFixed(2)}`;
         });
 
-
-
-
-
         
-        // Function to save the opinion and timestamp
-        saveOpinionButton.addEventListener("click", () => {
-            const currentTime = videoPlayer.currentTime;
-            const opinion = opinionInput.value.trim();
 
-            if (opinion === "") {
+        // when save button is clicked
+        saveOnomatopeaButton.addEventListener("click", () => {
+            const onomatopea = onomatopeaInput.value.trim();
+
+            if (onomatopea === "") {
                 messageDisplay.textContent = "Please enter your opinion.";
                 messageDisplay.style.color = "red";
                 return;
@@ -229,19 +226,19 @@
 
             // Create an object to store the timestamp and opinion
             const opinionData = {
-                timestamp: currentTime.toFixed(2),
-                opinion: opinion,
+                startTime: startDisplay.textContent,
+                endTime:endDisplay.textContent,
+                onomatopea: onomatopea,
             };
 
-            opinions.push(opinionData); // Add to the array
-
             // Display a success message
-            messageDisplay.textContent = "Opinion and timestamp saved!";
+            messageDisplay.textContent = "Onomatopea and start-end saved!";
             messageDisplay.style.color = "green";
 
             // Clear the opinion input
-            opinionInput.value = "";
-            timestampDisplay.textContent = ""; // Clear timestamp display after saving
+            onomatopeaInput.value = "";
+            startDisplay.textContent = "";
+            endDisplay.textContent = ""; // Clear timestamp display after saving
             // You can optionally save the opinions to a server here using fetch()
             // Example of sending data to a server (you'll need a server-side script to handle this):
             /*
@@ -268,6 +265,9 @@
             });
             */
         });
+
+
+            
     </script>
 </body>
 </html>
