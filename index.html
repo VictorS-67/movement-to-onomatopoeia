@@ -149,6 +149,12 @@
 
         let opinions = []; // Array to store opinions
 
+        function resetDisplay() {
+            onomatopeaInput.value = "";
+            startDisplay.textContent = "-.--";
+            endDisplay.textContent = "-.--";
+        }
+
         // function to fetch the list of video files
         const fetchFilesInFolder = async () => {
           const owner = "VictorS-67"; // GitHub username
@@ -199,6 +205,7 @@
             videoPlayer.src = videoSelect.value;
             videoPlayer.load();
             videoTitle.textContent = `Video: ${videoSelect.value}`;
+            resetDisplay()
         });
 
         
@@ -236,10 +243,7 @@
             messageDisplay.textContent = "Onomatopea and start-end saved!";
             messageDisplay.style.color = "green";
 
-            // Clear the opinion input
-            onomatopeaInput.value = "";
-            startDisplay.textContent = "-.--";
-            endDisplay.textContent = "-.--"; // Clear timestamp display after saving
+            resetDisplay() // Clear display after saving
             // You can optionally save the opinions to a server here using fetch()
             // Example of sending data to a server (you'll need a server-side script to handle this):
             /*
