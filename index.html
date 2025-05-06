@@ -168,29 +168,21 @@
           }
         };
 
-         // List of videos fetched from the repository
-        const videos = fetchFilesInFolder().then()
-        console.log(videos)
-        /*const videos = [
-            "1.mp4",
-            "10.mp4",
-            "100.mp4",
-            "101.mp4",
-            "102.mp4",
-            "103.mp4",
-            // Add all filenames here based on fetched content
-        ];*/
-
+        // fetch all the videos names
         fetchFilesInFolder().then(fileList => {
           console.log("Files in the folder:", fileList);
         });
     
         // Populate the dropdown dynamically
-        videos.forEach(video => {
-            const option = document.createElement("option");
-            option.value = `videos/${video}`;
-            option.textContent = video; // Display the video filename
-            videoSelect.appendChild(option);
+        fetchFilesInFolder().then(videos => {
+            videos.forEach(video => {
+                const option = document.createElement("option");
+                option.value = `videos/${video}`;
+                option.textContent = video; // Display the video filename
+                videoSelect.appendChild(option);
+            });
+        }).catch(error => {
+            console.error("Error populating dropdown:", error);
         });
     
         // Update video source when dropdown changes
