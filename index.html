@@ -199,30 +199,16 @@
             videoTitle.textContent = `Video: ${videoSelect.value}`;
         });
 
-
-        document.getElementById('addButton').addEventListener('click', function () {
-            // Create a new text area
-            const textArea = document.createElement('textarea');
-            textArea.setAttribute('placeholder', 'Enter onomatopoeia...');
-            textArea.classList.add('onomatopoeia-textarea');
-            textArea.rows = 3;
-            textArea.cols = 30;
-
-            // Append the text area to the container
-            const container = document.getElementById('textAreaContainer');
-            container.appendChild(textArea);
-        });
-
         
         // Function to get and display the current timestamp
         getStart.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
-            startDisplay.textContent = `${currentTime.toFixed(2)}`;
+            startDisplay.textContent = `vbvv ${currentTime.toFixed(2)}`;
         });
 
         getEnd.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
-            endDisplay.textContent = `${currentTime.toFixed(2)}`;
+            endDisplay.textContent = `aaa ${currentTime.toFixed(2)}`;
         });
 
 
