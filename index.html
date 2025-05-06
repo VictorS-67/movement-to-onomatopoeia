@@ -23,7 +23,7 @@
             overflow: hidden; /* To contain rounded corners of video */
         }
         #myVideo {
-            width: 100%;
+            width: auto;
             height: auto;
         }
         .input-group {
@@ -121,10 +121,12 @@
             timestampDisplay.textContent = `Current Timestamp: ${currentTime.toFixed(2)} seconds`;
         });
         */
-
+        
         getTimestampButton.addEventListener("click", () => {
-            timestampDisplay.textContent = `Current Timestamp`;
+            video.currentTime = 0; // Restart
         });
+
+
 
         // Function to save the opinion and timestamp
         saveOpinionButton.addEventListener("click", () => {
