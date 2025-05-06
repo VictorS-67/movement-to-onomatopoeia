@@ -108,7 +108,7 @@
         </div>
 
         <button id="getTimestamp" class="button">Get Timestamp</button>
-        <p id="timestampDisplay">test</p>
+        <p id="timestampDisplay">Current Timestamp: --:--</p>
 
         <button id="saveOpinion" class="button">Save Opinion</button>
 
@@ -126,15 +126,9 @@
         let opinions = []; // Array to store opinions
 
         // Function to get and display the current timestamp
-        /*
         getTimestampButton.addEventListener("click", () => {
             const currentTime = video.currentTime;
             timestampDisplay.textContent = `Current Timestamp: ${currentTime.toFixed(2)} seconds`;
-        });
-        */
-        
-        getTimestampButton.addEventListener("click", () => {
-            video.currentTime = 0; // Restart
         });
 
 
