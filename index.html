@@ -102,6 +102,13 @@
             </video>
         </div>
 
+        <!-- Dropdown to Select Video -->
+        <div class="dropdown">
+            <label for="videoSelect">Change the video:</label>
+            <select id="videoSelect">
+            </select>
+        </div>
+
         <div class="input-group">
             <label for="opinion">Your Opinion:</label>
             <textarea id="opinion" name="opinion" placeholder="Write your opinion about this part of the video"></textarea>
@@ -116,7 +123,8 @@
     </div>
 
     <script>
-        const video = document.getElementById("myVideo");
+        const videoPlayer = document.getElementById("myVideo");
+        const videoSelect = document.getElementById('videoSelect');
         const getTimestampButton = document.getElementById("getTimestamp");
         const timestampDisplay = document.getElementById("timestampDisplay");
         const opinionInput = document.getElementById("opinion");
@@ -125,17 +133,42 @@
 
         let opinions = []; // Array to store opinions
 
+
+         // List of videos fetched from the repository
+        const videos = [
+            "1.mp4",
+            "10.mp4",
+            "100.mp4",
+            "101.mp4",
+            "102.mp4",
+            "103.mp4",
+            // Add all filenames here based on fetched content
+        ];
+    
+        // Populate the dropdown dynamically
+        videos.forEach(video => {
+            const option = document.createElement("option");
+            option.value = `videos/${video}`;
+            option.textContent = video; // Display the video filename
+            videoSelect.appendChild(option);
+        });
+    
+        // Update video source when dropdown changes
+        videoSelect.addEventListener("change", () => {
+            videoPlayer.src = videoSelect.value;
+            videoPlayer.load();
+        });
+
+        
         // Function to get and display the current timestamp
         getTimestampButton.addEventListener("click", () => {
-            const currentTime = video.currentTime;
+            const currentTime = videoPlayer.currentTime;
             timestampDisplay.textContent = `Current Timestamp: ${currentTime.toFixed(2)} seconds`;
         });
 
-
-
         // Function to save the opinion and timestamp
         saveOpinionButton.addEventListener("click", () => {
-            const currentTime = video.currentTime;
+            const currentTime = videoPlayer.currentTime;
             const opinion = opinionInput.value.trim();
 
             if (opinion === "") {
