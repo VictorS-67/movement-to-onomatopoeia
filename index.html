@@ -169,7 +169,8 @@
         };
 
          // List of videos fetched from the repository
-        const videos = fetchFilesInFolder()
+        const videos = fetchFilesInFolder().then()
+        console.log(videos)
         /*const videos = [
             "1.mp4",
             "10.mp4",
