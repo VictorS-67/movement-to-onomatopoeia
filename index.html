@@ -110,15 +110,23 @@
             </select>
         </div>
 
+        <!-- Onomatopea -->
         <div class="input-group">
-            <label for="opinion">Onomatopea:</label>
-            <textarea id="opinion" name="opinion" placeholder="Write your opinion about this part of the video"></textarea>
+            <label for="onomatopea">Onomatopea 1:</label>
+            <textarea id="onomatopea" name="onomatopea" placeholder="Write your onomatopea"></textarea>
         </div>
 
-        <button id="getTimestamp" class="button">Get Timestamp</button>
-        <p id="timestampDisplay">Current Timestamp: --:--</p>
+        <button id="getStart" class="button">Get starting time</button>
+        <p>Onomatopea Start Time:</p>
+        <p id="startDisplay">--:--</p>
 
-        <button id="saveOpinion" class="button">Save Opinion</button>
+        <button id="getEnd" class="button">Get ending time</button>
+        <p>Onomatopea End Time:</p>
+        <p id="endDisplay">--:--</p>
+
+        <button id="saveOpinion" class="button">Save Onomatopea and add another one for the same video</button>
+
+        <button id="saveOpinion2" class="button">Save Onomatopea and change video</button>
 
         <div id="message" class="mt-4 text-gray-700"></div>
     </div>
@@ -127,8 +135,10 @@
         const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
         const videoSelect = document.getElementById('videoSelect');
-        const getTimestampButton = document.getElementById("getTimestamp");
-        const timestampDisplay = document.getElementById("timestampDisplay");
+        const getStart = document.getElementById("getStart");
+        const startDisplay = document.getElementById("startDisplay");
+        const getEnd = document.getElementById("getEnd");
+        const endDisplay = document.getElementById("endDisplay");
         const opinionInput = document.getElementById("opinion");
         const saveOpinionButton = document.getElementById("saveOpinion");
         const messageDisplay = document.getElementById("message");
@@ -192,10 +202,31 @@
             videoTitle.textContent = `Video: ${videoSelect.value}`;
         });
 
+
+        document.getElementById('addButton').addEventListener('click', function () {
+            // Create a new text area
+            const textArea = document.createElement('textarea');
+            textArea.setAttribute('placeholder', 'Enter onomatopoeia...');
+            textArea.classList.add('onomatopoeia-textarea');
+            textArea.rows = 3;
+            textArea.cols = 30;
+
+            // Append the text area to the container
+            const container = document.getElementById('textAreaContainer');
+            container.appendChild(textArea);
+        });
+
+        
+
         // Function to get and display the current timestamp
-        getTimestampButton.addEventListener("click", () => {
+        getStart.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
-            timestampDisplay.textContent = `Current Timestamp: ${currentTime.toFixed(2)} seconds`;
+            startDisplay.textContent = `${currentTime.toFixed(2)}`;
+        });
+
+        getEnd.addEventListener("click", () => {
+            const currentTime = videoPlayer.currentTime;
+            endDisplay.textContent = `${currentTime.toFixed(2)}`;
         });
 
         // Function to save the opinion and timestamp
