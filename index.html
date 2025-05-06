@@ -72,10 +72,7 @@
 </head>
 
     
-/*
-    -----------------------------------------------------
-    -----------------------------------------------------
-*/
+
     
 
     
@@ -84,10 +81,13 @@
         <div class="video-container">
             <iframe
                 id="myVideo"
-                src="https://drive.google.com/file/d/1wONpmPkKvBX0gaUiFI9tY2ielxd415fh/preview"  frameborder="0"
+                src="https://drive.google.com/file/d/1wONpmPkKvBX0gaUiFI9tY2ielxd415fh/preview" 
+                width="640" 
+                height="480" 
+                frameborder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowfullscreen
-                title="Embedded Video from Google Drive"
+                title="point light motion"
             ></iframe>
         </div>
 
@@ -97,7 +97,7 @@
         </div>
 
         <button id="getTimestamp" class="button">Get Timestamp</button>
-        <p id="timestampDisplay"></p>
+        <p id="timestampDisplay">test</p>
 
         <button id="saveOpinion" class="button">Save Opinion</button>
 
@@ -115,9 +115,15 @@
         let opinions = []; // Array to store opinions
 
         // Function to get and display the current timestamp
+        /*
         getTimestampButton.addEventListener("click", () => {
             const currentTime = video.currentTime;
             timestampDisplay.textContent = `Current Timestamp: ${currentTime.toFixed(2)} seconds`;
+        });
+        */
+
+        getTimestampButton.addEventListener("click", () => {
+            timestampDisplay.textContent = `Current Timestamp`;
         });
 
         // Function to save the opinion and timestamp
