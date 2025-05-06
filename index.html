@@ -79,6 +79,8 @@
 <body class="bg-gray-100">
     
     <div class="container">
+        <div id="message" class="mt-4 text-gray-700"></div>
+        
         <p id="videoTitle">Video 1.mp4</p>
         <div class="video-container">
             <!--
@@ -125,10 +127,10 @@
         <p id="endDisplay">--:--</p>
 
         <button id="saveOpinion" class="button">Save Onomatopea and add another one for the same video</button>
+        <!-- With this one, we want to save the onomatopea, start time and end time (in csv ?) and reset those values
+        Also want to display message like onomatopea "..." 1:3 -> 2:4 saved correctly 
+        Also put videoPlayer back to 0-->
 
-        <button id="saveOpinion2" class="button">Save Onomatopea and change video</button>
-
-        <div id="message" class="mt-4 text-gray-700"></div>
     </div>
 
     <script>
@@ -177,11 +179,6 @@
             return []; // Return an empty array in case of error
           }
         };
-
-        // fetch all the videos names
-        fetchFilesInFolder().then(fileList => {
-          console.log("Files in the folder:", fileList);
-        });
     
         // Populate the dropdown dynamically
         fetchFilesInFolder().then(videos => {
@@ -217,7 +214,6 @@
         });
 
         
-
         // Function to get and display the current timestamp
         getStart.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
@@ -229,6 +225,11 @@
             endDisplay.textContent = `${currentTime.toFixed(2)}`;
         });
 
+
+
+
+
+        
         // Function to save the opinion and timestamp
         saveOpinionButton.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
