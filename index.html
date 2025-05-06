@@ -179,6 +179,10 @@
             "103.mp4",
             // Add all filenames here based on fetched content
         ];*/
+
+        fetchFilesInFolder().then(fileList => {
+          console.log("Files in the folder:", fileList);
+        });
     
         // Populate the dropdown dynamically
         videos.forEach(video => {
