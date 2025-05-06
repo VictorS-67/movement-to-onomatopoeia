@@ -114,7 +114,7 @@
 
         <!-- Onomatopea -->
         <div class="input-group">
-            <label for="onomatopeaInput">Onomatopea 1:</label>
+            <label for="onomatopeaInput">Onomatopea:</label>
             <textarea id="onomatopeaInput" name="onomatopeaInput" placeholder="Write your onomatopea"></textarea>
         </div>
 
@@ -204,12 +204,12 @@
         // Function to get and display the current timestamp
         getStart.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
-            startDisplay.textContent = `vbvv ${currentTime.toFixed(2)}`;
+            startDisplay.textContent = `${currentTime.toFixed(2)}`;
         });
 
         getEnd.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
-            endDisplay.textContent = `aaa ${currentTime.toFixed(2)}`;
+            endDisplay.textContent = `${currentTime.toFixed(2)}`;
         });
 
         
