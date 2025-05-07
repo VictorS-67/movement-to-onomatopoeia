@@ -222,7 +222,7 @@
                 //const csvText = await response.text();
                 let decoder = new TextDecoder("iso-8859-1");
                 let csvText = decoder.decode(csvbuffer);
-
+                
                 return parseCSV(csvText);
             } catch (error) {
                 console.error("Failed to fetch or parse CSV:", error);
