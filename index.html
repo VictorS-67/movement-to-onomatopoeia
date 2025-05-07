@@ -218,11 +218,12 @@
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                console.log(response)
-                const csvbuffer = response.arrayBuffer();
-                //const csvText = await response.text();
-                let decoder = new TextDecoder("iso-8859-1");
-                let csvText = decoder.decode(csvbuffer);
+                //console.log(response)
+                //const csvbuffer = response.arrayBuffer();
+                const csvText = await response.text();
+                console.log(csvText)
+                //let decoder = new TextDecoder("iso-8859-1");
+                //let csvText = decoder.decode(csvbuffer);
                 
                 return parseCSV(csvText);
             } catch (error) {
