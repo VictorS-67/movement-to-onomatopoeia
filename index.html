@@ -79,6 +79,13 @@
 <body class="bg-gray-100">
     
     <div class="container">        
+        
+        <div class="input-group">
+            <label for="nameInput">Your name:</label>
+            <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
+        </div>
+
+        <!-- Video -->
         <p id="videoTitle">Video 1.mp4</p>
         <div class="video-container">
             <!--
@@ -136,6 +143,7 @@
     </div>
 
     <script>
+        const nameInput = document.getElementById("nameInput");
         const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
         const videoSelect = document.getElementById('videoSelect');
@@ -225,6 +233,9 @@
         // when save button is clicked
         saveOnomatopoeiaButton.addEventListener("click", () => {
             const onomatopoeia = onomatopoeiaInput.value.trim();
+            const name = nameInput.value.trim();
+            const startTime = startDisplay.textContent;
+            const endTime = endDisplay.textContent;
 
             if (onomatopoeia === "") {
                 messageDisplay.textContent = "Please enter your onomatopoeia.";
@@ -232,10 +243,28 @@
                 return;
             }
 
+            if (name === "") {
+                messageDisplay.textContent = "Please enter your name.";
+                messageDisplay.style.color = "red";
+                return;
+            }
+
+            if (startTime === "-.--") {
+                messageDisplay.textContent = "Please record the start of the onomatopoeia.";
+                messageDisplay.style.color = "red";
+                return;
+            }
+
+            if (endTime === "-.--") {
+                messageDisplay.textContent = "Please record the end of the onomatopoeia.";
+                messageDisplay.style.color = "red";
+                return;
+            }
+
             // Create an object to store the timestamp and opinion
             const opinionData = {
-                startTime: startDisplay.textContent,
-                endTime:endDisplay.textContent,
+                startTime: startTime,
+                endTime: endTime,
                 onomatopoeia: onomatopoeia,
             };
 
