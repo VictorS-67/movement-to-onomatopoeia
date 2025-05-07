@@ -139,6 +139,9 @@
         Also want to display message like onomatopoeia "..." 1:3 -> 2:4 saved correctly 
         Also put videoPlayer back to 0-->
 
+        <h3>Onomatopoeia already saved for this video:</h3>
+        <p id="recordOnomatopoeia">None</p>
+
 
     </div>
 
@@ -154,13 +157,24 @@
         const onomatopoeiaInput = document.getElementById("onomatopoeiaInput");
         const saveOnomatopoeiaButton = document.getElementById("saveOnomatopoeia");
         const messageDisplay = document.getElementById("message");
+        const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
 
-        let opinions = []; // Array to store opinions
+        let record = []; // Array to store recorded Onomatopoeia
 
-        function resetDisplay() {
+        function resetDisplay(record) {
             onomatopoeiaInput.value = "";
             startDisplay.textContent = "-.--";
             endDisplay.textContent = "-.--";
+
+            if (record == []) {
+                recordMessage = "None";
+            } else {
+                recordMessage = "";
+                record.forEach(elt => {
+                    recordMessage += "\n" + elt ;
+                });
+            }
+            recordOnomatopoeia.textContent = recordMessage;
         }
 
         // function to fetch the list of video files
@@ -271,6 +285,8 @@
             // Display a success message
             messageDisplay.textContent = "Onomatopoeia and start-end saved!";
             messageDisplay.style.color = "green";
+
+            record.push(onomatopoeia + " from " + startTime + " to " +  endTime)
 
             resetDisplay() // Clear display after saving
             // You can optionally save the opinions to a server here using fetch()
