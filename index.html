@@ -227,7 +227,7 @@
             videoPlayer.src = videoSelect.value;
             videoPlayer.load();
             videoTitle.textContent = `Video: ${videoSelect.value}`;
-            resetDisplay()
+            resetDisplay(record)
         });
 
         
@@ -288,7 +288,7 @@
 
             record.push(onomatopoeia + " from " + startTime + " to " +  endTime)
 
-            resetDisplay() // Clear display after saving
+            resetDisplay(record) // Clear display after saving
             // You can optionally save the opinions to a server here using fetch()
             // Example of sending data to a server (you'll need a server-side script to handle this):
             /*
