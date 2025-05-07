@@ -221,11 +221,7 @@
             const url = `https://api.github.com/repos/${owner}/${repo}/contents/${file}`;
 
             try {
-                const response = await fetch(url, {
-                    headers: {
-                        Accept: "application/vnd.github.v3+json",
-                    },
-                });
+                const response = await fetch(url);
             
                 if (!response.ok) {
                     throw new Error(`Failed to fetch files: ${response.statusText}`);
