@@ -231,7 +231,7 @@
                     throw new Error(`Failed to fetch files: ${response.statusText}`);
                 }
             
-                const data = await response.json();
+                const data = await response.text();
                 console.log(data);
                 return data;
                 
