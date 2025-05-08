@@ -70,10 +70,32 @@
         
         testButton.addEventListener("click", () => {
           fetchLogData().then(fetchedData => {
+            // test if the name has been entered
+            const name = nameInput.value.trim();
+            if (!nameInput) {
+              alert("Please enter a name.");
+              return;
+            }
+
+            const filteredData = parseCSV(fetchedData).filter(item => item["name"] === nameInput);
+            console.log("filteredData", filteredData)
+
+            /*
+            if (filteredData.length === 0) {
+              alert(`No data found for the name "${nameInput}".`);
+              return;
+            }
+            */
+
+            // Store the name and filtered data in localStorage
+            localStorage.setItem("userName", nameInput);
+            localStorage.setItem("filteredData", JSON.stringify(filteredData));
+          
+            // Redirect the user to survey.html
+            //window.location.href = "survey.html";
+            
             //console.log(parseCSV(data));
             //messageTest.textContent = parseCSV(fetchedData)[0]["onomatopoeia"];
-            messageTest.textContent = parseCSV(fetchedData)
-            data = fetchedData ;
           });
         });
 
