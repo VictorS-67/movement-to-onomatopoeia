@@ -65,14 +65,19 @@
         const testButton = document.getElementById("enterName");
         const nameInput = document.getElementById("nameInput");
         const messageTest = document.getElementById("messageTest");
+
+        let data = []
         
         testButton.addEventListener("click", () => {
-          fetchLogData().then(data => {
-          //console.log(parseCSV(data));
-            console.log(parseCSV(data)[0]["onomatopoeia"]);
-            messageTest.textContent = parseCSV(data)[0]["onomatopoeia"]
+          fetchLogData().then(fetchedData => {
+            //console.log(parseCSV(data));
+            //messageTest.textContent = parseCSV(fetchedData)[0]["onomatopoeia"];
+            messageTest.textContent = parseCSV(fetchedData)
+            data = fetchedData ;
           });
         });
+
+        
     </script>
     
 </body>
