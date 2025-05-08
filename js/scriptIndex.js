@@ -38,7 +38,8 @@ const nameInput = document.getElementById("nameInput");
 
 testButton.addEventListener("click", () => {
   fetchLogData().then(data => {
-  console.log(parseCSV(data));
+  //console.log(parseCSV(data));
+    nameInput.textContent = parseCSV(data)["onomatopoeia"]
   });
 });
                            
