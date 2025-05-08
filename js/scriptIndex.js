@@ -35,11 +35,28 @@ function parseCSV(data) {
 
 const testButton = document.getElementById("enterName");
 const nameInput = document.getElementById("nameInput");
+const messageTest = document.getElementById("messageTest");
+
+let data = []
 
 testButton.addEventListener("click", () => {
-  fetchLogData().then(data => {
-  //console.log(parseCSV(data));
-    nameInput.textContent = parseCSV(data)["onomatopoeia"]
+  fetchLogData().then(fetchedData => {
+    // test if the name has been entered
+    const name = nameInput.value.trim();
+    if (!nameInput) {
+      alert("Please enter a name.");
+      return;
+    }
+
+    const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
+
+    // Store the name and filtered data in localStorage
+    localStorage.setItem("userName", name);
+    localStorage.setItem("filteredData", JSON.stringify(filteredData));
+  
+    // Redirect the user to survey.html
+    window.location.href = "survey.html";
   });
 });
-                           
+
+                 
