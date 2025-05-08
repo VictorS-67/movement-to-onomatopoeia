@@ -1,5 +1,5 @@
 async function fetchLogData(){
-  const apiKey = 'AIzaSyBu4GTqT3oi9yHk5V7uo2zkJRNBUnp6ANo'; 
+  const apiKey = 'AIzaSyBu4GTqT3oi9yHk5V7uo2zkJRNBUnp6ANo';
   const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
   const sheetName = 'Sheet1';
   
@@ -31,7 +31,12 @@ function parseCSV(data) {
 }
 
 
-const parsedData = fetchLogData().then(data => {
+// ----------------------
+
+const testButton = document.getElementById("enterName");
+
+testButton.addEventListener("click", () => {
+  fetchLogData().then(data => {
   console.log(parseCSV(data));
 });
                            
