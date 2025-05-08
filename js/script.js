@@ -29,7 +29,7 @@ if(!userName){
 const nameDisplay = document.getElementById("nameDisplay");
 nameDisplay.textContent = "Your name: " + userName;
 
-
+const changeName = document.getElementById("changeName");
 const videoTitle = document.getElementById("videoTitle");
 const videoPlayer = document.getElementById("myVideo");
 const videoSelect = document.getElementById('videoSelect');
@@ -74,7 +74,7 @@ fetchCSV(csvUrl)
 
 // 
 
-
+// when click change Name button, erase local storage and come back to index.html
 
 
 // Populate the dropdown dynamically
