@@ -1,6 +1,7 @@
-//const userName = localStorage.getItem("userName");
-//const filteredData = JSON.parse(localStorage.getItem("filteredData"));
+const userName = localStorage.getItem("userName");
+const filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
+/*
 const filteredData = [
 {
   "name": "test",
@@ -19,6 +20,12 @@ const filteredData = [
   "answeredTimestamp": "35634574"
 }]
 const userName = "test"
+*/
+
+if(!userName){
+  alert("Warning, no user name");
+  window.location.href = "index.html";
+}
 
 
 const nameInput = document.getElementById("nameInput");
