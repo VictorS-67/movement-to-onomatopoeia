@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movement description using onomatopoeia</title>
+    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./css/style.css">
+    
+</head>
+
+    
+
+    
+
+    
+<body class="bg-gray-100">
+    
+    <div class="container">        
+        
+        <div class="input-group">
+            <label for="nameInput">Your name:</label>
+            <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
+        </div>
+
+        <!-- Video -->
+        <p id="videoTitle">Video 1.mp4</p>
+        <div class="video-container">
+            <!--
+            <iframe
+                id="myVideo"
+                src="https://drive.google.com/file/d/1wONpmPkKvBX0gaUiFI9tY2ielxd415fh/preview" 
+                width="640" 
+                height="480" 
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+                title="point light motion"
+            ></iframe>
+            -->
+            <video
+                id="myVideo"
+                src="videos/1.mp4" 
+                controls
+                title="point light motion"
+            >
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <!-- Dropdown to Select Video -->
+        <div class="dropdown">
+            <label for="videoSelect">Change the video:</label>
+            <select id="videoSelect">
+            </select>
+        </div>
+
+        <div id="message" class="mt-4 text-gray-700"></div>
+
+        <!-- Onomatopoeia -->
+        <div class="input-group">
+            <label for="onomatopoeiaInput">Onomatopoeia:</label>
+            <textarea id="onomatopoeiaInput" name="onomatopoeiaInput" placeholder="Write your onomatopoeia"></textarea>
+        </div>
+        <p>To log the start (end) time of the onomatopoeia, please pause the video at the start (end) of the movement corresponding to the onomatopoeia. Then click on the "Get starting (ending) time" button.</p>
+
+        <button id="getStart" class="button">Get starting time</button>
+        <p>Onomatopoeia Start Time:</p>
+        <p id="startDisplay">-.--</p>
+
+        <button id="getEnd" class="button">Get ending time</button>
+        <p>Onomatopoeia End Time:</p>
+        <p id="endDisplay">-.--</p>
+
+        <button id="saveOnomatopoeia" class="button">Save Onomatopoeia</button>
+        <!-- With this one, we want to save the onomatopoeia, start time and end time (in csv ?) and reset those values
+        Also want to display message like onomatopoeia "..." 1:3 -> 2:4 saved correctly 
+        Also put videoPlayer back to 0-->
+
+        <h3>Onomatopoeia already saved for this video:</h3>
+        <p id="recordOnomatopoeia">None</p>
+        <p id="output"></p>
+
+
+    </div>
+
+    <script src="./js/fun.js"></script>
+    <script src="./js/script.js"></script>
+    
+</body>
+</html>
