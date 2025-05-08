@@ -77,20 +77,10 @@
               return;
             }
 
-            console.log("parsedData", parseCSV(fetchedData));
-            console.log("parsedData name", parseCSV(fetchedData)[0]["name"]);
             const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
-            console.log("filteredData", filteredData);
-
-            /*
-            if (filteredData.length === 0) {
-              alert(`No data found for the name "${nameInput}".`);
-              return;
-            }
-            */
 
             // Store the name and filtered data in localStorage
-            localStorage.setItem("userName", nameInput);
+            localStorage.setItem("userName", name);
             localStorage.setItem("filteredData", JSON.stringify(filteredData));
           
             // Redirect the user to survey.html
