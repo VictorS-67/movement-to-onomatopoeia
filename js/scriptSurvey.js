@@ -1,6 +1,9 @@
 const userName = localStorage.getItem("userName");
 const filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
+localStorage.removeItem("userName");
+localStorage.removeItem("filteredData");
+
 /*
 const filteredData = [
 {
