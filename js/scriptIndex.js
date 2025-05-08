@@ -34,6 +34,7 @@ function parseCSV(data) {
 // ----------------------
 
 const testButton = document.getElementById("enterName");
+const nameInput = document.getElementById("nameInput");
 
 testButton.addEventListener("click", () => {
   fetchLogData().then(data => {
