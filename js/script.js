@@ -26,9 +26,10 @@ if(!userName){
   alert("Warning, no user name");
   window.location.href = "index.html";
 }
+const nameDisplay = document.getElementById("nameDisplay");
+nameDisplay.textContent = userName;
 
 
-const nameInput = document.getElementById("nameInput");
 const videoTitle = document.getElementById("videoTitle");
 const videoPlayer = document.getElementById("myVideo");
 const videoSelect = document.getElementById('videoSelect');
@@ -113,7 +114,6 @@ getEnd.addEventListener("click", () => {
 // when save button is clicked
 saveOnomatopoeiaButton.addEventListener("click", () => {
   const onomatopoeia = onomatopoeiaInput.value.trim();
-  const name = nameInput.value.trim();
   const startTime = startDisplay.textContent;
   const endTime = endDisplay.textContent;
 
