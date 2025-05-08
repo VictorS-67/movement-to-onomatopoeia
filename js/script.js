@@ -1,3 +1,26 @@
+//const userName = localStorage.getItem("userName");
+//const filteredData = JSON.parse(localStorage.getItem("filteredData"));
+
+const filteredData = [
+{
+  "name": "test",
+  "video": "1.mp4",
+  "onomatopoeia": "oy",
+  "startTime": "0.23",
+  "endTime": "3.45",
+  "answeredTimestamp": "12345"
+},// [object Object] 
+{
+  "name": "test",
+  "video": "3.mp4",
+  "onomatopoeia": "dasf",
+  "startTime": "0.45",
+  "endTime": "4.356",
+  "answeredTimestamp": "35634574"
+}]
+const userName = "test"
+
+
 const nameInput = document.getElementById("nameInput");
 const videoTitle = document.getElementById("videoTitle");
 const videoPlayer = document.getElementById("myVideo");
