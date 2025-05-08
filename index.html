@@ -77,8 +77,10 @@
               return;
             }
 
+            console.log("parsedData", parseCSV(fetchedData));
+            console.log("parsedData name", parseCSV(fetchedData)[0]["name"]);
             const filteredData = parseCSV(fetchedData).filter(item => item["name"] === nameInput);
-            console.log("filteredData", filteredData)
+            console.log("filteredData", filteredData);
 
             /*
             if (filteredData.length === 0) {
