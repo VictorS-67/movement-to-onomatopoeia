@@ -39,5 +39,5 @@ testButton.addEventListener("click", () => {
   fetchLogData().then(data => {
   console.log(parseCSV(data));
   });
-)
+});
                            
