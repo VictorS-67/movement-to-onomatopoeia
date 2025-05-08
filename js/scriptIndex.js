@@ -38,5 +38,6 @@ const testButton = document.getElementById("enterName");
 testButton.addEventListener("click", () => {
   fetchLogData().then(data => {
   console.log(parseCSV(data));
-});
+  });
+)
                            
