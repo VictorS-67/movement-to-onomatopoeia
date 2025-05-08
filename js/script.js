@@ -27,7 +27,7 @@ if(!userName){
   window.location.href = "index.html";
 }
 const nameDisplay = document.getElementById("nameDisplay");
-nameDisplay.textContent = userName;
+nameDisplay.textContent = "Your name: " + userName;
 
 
 const videoTitle = document.getElementById("videoTitle");
