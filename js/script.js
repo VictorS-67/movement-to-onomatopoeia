@@ -59,7 +59,7 @@ function resetDisplay(record) {
   recordOnomatopoeia.textContent = recordMessage;
 }
 
-
+/*
 const csvUrl = './data.csv';
 
 // get the csv data and transform it into a list of dictionnaries (one dict per row)
@@ -69,6 +69,7 @@ fetchCSV(csvUrl)
     console.log('CSV Data:', data);
   }
 });
+*/
 
 // 
 
