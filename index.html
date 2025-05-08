@@ -19,7 +19,7 @@
             <label for="nameInput">Your name:</label>
             <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
             <button id="enterName" class="button">Enter Name</button>
-            <p> test </p>
+            <p id="messageTest"> test </p>
         </div>
     </div>
 
@@ -64,11 +64,13 @@
         
         const testButton = document.getElementById("enterName");
         const nameInput = document.getElementById("nameInput");
+        const messageTest = document.getElementById("messageTest");
         
         testButton.addEventListener("click", () => {
           fetchLogData().then(data => {
           //console.log(parseCSV(data));
-            nameInput.textContent = parseCSV(data)["onomatopoeia"]
+            console.log(parseCSV(data)[0]["onomatopoeia"]);
+            messageTest.textContent = parseCSV(data)[0]["onomatopoeia"]
           });
         });
     </script>
