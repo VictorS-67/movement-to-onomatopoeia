@@ -80,6 +80,7 @@
        */
       function maybeEnableButtons() {
         if (gapiInited && gisInited) {
+          console.log("gapiInited", gapiInited, "gisInited", gisInited);
           document.getElementById('authorize_button').style.visibility = 'visible';
         }
       }
