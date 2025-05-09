@@ -7,8 +7,8 @@
     <p>Sheets API Quickstart</p>
 
     <!--Add buttons to initiate auth sequence and sign out-->
-    <button id="authorize_button" onclick="handleAuthClick()">Authorize</button>
-    <button id="signout_button" onclick="handleSignoutClick()">Sign Out</button>
+    <button id="authorize_button">Authorize</button>
+    <button id="signout_button">Sign Out</button>
 
     <pre id="content" style="white-space: pre-wrap;"></pre>
 
@@ -22,7 +22,7 @@
 
      const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
      const sheetName = 'Sheet1';
-     const sheetPath = https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}
+     const sheetPath = 'https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}';
 
       function start() {
         // 2. Initialize the JavaScript client library.
