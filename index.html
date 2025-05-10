@@ -27,6 +27,17 @@
   <script src="./js/fun.js"></script>
   <script>
 
+    function parseCSV(csvText) {
+      const headers = lines[0].split(',');
+      return lines.slice(1).map(line => {
+        const values = line.split(',');
+        return headers.reduce((obj, header, index) => {
+          obj[header] = values[index];
+          return obj;
+        }, {});
+      });
+    }
+
     const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
     const sheetName = 'Sheet1';
             
