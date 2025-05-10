@@ -48,6 +48,7 @@
         }
 
         console.log("fetchedData:", fetchedData);
+        messageTest.innerHTML = fetchedData;
 
         const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
 
