@@ -1,8 +1,9 @@
 const { google } = require('googleapis');
 const { JWT } = require('google-auth-library');
 
-//  Replace with the path to your service account credentials file (in Netlify)
-const credentialsPath = './credentials.json'; //  Make sure this path is correct in your Netlify environment!
+
+const fs = require('fs');
+const credentialsPath = '/tmp/credentials.json'; // Path where we'll write the content
 
 /**
  * Netlify Function to obtain an access token using a service account.
@@ -21,6 +22,9 @@ exports.handler = async (event, context, callback) => {
         statusCode: 400,
         body: JSON.stringify({ error: 'Missing spreadsheetId or sheetName in request body' }),
       });
+    }
+    if (!fs.existsSync(credentialsPath)) {
+      fs.writeFileSync(credentialsPath, process.env.GOOGLE_APPLICATION_CREDENTIALS_CONTENT);
     }
     // 2. Create a JWT client using the service account credentials.
     const auth = new JWT({
