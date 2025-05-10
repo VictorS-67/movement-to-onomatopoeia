@@ -28,11 +28,11 @@
   <script>
 
     function parseCSV(data) {
-      const headers = data[0].split(',');
+      const headers = data[0];
       return data.slice(1).map(line => {
-        const values = line.split(',');
+        //const values = line.split(',');
         return headers.reduce((obj, header, index) => {
-          obj[header] = values[index];
+          obj[header] = line[index];
           return obj;
         }, {});
       });
