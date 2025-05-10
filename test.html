@@ -4,12 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sheets API Example (Netlify)</title>
+    <script src="./js/sheetFun.js"></script>
     <script>
       const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
       const sheetName = 'Sheet1';
 
+      /*
       // Function to get an OAuth 2.0 access token using a Netlify Function.
-      async function getAccessToken() {
+      async function getAccessToken(spreadsheetId, sheetName) {
         try {
           const response = await fetch('/.netlify/functions/get-access-token', { 
             method: 'POST',
@@ -36,9 +38,9 @@
       }
 
       // Function to get data from the sheet
-      async function getSheetData() {
+      async function getSheetData(spreadsheetId, sheetName) {
         try {
-          const accessToken = await getAccessToken();
+          const accessToken = await getAccessToken(spreadsheetId, sheetName);
           const response = await fetch(
             `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}`,
             {
@@ -56,9 +58,9 @@
       }
 
       // Function to append data to the sheet
-      async function appendSheetData(newData) {
+      async function appendSheetData(spreadsheetId, sheetName, newData) {
         try {
-          const accessToken = await getAccessToken();
+          const accessToken = await getAccessToken(spreadsheetId, sheetName);
           const response = await fetch(
             `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
             {
@@ -83,19 +85,19 @@
           throw error;
         }
       }
-
+      */
       // Example of how to use the functions:
       async function main() {
         try {
-          const sheetData = await getSheetData();
+          const sheetData = await getSheetData(spreadsheetId, sheetName);
           console.log('Sheet Data:', sheetData);
 
           // Example of data to append:
           const newData = ['2024-07-24', '12:34:56', 'Some Opinion'];
-          const appendResult = await appendSheetData(newData);
+          const appendResult = await appendSheetData(spreadsheetId, sheetName, newData);
           console.log('Append Result:', appendResult);
 
-          const updatedSheetData = await getSheetData();
+          const updatedSheetData = await getSheetData(spreadsheetId, sheetName);
           console.log('Updated Sheet Data:', updatedSheetData);
         } catch (error) {
           console.error('An error occurred:', error);
