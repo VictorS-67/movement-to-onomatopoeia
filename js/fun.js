@@ -13,16 +13,12 @@ async function fetchFilesInFolder() {
 }
 
 
-/*
-function parseCSV(csvText) {
-  const lines = csvText.split('\n');
-  const headers = lines[0].split(',');
-  return lines.slice(1).map(line => {
-    const values = line.split(',');
+function parseCSV(data) {
+  const headers = data[0];
+  return data.slice(1).map(line => {
     return headers.reduce((obj, header, index) => {
-      obj[header] = values[index];
+      obj[header] = line[index];
       return obj;
     }, {});
   });
 }
-*/

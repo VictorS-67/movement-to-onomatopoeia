@@ -26,16 +26,6 @@
   <script src="./js/fun.js"></script>
   <script>
 
-    function parseCSV(data) {
-      const headers = data[0];
-      return data.slice(1).map(line => {
-        return headers.reduce((obj, header, index) => {
-          obj[header] = line[index];
-          return obj;
-        }, {});
-      });
-    }
-
     const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
     const sheetName = 'Sheet1';
             
