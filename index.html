@@ -1,96 +1,66 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Enter your name</title>
-    <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="./css/style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Enter your name</title>
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./css/style.css">
     
 </head>
 
     
 <body class="bg-gray-100">
-    
-    <div class="container">        
-        
-        <div class="input-group">
-            <label for="nameInput">Your name:</label>
-            <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
-            <button id="enterName" class="button">Enter Name</button>
-            <p id="messageTest"> test </p>
-        </div>
+  
+  <div class="container">        
+    <div class="input-group">
+      <label for="nameInput">Your name:</label>
+      <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
+      <button id="enterName" class="button">Enter Name</button>
+      <p id="messageTest"> test </p>
     </div>
+  </div>
 
-    
-    <script src="./js/scriptIndex.js"></script>
-    <!--
-    <script>
-        async function fetchLogData(){
-          const apiKey = 'AIzaSyBu4GTqT3oi9yHk5V7uo2zkJRNBUnp6ANo';
-          const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
-          const sheetName = 'Sheet1';
-          
-          try {
-            const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}?key=${apiKey}`);
-        
-            if (!response.ok) {
-              throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            let data = await response.json();
-        
-            return data.values;
-        
-          } catch (error) {
-            console.error("Failed to fetch or parse log info:", error);
-            return null;
-          }
-          
+  
+  <script src="./js/sheetFun.js"></script>
+  <script src="./js/fun.js"></script>
+  <script>
+
+    const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
+    const sheetName = 'Sheet1';
+            
+    const testButton = document.getElementById("enterName");
+    const nameInput = document.getElementById("nameInput");
+    const messageTest = document.getElementById("messageTest");
+
+    let data = []
+
+    testButton.addEventListener("click", () => {
+      // Fetch the data from the Google Sheet
+      // and check if the name is already in the sheet
+        getSheetData(spreadsheetId, sheetName).then(fetchedData => {
+        // test if the name has been entered in the field
+        const name = nameInput.value.trim();
+        if (!nameInput) {
+          alert("Please enter a name.");
+          return;
         }
-        
-        function parseCSV(data) {
-          const headers = data[0];
-          return data.slice(1).map(line => {
-            return headers.reduce((obj, header, index) => {
-              obj[header] = line[index];
-              return obj;
-            }, {});
-          });
-        }
-        
-        
-        // ----------------------
-        
-        const testButton = document.getElementById("enterName");
-        const nameInput = document.getElementById("nameInput");
-        const messageTest = document.getElementById("messageTest");
 
-        let data = []
-        
-        testButton.addEventListener("click", () => {
-          fetchLogData().then(fetchedData => {
-            // test if the name has been entered
-            const name = nameInput.value.trim();
-            if (!nameInput) {
-              alert("Please enter a name.");
-              return;
-            }
+        const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
 
-            const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
+        console.log("Filtered Data:", filteredData);
 
-            // Store the name and filtered data in localStorage
-            localStorage.setItem("userName", name);
-            localStorage.setItem("filteredData", JSON.stringify(filteredData));
-          
-            // Redirect the user to survey.html
-            window.location.href = "survey.html";
-          });
-        });
+        // Store the name and filtered data in localStorage
+        localStorage.setItem("userName", name);
+        localStorage.setItem("filteredData", JSON.stringify(filteredData));
 
-        
-    </script>
-    -->
+        // Redirect the user to survey.html
+        //window.location.href = "survey.html";
+      });
+    });
+
+  </script>
     
 </body>
 </html>
