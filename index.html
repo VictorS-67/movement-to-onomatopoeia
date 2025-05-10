@@ -18,7 +18,6 @@
       <label for="nameInput">Your name:</label>
       <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
       <button id="enterName" class="button">Enter Name</button>
-      <p id="messageTest"> test </p>
     </div>
   </div>
 
@@ -30,7 +29,6 @@
     function parseCSV(data) {
       const headers = data[0];
       return data.slice(1).map(line => {
-        //const values = line.split(',');
         return headers.reduce((obj, header, index) => {
           obj[header] = line[index];
           return obj;
@@ -43,7 +41,6 @@
             
     const testButton = document.getElementById("enterName");
     const nameInput = document.getElementById("nameInput");
-    const messageTest = document.getElementById("messageTest");
 
     let data = []
 
@@ -58,19 +55,14 @@
           return;
         }
 
-        console.log("fetchedData:", fetchedData);
-        messageTest.innerHTML = fetchedData;
-
         const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
-
-        console.log("Filtered Data:", filteredData);
 
         // Store the name and filtered data in localStorage
         localStorage.setItem("userName", name);
         localStorage.setItem("filteredData", JSON.stringify(filteredData));
 
         // Redirect the user to survey.html
-        //window.location.href = "survey.html";
+        window.location.href = "survey.html";
       });
     });
 
