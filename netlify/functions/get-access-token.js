@@ -33,7 +33,14 @@ exports.handler = async (event, context, callback) => {
     });
 
     // 3. Authorize the client to get an access token.
-    const client = await auth.getClient();
+    // const client = await auth.getClient();
+    await auth.authorize();
+    const { token } = await auth.getAccessToken();
+    callback(null, {
+      statusCode: 200,
+      body: JSON.stringify({ access_token: token }),
+    });
+    
     const accessTokenResponse = await client.getAccessToken();
     const accessToken = accessTokenResponse.token;
 
