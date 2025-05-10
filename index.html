@@ -47,6 +47,8 @@
           return;
         }
 
+        console.log("fetchedData:", fetchedData);
+
         const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
 
         console.log("Filtered Data:", filteredData);
