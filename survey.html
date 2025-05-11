@@ -128,9 +128,10 @@
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
 
         // obtain the data corresponding to the video (and the user name too still)
-        const videoName = videoPlayer.src.split("/").pop();
-        const videoData = filteredData.filter(item => item["video"] === videoName);
-
+        let videoName = videoPlayer.src.split("/").pop();
+        console.log("videoName", videoName);
+        let videoData = filteredData.filter(item => item["video"] === videoName);
+        console.log("videoData", videoData);
         //reset the display
         resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
 
@@ -154,7 +155,9 @@
             videoPlayer.src = videoSelect.value;
             videoPlayer.load();
             videoTitle.textContent = `Video: ${videoSelect.value}`;
-            resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
+            videoName = videoSelect.value.split("/").pop();
+            videoData = filteredData.filter(item => item["video"] === videoName);
+            resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
         });
 
 
