@@ -24,21 +24,21 @@ function parseCSV(data) {
 }
 
 
-function resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia) {
+function resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia) {
   onomatopoeiaInput.value = "";
   startDisplay.textContent = "-.--";
   endDisplay.textContent = "-.--";
 
   let recordMessage = "";
 
-  if (!filteredData.length) {
+  if (!videoData.length) {
    	recordMessage = "None";
   } else {
-    filteredData.forEach(elt => {
+    videoData.forEach(elt => {
       const startTime = elt["startTime"];
       const endTime = elt["endTime"];
       const onomatopoeia = elt["onomatopoeia"];
-      recordMessage += `Onomatopoeia: ${onomatopoeia}, from ${startTime} to ${endTime} <br>`;
+      recordMessage += `"${onomatopoeia}" from ${startTime} to ${endTime};<br>`;
     });
   }
   recordOnomatopoeia.innerHTML = recordMessage;

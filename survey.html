@@ -100,6 +100,7 @@
 
 
         const userName = localStorage.getItem("userName");
+        //filtered data is the data corresponding to the user name
         let filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
         localStorage.removeItem("userName");
@@ -126,8 +127,12 @@
         const messageDisplay = document.getElementById("message");
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
 
+        // obtain the data corresponding to the video (and the user name too still)
+        const videoName = videoPlayer.src.split("/").pop();
+        const videoData = filteredData.filter(item => item["video"] === videoName);
+
         //reset the display
-        resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
+        resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
 
         // when click change Name button, come back to index.html
 
