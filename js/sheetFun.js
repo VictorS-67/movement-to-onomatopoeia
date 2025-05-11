@@ -1,4 +1,4 @@
-  // Function to get an OAuth 2.0 access token using a Netlify Function.
+// Function to get an OAuth 2.0 access token using a Netlify Function.
 async function getAccessToken(spreadsheetId, sheetName) {
   try {
     const response = await fetch('/.netlify/functions/get-access-token', { 

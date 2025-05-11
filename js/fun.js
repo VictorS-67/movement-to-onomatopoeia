@@ -1,7 +1,3 @@
-//const { info } = require("console");
-
-const { on } = require("events");
-
 // function to fetch the list of video files
 async function fetchFilesInFolder() {
   try {

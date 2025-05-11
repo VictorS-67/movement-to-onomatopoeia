@@ -17,6 +17,9 @@ body {
   width: auto;
   height: auto;
 }
+#inputVisibility {
+  display: none;
+}
 .input-group {
   display: flex;
   flex-direction: column;
