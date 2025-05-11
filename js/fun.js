@@ -29,15 +29,19 @@ function resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay,
   startDisplay.textContent = "-.--";
   endDisplay.textContent = "-.--";
 
-  if (filteredData == []) {
+  let recordMessage = "";
+
+  if (!filteredData.length) {
    	recordMessage = "None";
   } else {
-    recordMessage = "";
     filteredData.forEach(elt => {
-      recordMessage += "\n" + elt ;
+      const startTime = elt["startTime"];
+      const endTime = elt["endTime"];
+      const onomatopoeia = elt["onomatopoeia"];
+      recordMessage += `Onomatopoeia: ${onomatopoeia}, from ${startTime} to ${endTime} <br>`;
     });
   }
-  recordOnomatopoeia.textContent = recordMessage;
+  recordOnomatopoeia.innerHTML = recordMessage;
 }
 
 function saveOnomatopoeia(onomatopoeia, startTime, endTime, filteredData) {
