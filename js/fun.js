@@ -1,3 +1,5 @@
+const { info } = require("console");
+
 // function to fetch the list of video files
 async function fetchFilesInFolder() {
   try {
@@ -44,7 +46,14 @@ function resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, re
   recordOnomatopoeia.innerHTML = recordMessage;
 }
 
-function saveOnomatopoeia(onomatopoeia, startTime, endTime, filteredData) {
+async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName, messageDisplay) {
+  const name = infoDict["name"];
+  const video = infoDict["video"];
+  const onomatopoeia = infoDict["onomatopoeia"];
+  const startTime = infoDict["startTime"];
+  const endTime = infoDict["endTime"];
+  const answeredTimestamp = infoDict["answeredTimestamp"];
+  
   if (onomatopoeia === "") {
     messageDisplay.textContent = "Please enter your onomatopoeia.";
     messageDisplay.style.color = "red";
@@ -60,17 +69,41 @@ function saveOnomatopoeia(onomatopoeia, startTime, endTime, filteredData) {
     messageDisplay.style.color = "red";
     return;
   }
+  if (!name || !video || !answeredTimestamp) {
+    messageDisplay.textContent = "Something went wrong when saving the data";
+    messageDisplay.style.color = "red";
+    return;
+  }
 
   // store the data in the sheet online
-  
+  const appendResult = await appendSheetData(spreadsheetId, sheetName, infoDict);
+  if (!appendResult) {
+    messageDisplay.textContent = "Failed to save data to the sheet.";
+    messageDisplay.style.color = "red";
+    return;
+  }
+  // Log the result of the append operation
+  console.log('Append Result:', appendResult);
 
   // update the local filteredData
-
+  filteredData.push(infoDict);
 
   // Display a success message
   messageDisplay.textContent = "Onomatopoeia and start-end saved!";
   messageDisplay.style.color = "green";
+}
 
-  resetDisplay(filteredData); // Clear display after saving
+function obtainDate(){
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const hours = String(today.getHours()).padStart(2, '0');
+  const minutes = String(today.getMinutes()).padStart(2, '0');
+  const seconds = String(today.getSeconds()).padStart(2, '0');
+  return `${year}:${month}:${day}:${hours}:${minutes}:${seconds}`;
+}
 
+function padStart(number, length) {
+  return String(number).padStart(length, '0');
 }

@@ -77,6 +77,9 @@
     <script src="./js/fun.js"></script>
     <script>
 
+        const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
+        const sheetName = 'Sheet1';
+
         /*
         const filteredData = [
         {
@@ -129,9 +132,7 @@
 
         // obtain the data corresponding to the video (and the user name too still)
         let videoName = videoPlayer.src.split("/").pop();
-        console.log("videoName", videoName);
         let videoData = filteredData.filter(item => item["video"] === videoName);
-        console.log("videoData", videoData);
         //reset the display
         resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
 
@@ -161,7 +162,7 @@
         });
 
 
-        // Function to get and display the current timestamp
+        // get and display the current timestamp
         getStart.addEventListener("click", () => {
             const currentTime = videoPlayer.currentTime;
             startDisplay.textContent = `${currentTime.toFixed(2)}`;
@@ -175,13 +176,23 @@
 
         // when save button is clicked
         saveOnomatopoeiaButton.addEventListener("click", () => {
-        const onomatopoeia = onomatopoeiaInput.value.trim();
-        const startTime = startDisplay.textContent;
-        const endTime = endDisplay.textContent;
+            infoDict = {
+                "name": userName,
+                "video": videoName,
+                "onomatopoeia": onomatopoeiaInput.value.trim(),
+                "startTime": startDisplay.textContent,
+                "endTime": endDisplay.textContent,
+                "answeredTimestamp": obtainDate()
+            };
 
-        saveOnomatopoeia(onomatopoeia, startTime, endTime, filteredData)
-        
+        saveOnomatopoeia(filteredData, infoDict,spreadsheetId, sheetName, messageDisplay).then(() => {
+            // Also update local data and display with the new data
+            videoData = filteredData.filter(item => item["video"] === videoName);
+            resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
+        }).catch(error => {
+            console.error("Error saving onomatopoeia:", error);
         });
+    });
 
     
     </script>
