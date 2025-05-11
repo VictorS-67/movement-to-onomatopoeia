@@ -24,7 +24,7 @@ function parseCSV(data) {
 }
 
 
-function resetDisplay(filteredData) {
+function resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia) {
   onomatopoeiaInput.value = "";
   startDisplay.textContent = "-.--";
   endDisplay.textContent = "-.--";

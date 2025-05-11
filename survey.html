@@ -100,7 +100,7 @@
 
 
         const userName = localStorage.getItem("userName");
-        const filteredData = JSON.parse(localStorage.getItem("filteredData"));
+        let filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
         localStorage.removeItem("userName");
         localStorage.removeItem("filteredData");
@@ -126,8 +126,8 @@
         const messageDisplay = document.getElementById("message");
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
 
-        let record = []; // Array to store recorded Onomatopoeia
-
+        //reset the display
+        resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
 
         // when click change Name button, come back to index.html
 
@@ -149,7 +149,7 @@
             videoPlayer.src = videoSelect.value;
             videoPlayer.load();
             videoTitle.textContent = `Video: ${videoSelect.value}`;
-            resetDisplay(record)
+            resetDisplay(filteredData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia);
         });
 
 
@@ -163,7 +163,6 @@
             const currentTime = videoPlayer.currentTime;
             endDisplay.textContent = `${currentTime.toFixed(2)}`;
         });
-
 
 
         // when save button is clicked
