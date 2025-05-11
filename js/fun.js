@@ -37,7 +37,7 @@ function resetDisplay(videoData, docElts) {
   docElts["startDisplay"].textContent = "-.--";
   docElts["endDisplay"].textContent = "-.--";
 
-  docElts]"buttonVisibility"].style.display = "block";
+  docElts["buttonVisibility"].style.display = "block";
   docElts["inputVisibility"].style.display = "none";
 
   let recordMessage = "";
