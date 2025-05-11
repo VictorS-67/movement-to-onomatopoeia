@@ -24,6 +24,11 @@ body {
   font-size: 1rem;
   border-radius: 0.375rem;
 }
+.dropdown label {
+  font-size: 1.25rem;
+  color: #4f46e5;
+  font-weight: 700;
+}
 #inputVisibility {
   display: none;
 }
