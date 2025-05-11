@@ -76,7 +76,8 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName
   }
 
   // store the data in the sheet online
-  const appendResult = await appendSheetData(spreadsheetId, sheetName, infoDict);
+  const newData = [name, video, onomatopoeia, startTime, endTime, answeredTimestamp];
+  const appendResult = await appendSheetData(spreadsheetId, sheetName, newData);
   if (!appendResult) {
     messageDisplay.textContent = "Failed to save data to the sheet.";
     messageDisplay.style.color = "red";
