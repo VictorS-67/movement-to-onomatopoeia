@@ -84,7 +84,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName
     return;
   }
   // Log the result of the append operation
-  console.log('Append Result:', appendResult);
+  // console.log('Append Result:', appendResult);
 
   // update the local filteredData
   filteredData.push(infoDict);
