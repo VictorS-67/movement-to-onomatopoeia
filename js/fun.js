@@ -1,5 +1,7 @@
 //const { info } = require("console");
 
+const { on } = require("events");
+
 // function to fetch the list of video files
 async function fetchFilesInFolder() {
   try {
@@ -26,10 +28,17 @@ function parseCSV(data) {
 }
 
 
-function resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, recordOnomatopoeia) {
-  onomatopoeiaInput.value = "";
-  startDisplay.textContent = "-.--";
-  endDisplay.textContent = "-.--";
+function resetDisplay(videoData, docElts) {
+  
+  // docElts contain onomatopoeiaInput, startDisplay,
+  // endDisplay, recordOnomatopoeia, buttonVisibility, 
+  // inputVisibility
+  docElts["onomatopoeiaInput"].value = "";
+  docElts["startDisplay"].textContent = "-.--";
+  docElts["endDisplay"].textContent = "-.--";
+
+  docElts]"buttonVisibility"].style.display = "block";
+  docElts["inputVisibility"].style.display = "none";
 
   let recordMessage = "";
 
@@ -40,10 +49,10 @@ function resetDisplay(videoData, onomatopoeiaInput, startDisplay, endDisplay, re
       const startTime = elt["startTime"];
       const endTime = elt["endTime"];
       const onomatopoeia = elt["onomatopoeia"];
-      recordMessage += `"${onomatopoeia}" from ${startTime} to ${endTime};<br>`;
+      recordMessage += `-"${onomatopoeia}" from ${startTime} to ${endTime};<br>`;
     });
   }
-  recordOnomatopoeia.innerHTML = recordMessage;
+  docElts["recordOnomatopoeia"].innerHTML = recordMessage;
 }
 
 async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName, messageDisplay) {
