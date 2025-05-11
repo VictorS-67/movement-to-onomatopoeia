@@ -1,4 +1,4 @@
-const { info } = require("console");
+//const { info } = require("console");
 
 // function to fetch the list of video files
 async function fetchFilesInFolder() {
