@@ -31,6 +31,10 @@
         try {
           const response = await fetch('/.netlify/functions/fetch-drive-files');
           const files = await response.json();
+
+          // Sort files alphabetically by name
+          files.sort((a, b) => a.name.localeCompare(b.name));    
+
           const dropdown = document.getElementById('videoSelect');
           files.forEach(file => {
             const option = document.createElement('option');
