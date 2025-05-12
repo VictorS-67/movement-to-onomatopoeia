@@ -33,7 +33,6 @@ exports.handler = async (event, context, callback) => {
     });
 
     // 3. Authorize the client to get an access token.
-    // const client = await auth.getClient();
     await auth.authorize();
     const { token } = await auth.getAccessToken();
     callback(null, {

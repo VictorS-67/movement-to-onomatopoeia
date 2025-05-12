@@ -5,46 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Google Sheets API Example (Netlify)</title>
     <script src="./js/sheetFun.js"></script>
+    <script src="./js/fun.js"></script>
     <script>
       //const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
       //const sheetName = 'Sheet1';
 
-      /*
-
-      // Example of how to use the auth functions:
-      async function main() {
-        try {
-          const sheetData = await getSheetData(spreadsheetId, sheetName);
-          console.log('Sheet Data:', sheetData);
-
-          // Example of data to append:
-          const newData = ['2024-07-24', '12:34:56', 'Some Opinion'];
-          const appendResult = await appendSheetData(spreadsheetId, sheetName, newData);
-          console.log('Append Result:', appendResult);
-
-          const updatedSheetData = await getSheetData(spreadsheetId, sheetName);
-          console.log('Updated Sheet Data:', updatedSheetData);
-        } catch (error) {
-          console.error('An error occurred:', error);
-        }
-      }
-      */
     </script>
 </head>
 <body>
-    <button id="runExample">Run Example</button>
-    <div id="output"></div>
+    <div class="container">        
 
-    <script>
-      /*
-      document.getElementById('runExample').addEventListener('click', () => {
-        main().then(() => {
-          document.getElementById('output').textContent = 'Example completed successfully. Check console for output.';
-        }).catch(error => {
-          document.getElementById('output').textContent = `Error: ${error.message}`;
-        });
-      });
-      */
-    </script>
+        <!-- Dropdown to Select Video -->
+        <div class="dropdown">
+            <label for="videoSelect">Change the video:</label>
+            <select id="videoSelect">
+            </select>
+        </div>
+
+        
+    </div>
 </body>
 </html>
