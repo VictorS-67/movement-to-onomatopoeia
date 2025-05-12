@@ -1,6 +1,7 @@
-// filepath: /home/victor/projects/movement-to-onomatopoeia/netlify/functions/fetch-drive-files.js
+// drive path: https://drive.google.com/drive/folders/1ZwOflO2NC7h2eKu5yow6BnwBuLQXr0lS
 const { google } = require('googleapis');
 
+const driveID = '1ZwOflO2NC7h2eKu5yow6BnwBuLQXr0lS';
 exports.handler = async () => {
   try {
     // Read service account creds from environment variable (or from a file)
@@ -17,9 +18,9 @@ exports.handler = async () => {
     await auth.authorize();
 
     const drive = google.drive({ version: 'v3', auth });
-    // Replace {FOLDER_ID} with the actual folder ID from your Drive
+    // put the folder ID here
     const { data } = await drive.files.list({
-      q: `'{FOLDER_ID}' in parents and trashed=false`,
+      q: `'${driveID}' in parents and trashed=false`,
       fields: 'files(id, name)',
     });
 
