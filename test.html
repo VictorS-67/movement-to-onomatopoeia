@@ -24,5 +24,24 @@
 
         
     </div>
+
+    <script>
+      async function loadDriveFiles() {
+        try {
+          const response = await fetch('/.netlify/functions/fetch-drive-files');
+          const files = await response.json();
+          const dropdown = document.getElementById('videoSelect');
+          files.forEach(file => {
+            const option = document.createElement('option');
+            option.value = file.id;
+            option.textContent = file.name;
+            dropdown.appendChild(option);
+          });
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      document.addEventListener('DOMContentLoaded', loadDriveFiles);
+    </script>
 </body>
 </html>

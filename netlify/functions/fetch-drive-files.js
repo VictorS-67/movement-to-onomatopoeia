@@ -1,6 +1,3 @@
-
-
-
 // filepath: /home/victor/projects/movement-to-onomatopoeia/netlify/functions/fetch-drive-files.js
 const { google } = require('googleapis');
 
