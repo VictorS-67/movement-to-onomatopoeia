@@ -49,14 +49,15 @@
     const messageDisplay = document.getElementById("message");
 
     // Load configuration from sheet-info.json
+    let spreadsheetId, OnomatopoeiaSheet, videoSheet, ParticipantSheet;
     
     fetch('./sheet-info.json')
         .then(response => response.json())
         .then(config => {
-        const spreadsheetId = config.spreadsheetId;
-        const OnomatopoeiaSheet = config.OnomatopoeiaSheet;
-        const videoSheet = config.videoSheet;
-        const ParticipantSheet = config.ParticipantSheet;
+        spreadsheetId = config.spreadsheetId;
+        OnomatopoeiaSheet = config.OnomatopoeiaSheet;
+        videoSheet = config.videoSheet;
+        ParticipantSheet = config.ParticipantSheet;
         })
         .catch(error => {
         console.error('Error loading sheet configuration:', error);
