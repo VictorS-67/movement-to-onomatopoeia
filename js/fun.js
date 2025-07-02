@@ -23,9 +23,7 @@ async function loadSelectedVideos(spreadsheetId, sheetName, videoSelect) {
       const videoNames = selectedVideosData.slice(1).map(row => row[0]).filter(name => name);
       
       // Sort videos alphabetically
-      console.log("Selected videos:", videoNames);
-      videoNames.sort();
-      console.log("Sorted selected videos:", videoNames);
+      videoNames.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
       
       videoNames.forEach(videoName => {
           const option = document.createElement('option');
