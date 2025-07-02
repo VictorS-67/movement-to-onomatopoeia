@@ -1,6 +1,7 @@
 # Movement to Onomatopoeia
 
 A web application for collecting onomatopoeia descriptions of point light motion videos.
+see https://movement-to-onomatopoeia.netlify.app/
 
 ## Features
 
