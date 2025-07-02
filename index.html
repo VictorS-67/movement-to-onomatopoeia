@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Enter your name</title>
+  <title>Movement to Onomatopoeia - Participant Login</title>
   <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./css/style.css">
@@ -15,10 +15,24 @@
   
   <div class="container">        
     <div class="input-group">
-      <label for="nameInput">Your name:</label>
-      <textarea id="nameInput" name="nameInput" placeholder="Your name"></textarea>
-      <button id="enterName" class="button">Enter Name</button>
+      <label for="emailInput">Your email address:</label>
+      <input type="email" id="emailInput" name="emailInput" placeholder="Enter your email address">
+      <button id="checkEmail" class="button">Next</button>
     </div>
+
+    <!-- New participant form (initially hidden) -->
+    <div id="newParticipantForm" class="input-group" style="display: none;">
+      <h2>Welcome! Please complete your profile:</h2>
+      <label for="nameInput">Your name/pseudo:</label>
+      <input type="text" id="nameInput" name="nameInput" placeholder="Enter your name or pseudonym">
+      
+      <label for="ageInput">Your age:</label>
+      <input type="number" id="ageInput" name="ageInput" placeholder="Enter your age" min="1" max="120">
+      
+      <button id="startSurvey" class="button">Start the survey</button>
+    </div>
+
+    <div id="message" class="mt-4 text-gray-700"></div>
   </div>
 
   
@@ -26,35 +40,117 @@
   <script src="./js/fun.js"></script>
   <script>
 
-    //const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
-    const spreadsheetId = '15bktiYSLTy6nKc4YipH2wroc1U57qvRRvHsstJHpkkY';
-    const sheetName = 'Sheet1';
-            
-    const testButton = document.getElementById("enterName");
+    const checkEmailButton = document.getElementById("checkEmail");
+    const startSurveyButton = document.getElementById("startSurvey");
+    const emailInput = document.getElementById("emailInput");
     const nameInput = document.getElementById("nameInput");
+    const ageInput = document.getElementById("ageInput");
+    const newParticipantForm = document.getElementById("newParticipantForm");
+    const messageDisplay = document.getElementById("message");
+
+    // Load configuration from sheet-info.json
+    
+    fetch('./sheet-info.json')
+        .then(response => response.json())
+        .then(config => {
+        const spreadsheetId = config.spreadsheetId;
+        const OnomatopoeiaSheet = config.OnomatopoeiaSheet;
+        const videoSheet = config.videoSheet;
+        const ParticipantSheet = config.ParticipantSheet;
+        })
+        .catch(error => {
+        console.error('Error loading sheet configuration:', error);
+        });
 
     let data = []
 
-    testButton.addEventListener("click", () => {
-      // Fetch the data from the Google Sheet
-      // and check if the name is already in the sheet
-        getSheetData(spreadsheetId, sheetName).then(fetchedData => {
-        // test if the name has been entered in the field
-        const name = nameInput.value.trim();
-        if (!nameInput) {
-          alert("Please enter a name.");
-          return;
+    checkEmailButton.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      
+      if (!email || !email.includes('@')) {
+        messageDisplay.textContent = "Please enter a valid email address.";
+        messageDisplay.style.color = "red";
+        return;
+      }
+
+      try {
+        messageDisplay.textContent = "Checking participant...";
+        messageDisplay.style.color = "blue";
+
+        // Check if participant exists
+        const existingParticipant = await checkParticipantExists(spreadsheetId, ParticipantSheet, email);
+        
+        if (existingParticipant) {
+          // Returning participant - store their ID and redirect
+          localStorage.setItem("participantId", existingParticipant.participantId);
+          localStorage.setItem("participantEmail", existingParticipant.email);
+          
+          // Get their existing data
+          const sheetData = await getSheetData(spreadsheetId, OnomatopoeiaSheet);
+          const filteredData = parseCSV(sheetData).filter(item => item["participantId"] === existingParticipant.participantId);
+          localStorage.setItem("filteredData", JSON.stringify(filteredData));
+          
+          // Redirect to survey
+          window.location.href = "survey.html";
+        } else {
+          // New participant - show registration form
+          newParticipantForm.style.display = "block";
+          messageDisplay.textContent = "Welcome! Please complete your profile to start.";
+          messageDisplay.style.color = "green";
         }
+      } catch (error) {
+        messageDisplay.textContent = "Error checking participant. Please try again.";
+        messageDisplay.style.color = "red";
+        console.error("Error:", error);
+      }
+    });
 
-        const filteredData = parseCSV(fetchedData).filter(item => item["name"] === name);
+    startSurveyButton.addEventListener("click", async () => {
+      const email = emailInput.value.trim();
+      const name = nameInput.value.trim();
+      const age = ageInput.value.trim();
 
-        // Store the name and filtered data in localStorage
-        localStorage.setItem("userName", name);
-        localStorage.setItem("filteredData", JSON.stringify(filteredData));
+      if (!name) {
+        messageDisplay.textContent = "Please enter your name.";
+        messageDisplay.style.color = "red";
+        return;
+      }
 
-        // Redirect the user to survey.html
+      if (!age || age < 1 || age > 120) {
+        messageDisplay.textContent = "Please enter a valid age.";
+        messageDisplay.style.color = "red";
+        return;
+      }
+
+      try {
+        messageDisplay.textContent = "Creating your profile...";
+        messageDisplay.style.color = "blue";
+
+        // Generate unique participant ID
+        const participantId = generateParticipantId();
+        
+        // Save new participant
+        const participantData = {
+          participantId: participantId,
+          email: email,
+          name: name,
+          age: age
+        };
+
+        await saveNewParticipant(spreadsheetId, ParticipantSheet, participantData);
+
+        // Store participant info in localStorage
+        localStorage.setItem("participantId", participantId);
+        localStorage.setItem("participantEmail", email);
+        localStorage.setItem("filteredData", JSON.stringify([])); // Empty for new participant
+
+        // Redirect to survey
         window.location.href = "survey.html";
-      });
+      } catch (error) {
+        messageDisplay.textContent = "Error creating profile. Please try again.";
+        messageDisplay.style.color = "red";
+        console.error("Error:", error);
+      }
     });
 
   </script>

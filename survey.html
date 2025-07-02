@@ -82,43 +82,7 @@
     <script src="./js/fun.js"></script>
     <script>
 
-        // change the visiblity of the object when click on buton
-        // reset visibility with function resetdisplay
-
-        //const spreadsheetId = '1wfTLMxPaXse6MRJp1q3ls5AX3oV2lc5ZDn8qNOYfdLA';
-        const spreadsheetId = '15bktiYSLTy6nKc4YipH2wroc1U57qvRRvHsstJHpkkY';
-        const sheetName = 'Sheet1';
-
-        /*
-        const filteredData = [
-            {
-            "name": "test",
-            "video": "1.mp4",
-            "onomatopoeia": "oy",
-            "startTime": "0.23",
-            "endTime": "3.45",
-            "answeredTimestamp": "12345"
-            },// [object Object] 
-            ...
-        ]
-        */
-
-
-        const userName = localStorage.getItem("userName");
-        //filtered data is the data corresponding to the user name
-        let filteredData = JSON.parse(localStorage.getItem("filteredData"));
-
-        localStorage.removeItem("userName");
-        localStorage.removeItem("filteredData");
-
-        if(!userName){
-            alert("Warning, no user name");
-            window.location.href = "index.html";
-        }
-
         const nameDisplay = document.getElementById("nameDisplay");
-        nameDisplay.textContent = "Your name: " + userName;
-        
         const buttonVisibility = document.getElementById("buttonVisibility");
         const inputVisibility = document.getElementById("inputVisibility");
         const hasOnomatopoeiaButtonYes = document.getElementById("hasOnomatopoeiaButtonYes");
@@ -135,7 +99,61 @@
         const messageDisplay = document.getElementById("message");
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
 
-        // obtain the data corresponding to the video (and the user name too)
+        // change the visiblity of the object when click on buton
+        // reset visibility with function resetdisplay
+
+        // Load configuration from sheet-info.json
+        // and populate the dropdown dynamically from SelectedVideos sheet
+        
+        fetch('./sheet-info.json')
+            .then(response => response.json())
+            .then(config => {
+            const spreadsheetId = config.spreadsheetId;
+            const OnomatopoeiaSheet = config.OnomatopoeiaSheet;
+            const videoSheet = config.videoSheet;
+            const ParticipantSheet = config.ParticipantSheet;
+            // Initialize dropdown after config is loaded
+            loadSelectedVideos(spreadsheetId, videoSheet, videoSelect);
+            })
+            .catch(error => {
+            console.error('Error loading sheet configuration:', error);
+            });
+
+        /*
+        const filteredData = [
+            {
+            "name": "test",
+            "video": "1.mp4",
+            "onomatopoeia": "oy",
+            "startTime": "0.23",
+            "endTime": "3.45",
+            "answeredTimestamp": "12345"
+            },// [object Object] 
+            ...
+        ]
+        */
+
+
+        const participantId = localStorage.getItem("participantId");
+        const participantEmail = localStorage.getItem("participantEmail");
+        //filtered data is the data corresponding to the participant ID
+        let filteredData = JSON.parse(localStorage.getItem("filteredData"));
+
+        localStorage.removeItem("participantId");
+        localStorage.removeItem("participantEmail");
+        localStorage.removeItem("filteredData");
+
+        if(!participantId){
+            alert("Warning, no participant ID found");
+            window.location.href = "index.html";
+        }
+
+        
+        nameDisplay.textContent = "Participant: " + participantEmail;
+        
+
+
+        // obtain the data corresponding to the video (and the participant ID too)
         let videoName = videoPlayer.src.split("/").pop();
         let videoData = filteredData.filter(item => item["video"] === videoName);
         //reset the display
@@ -154,18 +172,6 @@
             window.location.href = "index.html";
         });
 
-
-        // Populate the dropdown dynamically
-        fetchFilesInFolder().then(videos => {
-            videos.forEach(video => {
-                const option = document.createElement("option");
-                option.value = `videos/${video}`;
-                option.textContent = video; // Display the video filename
-                videoSelect.appendChild(option);
-            });
-        }).catch(error => {
-            console.error("Error populating dropdown:", error);
-        });
 
         // Update video source when dropdown changes
         videoSelect.addEventListener("change", () => {
@@ -199,7 +205,7 @@
         // when save button is clicked
         saveOnomatopoeiaButton.addEventListener("click", () => {
             infoDict = {
-                "name": userName,
+                "participantId": participantId,
                 "video": videoName,
                 "onomatopoeia": onomatopoeiaInput.value.trim(),
                 "startTime": startDisplay.textContent,
@@ -207,7 +213,7 @@
                 "answeredTimestamp": obtainDate()
             };
 
-        saveOnomatopoeia(filteredData, infoDict,spreadsheetId, sheetName, messageDisplay).then(() => {
+        saveOnomatopoeia(filteredData, infoDict,spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
             // Also update local data and display with the new data
             videoData = filteredData.filter(item => item["video"] === videoName);
             resetDisplay(videoData, docElts);

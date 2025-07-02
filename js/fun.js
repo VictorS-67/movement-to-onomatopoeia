@@ -12,6 +12,42 @@ async function fetchFilesInFolder() {
   }
 }
 
+async function loadSelectedVideos(spreadsheetId, sheetName, videoSelect) {
+  try {
+      const selectedVideosData = await getSheetData(spreadsheetId, sheetName);
+      if (!selectedVideosData || selectedVideosData.length === 0) {
+          throw new Error('No data found in SelectedVideos sheet');
+      }
+      
+      // Extract video names (skip header row if present)
+      const videoNames = selectedVideosData.slice(1).map(row => row[0]).filter(name => name);
+      
+      // Sort videos alphabetically
+      videoNames.sort();
+      
+      videoNames.forEach(videoName => {
+          const option = document.createElement('option');
+          option.value = `videos/${videoName}.mp4`;
+          option.textContent = videoName;
+          videoSelect.appendChild(option);
+      });
+  } catch (error) {
+      console.error("Error loading selected videos:", error);
+      // Fallback to local videos if sheet reading fails
+      try {
+          const videoNames = await fetchFilesInFolder();
+          videoNames.forEach(videoName => {
+              const option = document.createElement("option");
+              option.value = `videos/${videoName}.mp4`;
+              option.textContent = videoName;
+              videoSelect.appendChild(option);
+          });
+      } catch (fallbackError) {
+          console.error("Fallback also failed:", fallbackError);
+      }
+  }
+}
+
 
 function parseCSV(data) {
   const headers = data[0];
@@ -51,8 +87,8 @@ function resetDisplay(videoData, docElts) {
   docElts["recordOnomatopoeia"].innerHTML = recordMessage;
 }
 
-async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName, messageDisplay) {
-  const name = infoDict["name"];
+async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay) {
+  const participantId = infoDict["participantId"];
   const video = infoDict["video"];
   const onomatopoeia = infoDict["onomatopoeia"];
   const startTime = infoDict["startTime"];
@@ -74,15 +110,15 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName
     messageDisplay.style.color = "red";
     return;
   }
-  if (!name || !video || !answeredTimestamp) {
+  if (!participantId || !video || !answeredTimestamp) {
     messageDisplay.textContent = "Something went wrong when saving the data";
     messageDisplay.style.color = "red";
     return;
   }
 
   // store the data in the sheet online
-  const newData = [name, video, onomatopoeia, startTime, endTime, answeredTimestamp];
-  const appendResult = await appendSheetData(spreadsheetId, sheetName, newData);
+  const newData = [participantId, video, onomatopoeia, startTime, endTime, answeredTimestamp];
+  const appendResult = await appendSheetData(spreadsheetId, OnomatopoeiaSheet, newData);
   if (!appendResult) {
     messageDisplay.textContent = "Failed to save data to the sheet.";
     messageDisplay.style.color = "red";
@@ -97,6 +133,61 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, sheetName
   // Display a success message
   messageDisplay.textContent = "Onomatopoeia and start-end saved!";
   messageDisplay.style.color = "green";
+}
+
+// Function to generate a unique participant ID
+function generateParticipantId() {
+  return 'P' + Date.now() + Math.random().toString(36).substr(2, 9);
+}
+
+// Function to check if participant exists by email
+async function checkParticipantExists(spreadsheetId, ParticipantSheet, email) {
+  try {
+    const participantsData = await getSheetData(spreadsheetId, ParticipantSheet);
+    if (!participantsData || participantsData.length === 0) {
+      return null;
+    }
+    
+    const headers = participantsData[0];
+    const emailIndex = headers.indexOf('email');
+    const idIndex = headers.indexOf('participantId');
+    
+    if (emailIndex === -1 || idIndex === -1) {
+      console.error('Required columns not found in Participants sheet');
+      return null;
+    }
+    
+    // Find participant by email
+    for (let i = 1; i < participantsData.length; i++) {
+      if (participantsData[i][emailIndex] === email) {
+        return {
+          participantId: participantsData[i][idIndex],
+          email: participantsData[i][emailIndex],
+          name: participantsData[i][headers.indexOf('name')] || '',
+          age: participantsData[i][headers.indexOf('age')] || ''
+        };
+      }
+    }
+    
+    return null; // Participant not found
+  } catch (error) {
+    console.error('Error checking participant:', error);
+    throw error;
+  }
+}
+
+// Function to save new participant
+async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantData) {
+  try {
+    const { email, name, age, participantId } = participantData;
+    const timestamp = obtainDate();
+    
+    const newData = [participantId, email, name, age, timestamp];
+    return await appendSheetData(spreadsheetId, ParticipantSheet, newData);
+  } catch (error) {
+    console.error('Error saving participant:', error);
+    throw error;
+  }
 }
 
 function obtainDate(){
