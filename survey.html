@@ -103,7 +103,6 @@
         const participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
         //filtered data is the data corresponding to the participant ID
         let filteredData = JSON.parse(localStorage.getItem("filteredData"));
-
         /*
         const filteredData = [
             {
@@ -130,6 +129,9 @@
         const participantEmail = participantInfo.email;
         const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
 
+        let currentVideoName, currentVideoData ;
+
+        nameDisplay.textContent = "Participant: " + participantName;
 
         // Load configuration from sheet-info.json
         // and populate the dropdown dynamically from SelectedVideos sheet
@@ -143,39 +145,35 @@
                 videoSheet = config.videoSheet;
                 ParticipantSheet = config.ParticipantSheet;
                 
-                // Return the promise to chain it
-                return loadSelectedVideos(spreadsheetId, videoSheet, videoSelect);
+                // --------- initial dropdown population
+
+                return loadSelectedVideos(spreadsheetId, videoSheet, videoSelect); // Return the promise to chain it
             })
-            .then(() => {
-                // This executes after loadSelectedVideos completes
+            .then(() => {// This executes after loadSelectedVideos completes
+                
+                // ------- initial video setup and display
+
                 const initialVideo = videoSelect.value || "videos/1.mp4";
                 videoPlayer.src = initialVideo;
                 videoPlayer.load();
                 videoTitle.textContent = `Video: ${initialVideo}`;
+
+                currentVideoName = videoPlayer.src.split("/").pop();
+                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+                docElts = {
+                    "onomatopoeiaInput": onomatopoeiaInput,
+                    "startDisplay": startDisplay,
+                    "endDisplay": endDisplay,
+                    "recordOnomatopoeia": recordOnomatopoeia,
+                    "buttonVisibility": buttonVisibility,
+                    "inputVisibility": inputVisibility,
+                }
+                //reset the display
+                resetDisplay(currentVideoData, docElts);
             })
             .catch(error => {
                 console.error('Error loading sheet configuration:', error);
             });
-
-
-
-        // ---------- initial display
-        
-        nameDisplay.textContent = "Participant: " + participantName;
-
-        // obtain the data corresponding to the video (and the participant ID too)
-        let currentVideoName = videoPlayer.src.split("/").pop();
-        let currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
-        //reset the display
-        docElts = {
-            "onomatopoeiaInput": onomatopoeiaInput,
-            "startDisplay": startDisplay,
-            "endDisplay": endDisplay,
-            "recordOnomatopoeia": recordOnomatopoeia,
-            "buttonVisibility": buttonVisibility,
-            "inputVisibility": inputVisibility,
-        }
-        resetDisplay(currentVideoData, docElts);
 
 
         // ------------ event listeners
