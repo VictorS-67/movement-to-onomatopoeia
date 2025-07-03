@@ -78,7 +78,7 @@ function parseCSV(data) {
 }
 
 
-function resetDisplay(videoData, docElts) {
+function resetDisplay(currentVideoName, filteredData, docElts) {
     
     // docElts contain onomatopoeiaInput, startDisplay,
     // endDisplay, recordOnomatopoeia, buttonVisibility, 
@@ -92,12 +92,25 @@ function resetDisplay(videoData, docElts) {
 
     let recordMessage = "";
 
-    // first, delete data where onomatopoeia == "null"
-    const nonNullVideoData = videoData.filter(elt => elt["onomatopoeia"] !== "null");
+    // ----- color in green all buttons where we have data for the video
+    const videoButtons = document.querySelectorAll('.video-button');
+    videoButtons.forEach(button => {
+        const buttonVideo = button.dataset.video.split("/").pop();
+        if (filteredData.some(item => item["video"] === buttonVideo)) {
+            button.classList.add('bg-green-500');
+        }
+    });
+
+    // ----- write on screen already recorded onomatopoeia data for the current video
+    const currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+
+    // delete data where onomatopoeia == "null"
+    const nonNullVideoData = currentVideoData.filter(elt => elt["onomatopoeia"] !== "null");
 
     if (!nonNullVideoData.length) {
         recordMessage = "None";
     } else {
+        // write any onomatopoeia data that was not null
         nonNullVideoData.forEach(elt => {
             const startTime = elt["startTime"];
             const endTime = elt["endTime"];

@@ -110,7 +110,8 @@
         /*
         const filteredData = [
             {
-            "name": "test",
+            "participantId": "3",
+            "participantName": "test",
             "video": "1.mp4",
             "onomatopoeia": "oy",
             "startTime": "0.23",
@@ -133,7 +134,7 @@
         const participantEmail = participantInfo.email;
         const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
 
-        let currentVideoName, currentVideoData ;
+        let currentVideoName;
 
         nameDisplay.textContent = "Participant: " + participantName;
 
@@ -149,7 +150,8 @@
                 videoSheet = config.videoSheet;
                 ParticipantSheet = config.ParticipantSheet;
                 
-                // --------- initial dropdown population
+                // --------- initial button creation
+                // This will create buttons for each video in the SelectedVideos sheet
 
                 return loadSelectedVideos(spreadsheetId, videoSheet, videoButtons); // Return the promise to chain it
             })
@@ -169,7 +171,6 @@
                 }
 
                 currentVideoName = videoPlayer.src.split("/").pop();
-                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
                 docElts = {
                     "onomatopoeiaInput": onomatopoeiaInput,
                     "startDisplay": startDisplay,
@@ -179,7 +180,7 @@
                     "inputVisibility": inputVisibility,
                 }
                 //reset the display
-                resetDisplay(currentVideoData, docElts);
+                resetDisplay(currentVideoName, filteredData, docElts);
             })
             .catch(error => {
                 console.error('Error loading sheet configuration:', error);
@@ -202,8 +203,7 @@
                 videoPlayer.load();
                 videoTitle.textContent = `Video: ${selectedVideo}`;
                 currentVideoName = selectedVideo.split("/").pop();
-                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
-                resetDisplay(currentVideoData, docElts);
+                resetDisplay(currentVideoName, filteredData, docElts);
                 
                 // Update button styles to show active state
                 videoButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -220,6 +220,7 @@
         // when click on the button No (no onomatopoeia), save null entry if needed and go to next video
         hasOnomatopoeiaButtonNo.addEventListener("click", () => {
             // If no onomatopoeia has been saved yet, save a null entry
+            const currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
             if (!currentVideoData.length){
                 const infoDict = {
                     "participantId": participantId,
@@ -234,10 +235,7 @@
                 // Wait for the save to complete before proceeding
                 saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = false)
                     .then(() => {
-                        // Update local data AFTER successful save
-                        currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
-                        
-                        // Now go to next video
+                        // Now go to next video AFTER successful save
                         const currentButton = videoButtons.querySelector('button.active');
                         goToNextVideo(currentButton);
                     })
@@ -280,8 +278,7 @@
 
             saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
                 // Also update local data and display with the new data
-                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
-                resetDisplay(currentVideoData, docElts);
+                resetDisplay(currentVideoName, filteredData, docElts);
             }).catch(error => {
                 console.error("Error saving onomatopoeia:", error);
             });
