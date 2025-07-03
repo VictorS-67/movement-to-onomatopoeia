@@ -13,7 +13,7 @@ async function fetchFilesInFolder() {
 }
 
 // Function to load selected videos from the Google Sheet
-async function loadSelectedVideos(spreadsheetId, sheetName, videoSelect) {
+async function loadSelectedVideos(spreadsheetId, sheetName, videoButtonsContainer) {
   try {
       const selectedVideosData = await getSheetData(spreadsheetId, sheetName);
       if (!selectedVideosData || selectedVideosData.length === 0) {
@@ -26,22 +26,36 @@ async function loadSelectedVideos(spreadsheetId, sheetName, videoSelect) {
       // Sort videos alphabetically
       videoNames.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
       
-      videoNames.forEach(videoName => {
-          const option = document.createElement('option');
-          option.value = `videos/${videoName}.mp4`;
-          option.textContent = videoName;
-          videoSelect.appendChild(option);
+      videoNames.forEach((videoName, index) => {
+          const button = document.createElement('button');
+          button.className = 'video-button button';
+          button.dataset.video = `videos/${videoName}`;
+          button.textContent = videoName;
+          
+          // Mark first button as active by default
+          if (index === 0) {
+              button.classList.add('active');
+          }
+          
+          videoButtonsContainer.appendChild(button);
       });
   } catch (error) {
       console.error("Error loading selected videos:", error);
       // Fallback to local videos if sheet reading fails
       try {
           const videoNames = await fetchFilesInFolder();
-          videoNames.forEach(videoName => {
-              const option = document.createElement("option");
-              option.value = `videos/${videoName}.mp4`;
-              option.textContent = videoName;
-              videoSelect.appendChild(option);
+          videoNames.forEach((videoName, index) => {
+              const button = document.createElement("button");
+              button.className = 'video-button button';
+              button.dataset.video = `videos/${videoName}`;
+              button.textContent = videoName;
+              
+              // Mark first button as active by default
+              if (index === 0) {
+                  button.classList.add('active');
+              }
+              
+              videoButtonsContainer.appendChild(button);
           });
       } catch (fallbackError) {
           console.error("Fallback also failed:", fallbackError);

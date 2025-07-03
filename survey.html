@@ -37,11 +37,12 @@
             </video>
         </div>
 
-        <!-- Dropdown to Select Video -->
-        <div class="dropdown">
-            <label for="videoSelect">Change the video:</label>
-            <select id="videoSelect">
-            </select>
+        <!-- Video Selection Buttons -->
+        <div class="video-buttons-container">
+            <h3>Select a video:</h3>
+            <div id="videoButtons" class="video-buttons">
+                <!-- Buttons will be populated here -->
+            </div>
         </div>
 
         <h3>Onomatopoeia already saved for this video:</h3>
@@ -89,7 +90,7 @@
         const buttonLogout = document.getElementById("buttonLogout");
         const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
-        const videoSelect = document.getElementById('videoSelect');
+        const videoButtons = document.getElementById('videoButtons');
         const getStart = document.getElementById("getStart");
         const startDisplay = document.getElementById("startDisplay");
         const getEnd = document.getElementById("getEnd");
@@ -147,16 +148,22 @@
                 
                 // --------- initial dropdown population
 
-                return loadSelectedVideos(spreadsheetId, videoSheet, videoSelect); // Return the promise to chain it
+                return loadSelectedVideos(spreadsheetId, videoSheet, videoButtons); // Return the promise to chain it
             })
             .then(() => {// This executes after loadSelectedVideos completes
                 
                 // ------- initial video setup and display
 
-                const initialVideo = videoSelect.value || "videos/1.mp4";
+                const firstButton = videoButtons.querySelector('button');
+                const initialVideo = firstButton ? firstButton.dataset.video : "videos/1.mp4";
                 videoPlayer.src = initialVideo;
                 videoPlayer.load();
                 videoTitle.textContent = `Video: ${initialVideo}`;
+
+                // Ensure first button is marked as active
+                if (firstButton) {
+                    firstButton.classList.add('active');
+                }
 
                 currentVideoName = videoPlayer.src.split("/").pop();
                 currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
@@ -184,14 +191,21 @@
         });
 
 
-        // Update video source when dropdown changes
-        videoSelect.addEventListener("change", () => {
-            videoPlayer.src = videoSelect.value;
-            videoPlayer.load();
-            videoTitle.textContent = `Video: ${videoSelect.value}`;
-            currentVideoName = videoSelect.value.split("/").pop();
-            currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
-            resetDisplay(currentVideoData, docElts);
+        // Update video source when video button is clicked
+        videoButtons.addEventListener("click", (event) => {
+            if (event.target.tagName === 'BUTTON') {
+                const selectedVideo = event.target.dataset.video;
+                videoPlayer.src = selectedVideo;
+                videoPlayer.load();
+                videoTitle.textContent = `Video: ${selectedVideo}`;
+                currentVideoName = selectedVideo.split("/").pop();
+                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+                resetDisplay(currentVideoData, docElts);
+                
+                // Update button styles to show active state
+                videoButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+                event.target.classList.add('active');
+            }
         });
 
         // when click on the button, change the visibility of the input
