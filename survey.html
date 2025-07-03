@@ -105,7 +105,7 @@
         // Load configuration from sheet-info.json
         // and populate the dropdown dynamically from SelectedVideos sheet
         let spreadsheetId, OnomatopoeiaSheet, videoSheet, ParticipantSheet;
-        
+
         fetch('./sheet-info.json')
             .then(response => response.json())
             .then(config => {
@@ -134,14 +134,15 @@
         ]
         */
 
-
-        const participantId = localStorage.getItem("participantId");
-        const participantEmail = localStorage.getItem("participantEmail");
+        const participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
+        const participantId = participantInfo.participantId;
+        const participantEmail = participantInfo.email;
+        const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
+        
         //filtered data is the data corresponding to the participant ID
         let filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
-        localStorage.removeItem("participantId");
-        localStorage.removeItem("participantEmail");
+        localStorage.removeItem("participantInfo");
         localStorage.removeItem("filteredData");
 
         if(!participantId){
@@ -150,8 +151,7 @@
         }
 
         
-        nameDisplay.textContent = "Participant: " + participantEmail;
-        
+        nameDisplay.textContent = "Participant: " + participantName;
 
 
         // obtain the data corresponding to the video (and the participant ID too)

@@ -79,13 +79,12 @@
         messageDisplay.style.color = "blue";
 
         // Check if participant exists
-        const existingParticipant = await checkParticipantExists(spreadsheetId, ParticipantSheet, email);
-        
-        if (existingParticipant) {
-          // Returning participant - store their ID and redirect
-          localStorage.setItem("participantId", existingParticipant.participantId);
-          localStorage.setItem("participantEmail", existingParticipant.email);
-          
+        const existingParticipantInfo = await checkParticipantExists(spreadsheetId, ParticipantSheet, email);
+
+        if (existingParticipantInfo) {
+          // Returning participant Info (a dictionnary)
+          localStorage.setItem("participantInfo", JSON.stringify(existingParticipantInfo));
+
           // Get their existing data
           const sheetData = await getSheetData(spreadsheetId, OnomatopoeiaSheet);
           const filteredData = parseCSV(sheetData).filter(item => item["participantId"] === existingParticipant.participantId);
@@ -127,22 +126,22 @@
         messageDisplay.textContent = "Creating your profile...";
         messageDisplay.style.color = "blue";
 
-        // Generate unique participant ID
-        const participantId = generateParticipantId();
         
         // Save new participant
         const participantData = {
-          participantId: participantId,
           email: email,
           name: name,
           age: age
         };
 
-        await saveNewParticipant(spreadsheetId, ParticipantSheet, participantData);
+        // Save participant data to Google Sheets and
+        // get its unique ID
+        const participantId = await saveNewParticipant(spreadsheetId, ParticipantSheet, participantData);
 
+        // Add participantId to participantData
+        participantData.participantId = participantId;
         // Store participant info in localStorage
-        localStorage.setItem("participantId", participantId);
-        localStorage.setItem("participantEmail", email);
+        localStorage.setItem("participantInfo", JSON.stringify(participantData));
         localStorage.setItem("filteredData", JSON.stringify([])); // Empty for new participant
 
         // Redirect to survey

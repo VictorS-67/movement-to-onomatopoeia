@@ -135,11 +135,6 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
   messageDisplay.style.color = "green";
 }
 
-// Function to generate a unique participant ID
-function generateParticipantId() {
-  return 'P' + Date.now() + Math.random().toString(36).substr(2, 9);
-}
-
 // Function to check if participant exists by email
 async function checkParticipantExists(spreadsheetId, ParticipantSheet, email) {
   try {
@@ -179,9 +174,33 @@ async function checkParticipantExists(spreadsheetId, ParticipantSheet, email) {
 // Function to save new participant
 async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantData) {
   try {
-    const { email, name, age, participantId } = participantData;
+    const { email, name, age } = participantData;
     const timestamp = obtainDate();
     
+    // Generate a unique participant ID
+    const participantsData = await getSheetData(spreadsheetId, ParticipantSheet);
+    if (!participantsData || participantsData.length === 0) {
+      throw new Error('Participants sheet is empty or not found');
+    }
+    
+    const headers = participantsData[0];
+    const idIndex = headers.indexOf('participantId');
+    
+    if (idIndex === -1) {
+      throw new Error('participantId column not found in Participants sheet');
+    }
+    
+    // Find the highest existing participant ID
+    let maxId = 0;
+    for (let i = 1; i < participantsData.length; i++) {
+      const currentId = parseInt(participantsData[i][idIndex]) || 0;
+      if (currentId > maxId) {
+        maxId = currentId;
+      }
+    }
+    
+    const participantId = maxId + 1;
+
     const newData = [participantId, email, name, age, timestamp];
     return await appendSheetData(spreadsheetId, ParticipantSheet, newData);
   } catch (error) {
