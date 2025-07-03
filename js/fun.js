@@ -22,15 +22,12 @@ async function loadSelectedVideos(spreadsheetId, sheetName, videoButtonsContaine
       
       // Extract video names (skip header row if present)
       const videoNames = selectedVideosData.slice(1).map(row => row[0]).filter(name => name);
-      console.log("Selected videos:", videoNames);
       
       // Sort videos alphabetically
       videoNames.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-      console.log("Sorted video names:", videoNames);
 
       // add format to video names
-      videoNames = videoNames.map(name => `${name}.mp4`);
-      console.log("Formatted video names:", videoNames);
+      videoNames.forEach((name, index) => {videoNames[index] = `${name}.mp4`;});
 
       videoNames.forEach((videoName, index) => {
           const button = document.createElement('button');
