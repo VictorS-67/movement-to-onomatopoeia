@@ -92,10 +92,13 @@ function resetDisplay(videoData, docElts) {
 
     let recordMessage = "";
 
-    if (!videoData.length) {
+    // first, delete data where onomatopoeia == "null"
+    const nonNullVideoData = videoData.filter(elt => elt["onomatopoeia"] !== "null");
+
+    if (!nonNullVideoData.length) {
         recordMessage = "None";
     } else {
-        videoData.forEach(elt => {
+        nonNullVideoData.forEach(elt => {
             const startTime = elt["startTime"];
             const endTime = elt["endTime"];
             const onomatopoeia = elt["onomatopoeia"];
