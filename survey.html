@@ -151,6 +151,7 @@
             videoPlayer.src = initialVideo;
             videoPlayer.load();
             videoTitle.textContent = `Video: ${initialVideo}`;
+            console.log("Initial video set to:", initialVideo);
             })
             .catch(error => {
             console.error('Error loading sheet configuration:', error);
