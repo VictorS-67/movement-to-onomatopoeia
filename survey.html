@@ -21,7 +21,7 @@
         
         <div class="input-group">
             <p id="nameDisplay"></p>
-            <button id="changeName" class="button">Change Name</button>
+            <button id="buttonLogout" class="button">Logout</button>
         </div>
 
         <!-- Video -->
@@ -86,7 +86,7 @@
         const buttonVisibility = document.getElementById("buttonVisibility");
         const inputVisibility = document.getElementById("inputVisibility");
         const hasOnomatopoeiaButtonYes = document.getElementById("hasOnomatopoeiaButtonYes");
-        const changeName = document.getElementById("changeName");
+        const buttonLogout = document.getElementById("buttonLogout");
         const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
         const videoSelect = document.getElementById('videoSelect');
@@ -150,6 +150,8 @@
         const participantEmail = participantInfo.email;
         const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
 
+        console.log("Participant Info:", participantInfo);
+
         
         nameDisplay.textContent = "Participant: " + participantName;
 
@@ -169,7 +171,7 @@
         resetDisplay(videoData, docElts);
 
         // when click change Name button, come back to index.html
-        changeName.addEventListener("click", () => {
+        buttonLogout.addEventListener("click", () => {
             window.location.href = "index.html";
         });
 
