@@ -116,22 +116,22 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
   if (onomatopoeia === "") {
     messageDisplay.textContent = "Please enter your onomatopoeia.";
     messageDisplay.style.color = "red";
-    return;
+    throw new Error("Onomatopoeia is required");
   }
   if (startTime === "-.--") {
     messageDisplay.textContent = "Please record the start of the onomatopoeia.";
     messageDisplay.style.color = "red";
-    return;
+    throw new Error("Start time is required");
   }
   if (endTime === "-.--") {
     messageDisplay.textContent = "Please record the end of the onomatopoeia.";
     messageDisplay.style.color = "red";
-    return;
+    throw new Error("End time is required");
   }
   if (!participantId || !video || !answeredTimestamp) {
     messageDisplay.textContent = "Something went wrong when saving the data";
     messageDisplay.style.color = "red";
-    return;
+    throw new Error("Missing required data");
   }
 
   // store the data in the sheet online
@@ -140,7 +140,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
   if (!appendResult) {
     messageDisplay.textContent = "Failed to save data to the sheet.";
     messageDisplay.style.color = "red";
-    return;
+    throw new Error("Failed to save to sheet");
   }
   // Log the result of the append operation
   // console.log('Append Result:', appendResult);
