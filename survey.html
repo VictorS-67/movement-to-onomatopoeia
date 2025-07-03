@@ -237,7 +237,7 @@
                     .then(() => {
                         // Now go to next video AFTER successful save
                         const currentButton = videoButtons.querySelector('button.active');
-                        goToNextVideo(currentButton);
+                        goToNextVideo(currentButton); // simulate a click on the sibling video button
                     })
                     .catch(error => {
                         console.error("Error saving onomatopoeia:", error);

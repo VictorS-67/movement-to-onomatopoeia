@@ -97,7 +97,7 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     videoButtons.forEach(button => {
         const buttonVideo = button.dataset.video.split("/").pop();
         if (filteredData.some(item => item["video"] === buttonVideo)) {
-            button.classList.add('bg-green-500');
+            button.classList.add('completed');
         }
     });
 
