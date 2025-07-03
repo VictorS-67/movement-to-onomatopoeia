@@ -217,42 +217,41 @@
             inputVisibility.style.display = "block";
         });
 
-        // when click on the button No (no onomatopoeia), save null entry and go to next video
+        // when click on the button No (no onomatopoeia), save null entry if needed and go to next video
         hasOnomatopoeiaButtonNo.addEventListener("click", () => {
-            const infoDict = {
-                "participantId": participantId,
-                "participantName": participantName,
-                "video": currentVideoName,
-                "onomatopoeia": "null",
-                "startTime": "0",
-                "endTime": "0",
-                "answeredTimestamp": obtainDate()
-            };
-
-            saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
-                // Update local data
-                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+            // If no onomatopoeia has been saved yet, save a null entry
+            if (!currentVideoData.length){
+                const infoDict = {
+                    "participantId": participantId,
+                    "participantName": participantName,
+                    "video": currentVideoName,
+                    "onomatopoeia": "null",
+                    "startTime": "0",
+                    "endTime": "0",
+                    "answeredTimestamp": obtainDate()
+                };
                 
-                // Go to next video
+                // Wait for the save to complete before proceeding
+                saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay)
+                    .then(() => {
+                        // Update local data AFTER successful save
+                        currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+                        
+                        // Now go to next video
+                        const currentButton = videoButtons.querySelector('button.active');
+                        goToNextVideo(currentButton);
+                    })
+                    .catch(error => {
+                        console.error("Error saving onomatopoeia:", error);
+                        // Don't proceed to next video if save failed
+                    });
+            } else {
+                // If already saved, just go to next video
                 const currentButton = videoButtons.querySelector('button.active');
-                let nextButton = currentButton ? currentButton.nextElementSibling : null;
-                
-                // If no next button, go to first button (loop around)
-                if (!nextButton) {
-                    nextButton = videoButtons.querySelector('button');
-                }
-                
-                if (nextButton) {
-                    // Trigger click on next video button
-                    nextButton.click();
-                } else {
-                    // If no videos available, just reset display
-                    resetDisplay(currentVideoData, docElts);
-                }
-            }).catch(error => {
-                console.error("Error saving null onomatopoeia:", error);
-            });
+                goToNextVideo(currentButton);
+            }
         });
+
         
 
         // get and display the current timestamp
@@ -279,7 +278,7 @@
                 "answeredTimestamp": obtainDate()
             };
 
-            saveOnomatopoeia(filteredData, infoDict,spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
+            saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
                 // Also update local data and display with the new data
                 currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
                 resetDisplay(currentVideoData, docElts);
