@@ -25,7 +25,10 @@ async function loadSelectedVideos(spreadsheetId, sheetName, videoButtonsContaine
       
       // Sort videos alphabetically
       videoNames.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-      
+
+      // add format to video names
+      videoNames = videoNames.map(name => `${name}.mp4`);
+
       videoNames.forEach((videoName, index) => {
           const button = document.createElement('button');
           button.className = 'video-button button';
