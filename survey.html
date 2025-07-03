@@ -232,7 +232,7 @@
                 };
                 
                 // Wait for the save to complete before proceeding
-                saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay)
+                saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = false)
                     .then(() => {
                         // Update local data AFTER successful save
                         currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);

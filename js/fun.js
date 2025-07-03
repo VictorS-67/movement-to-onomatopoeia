@@ -108,7 +108,7 @@ function resetDisplay(videoData, docElts) {
     docElts["recordOnomatopoeia"].innerHTML = recordMessage;
 }
 
-async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay) {
+async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = true) {
     const participantId = infoDict["participantId"];
     const participantName = infoDict["participantName"];
     const video = infoDict["video"];
@@ -118,23 +118,31 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     const answeredTimestamp = infoDict["answeredTimestamp"];
     
     if (onomatopoeia === "") {
-        messageDisplay.textContent = "Please enter your onomatopoeia.";
-        messageDisplay.style.color = "red";
+        if (verbose) {
+            messageDisplay.textContent = "Please enter your onomatopoeia.";
+            messageDisplay.style.color = "red";
+        }
         throw new Error("Onomatopoeia is required");
     }
     if (startTime === "-.--") {
-        messageDisplay.textContent = "Please record the start of the onomatopoeia.";
-        messageDisplay.style.color = "red";
+        if (verbose) {
+            messageDisplay.textContent = "Please record the start of the onomatopoeia.";
+            messageDisplay.style.color = "red";
+        }
         throw new Error("Start time is required");
     }
     if (endTime === "-.--") {
-        messageDisplay.textContent = "Please record the end of the onomatopoeia.";
-        messageDisplay.style.color = "red";
+        if (verbose) {
+            messageDisplay.textContent = "Please record the end of the onomatopoeia.";
+            messageDisplay.style.color = "red";
+        }
         throw new Error("End time is required");
     }
     if (!participantId || !video || !answeredTimestamp) {
-        messageDisplay.textContent = "Something went wrong when saving the data";
-        messageDisplay.style.color = "red";
+        if (verbose) {
+            messageDisplay.textContent = "Something went wrong when saving the data";
+            messageDisplay.style.color = "red";
+        }
         throw new Error("Missing required data");
     }
 
@@ -151,8 +159,10 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     const appendResult = await appendSheetData(spreadsheetId, OnomatopoeiaSheet, newData);
 
     if (!appendResult) {
-        messageDisplay.textContent = "Failed to save data to the sheet.";
-        messageDisplay.style.color = "red";
+        if (verbose) {
+            messageDisplay.textContent = "Failed to save data to the sheet.";
+            messageDisplay.style.color = "red";
+        }
         throw new Error("Failed to save to sheet");
     }
     // Log the result of the append operation
@@ -162,8 +172,10 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     filteredData.push(infoDict);
 
     // Display a success message
-    messageDisplay.textContent = "Onomatopoeia and start-end saved!";
-    messageDisplay.style.color = "green";
+    if (verbose) {
+        messageDisplay.textContent = "Onomatopoeia and start-end saved!";
+        messageDisplay.style.color = "green";
+    }
 }
 
 // Function to check if participant exists by email
