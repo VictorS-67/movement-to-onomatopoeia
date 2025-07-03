@@ -55,8 +55,10 @@
         <div class="input-group">
             <div id="buttonVisibility">
                 <p>Are there moments in this video that make you think of an onomatopoeia?</p>
-                <button id="hasOnomatopoeiaButtonYes" class="button">Yes</button>
-                <p>If not, please select another video</p>
+                <div class="yes-no-buttons">
+                    <button id="hasOnomatopoeiaButtonYes" class="button">Yes</button>
+                    <button id="hasOnomatopoeiaButtonNo" class="button">No</button>
+                </div>
             </div>
             <div id ="inputVisibility">
                 <label for="onomatopoeiaInput">Onomatopoeia:</label>
@@ -87,6 +89,7 @@
         const buttonVisibility = document.getElementById("buttonVisibility");
         const inputVisibility = document.getElementById("inputVisibility");
         const hasOnomatopoeiaButtonYes = document.getElementById("hasOnomatopoeiaButtonYes");
+        const hasOnomatopoeiaButtonNo = document.getElementById("hasOnomatopoeiaButtonNo");
         const buttonLogout = document.getElementById("buttonLogout");
         const videoTitle = document.getElementById("videoTitle");
         const videoPlayer = document.getElementById("myVideo");
@@ -213,6 +216,43 @@
             buttonVisibility.style.display = "none";
             inputVisibility.style.display = "block";
         });
+
+        // when click on the button No (no onomatopoeia), save null entry and go to next video
+        hasOnomatopoeiaButtonNo.addEventListener("click", () => {
+            const infoDict = {
+                "participantId": participantId,
+                "participantName": participantName,
+                "video": currentVideoName,
+                "onomatopoeia": "null",
+                "startTime": "0",
+                "endTime": "0",
+                "answeredTimestamp": obtainDate()
+            };
+
+            saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
+                // Update local data
+                currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
+                
+                // Go to next video
+                const currentButton = videoButtons.querySelector('button.active');
+                let nextButton = currentButton ? currentButton.nextElementSibling : null;
+                
+                // If no next button, go to first button (loop around)
+                if (!nextButton) {
+                    nextButton = videoButtons.querySelector('button');
+                }
+                
+                if (nextButton) {
+                    // Trigger click on next video button
+                    nextButton.click();
+                } else {
+                    // If no videos available, just reset display
+                    resetDisplay(currentVideoData, docElts);
+                }
+            }).catch(error => {
+                console.error("Error saving null onomatopoeia:", error);
+            });
+        });
         
 
         // get and display the current timestamp
@@ -231,6 +271,7 @@
         saveOnomatopoeiaButton.addEventListener("click", () => {
             infoDict = {
                 "participantId": participantId,
+                "participantName": participantName,
                 "video": currentVideoName,
                 "onomatopoeia": onomatopoeiaInput.value.trim(),
                 "startTime": startDisplay.textContent,

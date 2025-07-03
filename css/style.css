@@ -138,3 +138,23 @@ body {
   background-color: #4338ca;
   border-color: #4338ca;
 }
+
+#buttonVisibility {
+  text-align: center;
+}
+
+#buttonVisibility p {
+  margin-bottom: 1rem;
+}
+
+.yes-no-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin: 1rem 0;
+}
+
+.yes-no-buttons .button {
+  flex: 0 0 auto;
+  min-width: 100px;
+}

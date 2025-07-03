@@ -107,6 +107,7 @@ function resetDisplay(videoData, docElts) {
 
 async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay) {
   const participantId = infoDict["participantId"];
+  const participantName = infoDict["participantName"];
   const video = infoDict["video"];
   const onomatopoeia = infoDict["onomatopoeia"];
   const startTime = infoDict["startTime"];
@@ -135,8 +136,17 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
   }
 
   // store the data in the sheet online
-  const newData = [participantId, video, onomatopoeia, startTime, endTime, answeredTimestamp];
+  const newData = [
+    parseInt(participantId),          // Convert to integer
+    participantName,                  // Keep as string
+    video,                            // Keep as string
+    onomatopoeia,                     // Keep as string
+    parseFloat(startTime),            // Convert to decimal number
+    parseFloat(endTime),              // Convert to decimal number
+    answeredTimestamp                 // Keep as string
+  ];
   const appendResult = await appendSheetData(spreadsheetId, OnomatopoeiaSheet, newData);
+
   if (!appendResult) {
     messageDisplay.textContent = "Failed to save data to the sheet.";
     messageDisplay.style.color = "red";
@@ -219,7 +229,13 @@ async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantDa
     
     const participantId = maxId + 1;
 
-    const newData = [participantId, email, name, age, timestamp];
+    const newData = [
+      parseInt(participantId),       // Convert to integer
+      email,                         // Keep as string
+      name,                          // Keep as string
+      parseInt(age),                 // Convert to integer
+      timestamp                      // Keep as string
+    ];
     return await appendSheetData(spreadsheetId, ParticipantSheet, newData);
   } catch (error) {
     console.error('Error saving participant:', error);
