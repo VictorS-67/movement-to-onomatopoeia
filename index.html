@@ -87,7 +87,7 @@
 
           // Get their existing data
           const sheetData = await getSheetData(spreadsheetId, OnomatopoeiaSheet);
-          const filteredData = parseCSV(sheetData).filter(item => item["participantId"] === existingParticipant.participantId);
+          const filteredData = parseCSV(sheetData).filter(item => item["participantId"] === existingParticipantInfo.participantId);
           localStorage.setItem("filteredData", JSON.stringify(filteredData));
           
           // Redirect to survey
