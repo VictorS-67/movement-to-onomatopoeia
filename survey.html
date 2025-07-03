@@ -138,23 +138,23 @@
         fetch('./sheet-info.json')
             .then(response => response.json())
             .then(config => {
-            spreadsheetId = config.spreadsheetId;
-            OnomatopoeiaSheet = config.OnomatopoeiaSheet;
-            videoSheet = config.videoSheet;
-            ParticipantSheet = config.ParticipantSheet;
-            // Initialize dropdown after config is loaded
-            loadSelectedVideos(spreadsheetId, videoSheet, videoSelect);
+                spreadsheetId = config.spreadsheetId;
+                OnomatopoeiaSheet = config.OnomatopoeiaSheet;
+                videoSheet = config.videoSheet;
+                ParticipantSheet = config.ParticipantSheet;
+                
+                // Return the promise to chain it
+                return loadSelectedVideos(spreadsheetId, videoSheet, videoSelect);
             })
             .then(() => {
-            // --------  Load the selected video into the video player
-            const initialVideo = videoSelect.value || "videos/1.mp4"; // Default to "videos/1.mp4" if no selection
-            videoPlayer.src = initialVideo;
-            videoPlayer.load();
-            videoTitle.textContent = `Video: ${initialVideo}`;
-            console.log("Initial video set to:", initialVideo);
+                // This executes after loadSelectedVideos completes
+                const initialVideo = videoSelect.value || "videos/1.mp4";
+                videoPlayer.src = initialVideo;
+                videoPlayer.load();
+                videoTitle.textContent = `Video: ${initialVideo}`;
             })
             .catch(error => {
-            console.error('Error loading sheet configuration:', error);
+                console.error('Error loading sheet configuration:', error);
             });
 
 
