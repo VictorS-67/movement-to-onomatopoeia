@@ -135,20 +135,20 @@
         */
 
         const participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
-        const participantId = participantInfo.participantId;
-        const participantEmail = participantInfo.email;
-        const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
-        
         //filtered data is the data corresponding to the participant ID
         let filteredData = JSON.parse(localStorage.getItem("filteredData"));
 
         localStorage.removeItem("participantInfo");
         localStorage.removeItem("filteredData");
 
-        if(!participantId){
-            alert("Warning, no participant ID found");
+        if(!participantInfo){
+            alert("Warning, no participant information found");
             window.location.href = "index.html";
         }
+
+        const participantId = participantInfo.participantId;
+        const participantEmail = participantInfo.email;
+        const participantName = participantInfo.name || participantEmail; // Use name if available, otherwise email
 
         
         nameDisplay.textContent = "Participant: " + participantName;
