@@ -12,6 +12,7 @@ async function fetchFilesInFolder() {
   }
 }
 
+// Function to load selected videos from the Google Sheet
 async function loadSelectedVideos(spreadsheetId, sheetName, videoSelect) {
   try {
       const selectedVideosData = await getSheetData(spreadsheetId, sheetName);
