@@ -236,6 +236,11 @@ async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantDa
         const { email, name, age, gender, movementPractice, nativeLanguage } = participantData;
         const signUpDate = obtainDate();
 
+        let checkMovementPractice = movementPractice || '';
+        if (checkMovementPractice=== '') {
+            checkMovementPractice = 'null';
+        }
+
         // Generate a unique participant ID
         const participantsData = await getSheetData(spreadsheetId, ParticipantSheet);
         if (!participantsData || participantsData.length === 0) {
@@ -266,7 +271,7 @@ async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantDa
             name,                          // Keep as string
             parseInt(age),                 // Convert to integer
             gender,                        // Keep as string
-            movementPractice || '',        // Keep as string (empty if not provided)
+            checkMovementPractice,         // Keep as string
             nativeLanguage,                // Keep as string
             signUpDate                     // Keep as string
         ];
