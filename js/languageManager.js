@@ -107,10 +107,14 @@ class LanguageManager {
     updateElement(id, text, attribute = 'textContent') {
         const element = document.getElementById(id);
         if (element) {
-            if (attribute === 'textContent') {
-                element.textContent = text;
-            } else {
-                element.setAttribute(attribute, text);
+            const currentValue = attribute === 'textContent' ? element.textContent : element.getAttribute(attribute);
+            // Only update if the value has changed
+            if (currentValue !== text) {
+                if (attribute === 'textContent') {
+                    element.textContent = text;
+                } else {
+                    element.setAttribute(attribute, text);
+                }
             }
         }
     }

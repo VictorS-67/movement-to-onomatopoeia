@@ -224,6 +224,9 @@
         // Update video source when video button is clicked
         videoButtons.addEventListener("click", (event) => {
             if (event.target.tagName === 'BUTTON') {
+                // Clear any existing messages when changing videos
+                UIUtils.clearMessage(messageDisplay);
+                
                 const selectedVideo = event.target.dataset.video;
                 videoPlayer.src = selectedVideo;
                 videoPlayer.load();
@@ -239,12 +242,18 @@
 
         // when click on the button Yes (i see onomatopoeia), change the visibility of the input
         hasOnomatopoeiaButtonYes.addEventListener("click", () => {
+            // Clear any existing messages when starting to input onomatopoeia
+            UIUtils.clearMessage(messageDisplay);
+            
             buttonVisibility.style.display = "none";
             inputVisibility.style.display = "block";
         });
 
         // when click on the button No (no onomatopoeia), save null entry if needed and go to next video
         hasOnomatopoeiaButtonNo.addEventListener("click", () => {
+            // Clear any existing messages when clicking "No"
+            UIUtils.clearMessage(messageDisplay);
+            
             // If no onomatopoeia has been saved yet, save a null entry
             const currentVideoData = filteredData.filter(item => item["video"] === currentVideoName);
             if (!currentVideoData.length){

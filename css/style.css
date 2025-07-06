@@ -1,3 +1,23 @@
+/* CSS Variables for consistency and maintainability */
+:root {
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --text-primary: #374151;
+    --text-secondary: #6b7280;
+    --border-color: #d1d5db;
+    --border-light: #e5e7eb;
+    --bg-light: #f9fafb;
+    --bg-gray: #edf2f7;
+    --success-color: #10b981;
+    --success-hover: #059669;
+    --error-color: #ef4444;
+    --border-radius: 0.375rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     position: relative;
@@ -10,8 +30,8 @@ body {
 }
 .video-container {
     margin-bottom: 1rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
     overflow: hidden; /* To contain rounded corners of video */
 }
 #myVideo {
@@ -19,15 +39,15 @@ body {
     height: auto;
 }
 #videoSelect {
-    border: 2px solid #4f46e5;
-    background-color: #edf2f7;
-    padding: 0.5rem;
+    border: 2px solid var(--primary-color);
+    background-color: var(--bg-gray);
+    padding: var(--spacing-sm);
     font-size: 1rem;
-    border-radius: 0.375rem;
+    border-radius: var(--border-radius);
 }
 .dropdown label {
     font-size: 1.25rem;
-    color: #4f46e5;
+    color: var(--primary-color);
     font-weight: 700;
 }
 #inputVisibility {
@@ -39,59 +59,59 @@ body {
     margin-bottom: 1rem;
 }
 .input-group label {
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
     text-align: left;
 }
 .input-group input, .input-group textarea, .input-group select {
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
 }
 .input-group textarea {
     resize: vertical;
     min-height: 4rem;
 }
 .button {
-    padding: 0.75rem 1.5rem;
-    background-color: #4f46e5;
+    padding: var(--spacing-sm) 1.5rem;
+    background-color: var(--primary-color);
     color: #fff;
     font-weight: 600;
-    border-radius: 0.375rem;
+    border-radius: var(--border-radius);
     cursor: pointer;
     transition: background-color 0.3s ease;
     font-size: 1rem;
-    margin: 0.5rem 0;
+    margin: var(--spacing-sm) 0;
 }
 .button:hover {
-    background-color: #4338ca;
+    background-color: var(--primary-hover);
 }
 #timestampDisplay {
     font-size: 1.25rem;
     font-weight: 600;
     margin-bottom: 1rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 #newParticipantForm {
     margin-top: 2rem;
     padding: 1.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    background-color: #f9fafb;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
 }
 #newParticipantForm h2 {
     margin-bottom: 1rem;
-    color: #374151;
+    color: var(--text-primary);
     font-size: 1.25rem;
     font-weight: 600;
 }
 #message {
     margin-top: 1rem;
-    padding: 0.5rem;
-    border-radius: 0.375rem;
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
     font-weight: 500;
 }
 .video-buttons-container {
@@ -100,7 +120,7 @@ body {
 
 .video-buttons-container h3 {
     margin-bottom: 1rem;
-    color: #374151;
+    color: var(--text-primary);
     font-size: 1.125rem;
     font-weight: 600;
 }
@@ -108,16 +128,16 @@ body {
 .video-buttons {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
+    gap: var(--spacing-sm);
     justify-content: center;
 }
 
 .video-button {
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-sm) 1rem;
     background-color: #f3f4f6;
-    color: #374151;
-    border: 2px solid #d1d5db;
-    border-radius: 0.375rem;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -130,25 +150,25 @@ body {
 }
 
 .video-button.active {
-    background-color: #4f46e5;
+    background-color: var(--primary-color);
     color: #ffffff;
-    border-color: #4f46e5;
+    border-color: var(--primary-color);
 }
 
 .video-button.active:hover {
-    background-color: #4338ca;
-    border-color: #4338ca;
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
 }
 
 .video-button.completed {
-    background-color: #10b981;
+    background-color: var(--success-color);
     color: #ffffff;
-    border-color: #10b981;
+    border-color: var(--success-color);
 }
 
 .video-button.completed:hover {
-    background-color: #059669;
-    border-color: #059669;
+    background-color: var(--success-hover);
+    border-color: var(--success-hover);
 }
 
 #buttonVisibility {
@@ -179,11 +199,11 @@ body {
 }
 
 .language-button {
-    padding: 0.5rem 1rem;
+    padding: var(--spacing-sm) 1rem;
     background-color: #f3f4f6;
-    color: #374151;
-    border: 2px solid #d1d5db;
-    border-radius: 0.375rem;
+    color: var(--text-primary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -196,47 +216,47 @@ body {
 }
 
 .language-button.active {
-    background-color: #4f46e5;
+    background-color: var(--primary-color);
     color: #ffffff;
-    border-color: #4f46e5;
+    border-color: var(--primary-color);
 }
 
 .language-button.active:hover {
-    background-color: #4338ca;
-    border-color: #4338ca;
+    background-color: var(--primary-hover);
+    border-color: var(--primary-hover);
 }
 
 .intro-text {
     text-align: left;
     margin-bottom: 2rem;
     padding: 1.5rem;
-    background-color: #f9fafb;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
+    background-color: var(--bg-light);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
 }
 
 .intro-text h2 {
-    color: #374151;
+    color: var(--text-primary);
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1rem;
 }
 
 .intro-text h3 {
-    color: #374151;
+    color: var(--text-primary);
     font-size: 1.25rem;
     font-weight: 600;
     margin: 1rem 0 0.5rem 0;
 }
 
 .intro-text p {
-    color: #6b7280;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 1rem;
 }
 
 .intro-text ul {
-    color: #6b7280;
+    color: var(--text-secondary);
     line-height: 1.6;
     margin-left: 1.5rem;
     margin-bottom: 1rem;
@@ -253,10 +273,10 @@ body {
 }
 
 .language-dropdown {
-    padding: 0.5rem 0.75rem;
+    padding: var(--spacing-sm) 0.75rem;
     background-color: #ffffff;
-    border: 2px solid #d1d5db;
-    border-radius: 0.375rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -265,25 +285,25 @@ body {
 }
 
 .language-dropdown:hover {
-    border-color: #4f46e5;
+    border-color: var(--primary-color);
 }
 
 .language-dropdown:focus {
     outline: none;
-    border-color: #4f46e5;
+    border-color: var(--primary-color);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 #participantForm {
     margin-top: 2rem;
     padding: 1.5rem;
-    border: 1px solid #e5e7eb;
-    border-radius: 0.5rem;
-    background-color: #f9fafb;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
 }
 
 #participantForm h2 {
     margin-bottom: 1.5rem;
-    color: #374151;
+    color: var(--text-primary);
     font-size: 1.25rem;
     font-weight: 600;
 }
@@ -291,18 +311,18 @@ body {
 #participantForm label {
     display: block;
     margin-top: 1rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: var(--spacing-sm);
     font-weight: 600;
-    color: #374151;
+    color: var(--text-primary);
     text-align: left;
 }
 
 #participantForm input,
 #participantForm select {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid #d1d5db;
-    border-radius: 0.375rem;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
     font-size: 1rem;
     margin-bottom: 1rem;
     box-sizing: border-box;

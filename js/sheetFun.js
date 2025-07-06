@@ -1,6 +1,17 @@
-// Function to get an OAuth 2.0 access token using a Netlify Function.
+// Token cache with expiration
+let tokenCache = {
+    token: null,
+    expiry: null
+};
+
+// Function to get an OAuth 2.0 access token with caching
 async function getAccessToken(spreadsheetId, sheetName) {
     try {
+        // Check if we have a valid cached token
+        if (tokenCache.token && tokenCache.expiry && new Date() < tokenCache.expiry) {
+            return tokenCache.token;
+        }
+
         const response = await fetch('/.netlify/functions/get-access-token', { 
             method: 'POST',
             headers: {
@@ -18,9 +29,16 @@ async function getAccessToken(spreadsheetId, sheetName) {
         }
 
         const data = await response.json();
+        
+        // Cache the token for 50 minutes (tokens expire in 1 hour)
+        tokenCache.token = data.access_token;
+        tokenCache.expiry = new Date(Date.now() + 50 * 60 * 1000);
+        
         return data.access_token;
     } catch (error) {
         console.error('Error getting access token:', error);
+        // Clear cache on error
+        tokenCache = { token: null, expiry: null };
         throw error;
     }
 }

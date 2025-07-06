@@ -118,20 +118,15 @@
             console.error('Failed to initialize language manager:', error);
         });
 
-        // Load configuration from sheet-info.json
-        let spreadsheetId, OnomatopoeiaSheet, videoSheet, ParticipantSheet;
-        
-        fetch('./sheet-info.json')
-            .then(response => response.json())
-            .then(config => {
-                spreadsheetId = config.spreadsheetId;
-                OnomatopoeiaSheet = config.OnomatopoeiaSheet;
-                videoSheet = config.videoSheet;
-                ParticipantSheet = config.ParticipantSheet;
-            })
-            .catch(error => {
-                console.error('Error loading sheet configuration:', error);
-            });
+        // Load configuration using ConfigManager
+        ConfigManager.loadConfig().then(config => {
+            spreadsheetId = config.spreadsheetId;
+            OnomatopoeiaSheet = config.OnomatopoeiaSheet;
+            videoSheet = config.videoSheet;
+            ParticipantSheet = config.ParticipantSheet;
+        }).catch(error => {
+            console.error('Error loading sheet configuration:', error);
+        });
 
         let data = []
 

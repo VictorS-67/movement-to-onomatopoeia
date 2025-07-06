@@ -90,6 +90,13 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     docElts["buttonVisibility"].style.display = "block";
     docElts["inputVisibility"].style.display = "none";
 
+    // Clear any existing messages when resetting display
+    const messageDisplay = document.getElementById("message");
+    if (messageDisplay) {
+        messageDisplay.textContent = "";
+        messageDisplay.style.color = "";
+    }
+
     let recordMessage = "";
 
     // ----- color in green all buttons where we have data for the video
@@ -318,5 +325,56 @@ function goToNextVideo(currentButton) {
         // Reached the end - show completion message instead of looping
         messageDisplay.textContent = langManager.getText('survey.all_videos_complete');
         messageDisplay.style.color = "green";
+    }
+}
+
+// Utility functions to reduce redundancy
+class UIUtils {
+    static clearMessage(messageElement) {
+        if (messageElement) {
+            messageElement.textContent = "";
+            messageElement.style.color = "";
+        }
+    }
+    
+    static showMessage(messageElement, text, color = "black") {
+        if (messageElement) {
+            messageElement.textContent = text;
+            messageElement.style.color = color;
+        }
+    }
+    
+    static showError(messageElement, text) {
+        this.showMessage(messageElement, text, "red");
+    }
+    
+    static showSuccess(messageElement, text) {
+        this.showMessage(messageElement, text, "green");
+    }
+    
+    static showInfo(messageElement, text) {
+        this.showMessage(messageElement, text, "blue");
+    }
+}
+
+// Configuration manager to avoid redundant config loading
+class ConfigManager {
+    static config = null;
+    
+    static async loadConfig() {
+        if (this.config) return this.config;
+        
+        try {
+            const response = await fetch('./sheet-info.json');
+            this.config = await response.json();
+            return this.config;
+        } catch (error) {
+            console.error('Error loading configuration:', error);
+            throw error;
+        }
+    }
+    
+    static getConfig() {
+        return this.config;
     }
 }
