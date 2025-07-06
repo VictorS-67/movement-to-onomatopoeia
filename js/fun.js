@@ -278,7 +278,16 @@ async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantDa
             nativeLanguage,                // Keep as string
             signUpDate                     // Keep as string
         ];
-        return await appendSheetData(spreadsheetId, ParticipantSheet, newData);
+        
+        // Save to sheet first and check if successful
+        const appendResult = await appendSheetData(spreadsheetId, ParticipantSheet, newData);
+        
+        if (!appendResult) {
+            throw new Error('Failed to save participant data to sheet');
+        }
+        
+        // Only return the participant ID if save was successful
+        return participantId;
     } catch (error) {
         console.error('Error saving participant:', error);
         throw error;
