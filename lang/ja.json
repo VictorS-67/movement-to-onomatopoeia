@@ -58,6 +58,7 @@
     },
     "survey": {
         "page_title": "オノマトペを使った動作の描写",
+        "participant_name": "参加者：",
         "logout_button": "ログアウト",
         "video_title": "動画",
         "select_video_title": "動画を選択してください：",

@@ -58,6 +58,7 @@
     },
     "survey": {
         "page_title": "Movement description using onomatopoeia",
+        "participant_name": "Participant: ",
         "logout_button": "Logout",
         "video_title": "Video",
         "select_video_title": "Select a video:",

@@ -273,3 +273,41 @@ body {
     border-color: #4f46e5;
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
+#participantForm {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 0.5rem;
+    background-color: #f9fafb;
+}
+
+#participantForm h2 {
+    margin-bottom: 1.5rem;
+    color: #374151;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+#participantForm label {
+    display: block;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #374151;
+    text-align: left;
+}
+
+#participantForm input,
+#participantForm select {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    box-sizing: border-box;
+}
+
+#participantForm button {
+    margin-top: 1.5rem;
+}
