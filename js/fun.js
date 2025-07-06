@@ -215,7 +215,10 @@ async function checkParticipantExists(spreadsheetId, ParticipantSheet, email) {
                     participantId: participantsData[i][idIndex],
                     email: participantsData[i][emailIndex],
                     name: participantsData[i][headers.indexOf('name')] || '',
-                    age: participantsData[i][headers.indexOf('age')] || ''
+                    age: participantsData[i][headers.indexOf('age')] || '',
+                    gender: participantsData[i][headers.indexOf('gender')] || '',
+                    movementPractice: participantsData[i][headers.indexOf('movementPractice')] || '',
+                    nativeLanguage: participantsData[i][headers.indexOf('nativeLanguage')] || ''
                 };
             }
         }
@@ -230,9 +233,9 @@ async function checkParticipantExists(spreadsheetId, ParticipantSheet, email) {
 // Function to save new participant
 async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantData) {
     try {
-        const { email, name, age } = participantData;
-        const timestamp = obtainDate();
-        
+        const { email, name, age, gender, movementPractice, nativeLanguage } = participantData;
+        const signUpDate = obtainDate();
+
         // Generate a unique participant ID
         const participantsData = await getSheetData(spreadsheetId, ParticipantSheet);
         if (!participantsData || participantsData.length === 0) {
@@ -262,7 +265,10 @@ async function saveNewParticipant(spreadsheetId, ParticipantSheet, participantDa
             email,                         // Keep as string
             name,                          // Keep as string
             parseInt(age),                 // Convert to integer
-            timestamp                      // Keep as string
+            gender,                        // Keep as string
+            movementPractice || '',        // Keep as string (empty if not provided)
+            nativeLanguage,                // Keep as string
+            signUpDate                     // Keep as string
         ];
         return await appendSheetData(spreadsheetId, ParticipantSheet, newData);
     } catch (error) {

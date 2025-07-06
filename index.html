@@ -14,23 +14,51 @@
 <body class="bg-gray-100">
     
     <div class="container">        
-        <div class="input-group">
+        <form id="emailForm" class="input-group">
             <label for="emailInput">Your email address:</label>
-            <input type="email" id="emailInput" name="emailInput" placeholder="Enter your email address">
-            <button id="checkEmail" class="button">Next</button>
-        </div>
+            <input type="email" id="emailInput"
+             name="emailInput" placeholder="Enter your email address"
+             required>
+            <button type="submit" id="checkEmail" class="button">Next</button>
+        </form>
 
         <!-- New participant form (initially hidden) -->
-        <div id="newParticipantForm" class="input-group" style="display: none;">
+        <form id="participantForm" class="input-group" style="display: none;">
             <h2>Welcome! Please complete your profile:</h2>
             <label for="nameInput">Your name/pseudo:</label>
-            <input type="text" id="nameInput" name="nameInput" placeholder="Enter your name or pseudonym">
+            <input type="text" id="nameInput" name="nameInput" 
+                   placeholder="Enter your name or pseudonym" 
+                   required minlength="2" maxlength="50">
             
             <label for="ageInput">Your age:</label>
-            <input type="number" id="ageInput" name="ageInput" placeholder="Enter your age" min="1" max="120">
-            
-            <button id="startSurvey" class="button">Start the survey</button>
-        </div>
+            <input type="number" id="ageInput" name="ageInput" 
+                   placeholder="Enter your age" 
+                   min="1" max="120" required>
+
+            <label for="genderInput">Your gender:</label>
+            <select id="genderInput" name="genderInput" required>
+                <option value="">Please select...</option>
+                <option value="Female">Female</option>
+                <option value="Male">Male</option>
+                <option value="Other">Other</option>
+                <option value="Prefer not to say">Prefer not to say</option>
+            </select>
+
+            <label for="movementPracticeInput">Your movement practice (optional):</label>
+            <input type="text" id="movementPracticeInput" name="movementPracticeInput" 
+                   placeholder="e.g., dance, somatics, manual therapy, movement analysis..." 
+                   maxlength="100">
+
+            <label for="nativeLanguageInput">Your native language:</label>
+            <select id="nativeLanguageInput" name="nativeLanguageInput" required>
+                <option value="">Please select...</option>
+                <option value="Japanese">Japanese</option>
+                <option value="English">English</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <button type="submit" id="startSurvey" class="button">Start the survey</button>
+        </form>
 
         <div id="message" class="mt-4 text-gray-700"></div>
     </div>
@@ -40,12 +68,14 @@
     <script src="./js/fun.js"></script>
     <script>
 
-        const checkEmailButton = document.getElementById("checkEmail");
-        const startSurveyButton = document.getElementById("startSurvey");
+        const emailForm = document.getElementById("emailForm");
+        const participantForm = document.getElementById("participantForm");
         const emailInput = document.getElementById("emailInput");
         const nameInput = document.getElementById("nameInput");
         const ageInput = document.getElementById("ageInput");
-        const newParticipantForm = document.getElementById("newParticipantForm");
+        const genderInput = document.getElementById("genderInput");
+        const movementPracticeInput = document.getElementById("movementPracticeInput");
+        const nativeLanguageInput = document.getElementById("nativeLanguageInput");
         const messageDisplay = document.getElementById("message");
 
         // Load configuration from sheet-info.json
@@ -65,14 +95,10 @@
 
         let data = []
 
-        checkEmailButton.addEventListener("click", async () => {
-            const email = emailInput.value.trim();
+        emailForm.addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent default form submission
             
-            if (!email || !email.includes('@')) {
-                messageDisplay.textContent = "Please enter a valid email address.";
-                messageDisplay.style.color = "red";
-                return;
-            }
+            const email = emailInput.value.trim();
 
             try {
                 messageDisplay.textContent = "Checking participant...";
@@ -94,7 +120,7 @@
                     window.location.href = "survey.html";
                 } else {
                     // New participant - show registration form
-                    newParticipantForm.style.display = "block";
+                    participantForm.style.display = "block";
                     messageDisplay.textContent = "Welcome! Please complete your profile to start.";
                     messageDisplay.style.color = "green";
                 }
@@ -105,22 +131,15 @@
             }
         });
 
-        startSurveyButton.addEventListener("click", async () => {
+        participantForm.addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent default form submission
+            
             const email = emailInput.value.trim();
             const name = nameInput.value.trim();
             const age = ageInput.value.trim();
-
-            if (!name) {
-                messageDisplay.textContent = "Please enter your name.";
-                messageDisplay.style.color = "red";
-                return;
-            }
-
-            if (!age || age < 1 || age > 120) {
-                messageDisplay.textContent = "Please enter a valid age.";
-                messageDisplay.style.color = "red";
-                return;
-            }
+            const gender = genderInput.value;
+            const movementPractice = movementPracticeInput.value.trim();
+            const nativeLanguage = nativeLanguageInput.value;
 
             try {
                 messageDisplay.textContent = "Creating your profile...";
@@ -131,7 +150,10 @@
                 const participantData = {
                     email: email,
                     name: name,
-                    age: age
+                    age: age,
+                    gender: gender,
+                    movementPractice: movementPractice,
+                    nativeLanguage: nativeLanguage
                 };
 
                 // Save participant data to Google Sheets and

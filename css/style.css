@@ -43,7 +43,7 @@ body {
     color: #374151;
     text-align: left;
 }
-.input-group input, .input-group textarea {
+.input-group input, .input-group textarea, .input-group select {
     padding: 0.75rem;
     border: 1px solid #d1d5db;
     border-radius: 0.375rem;
