@@ -1,5 +1,6 @@
 body {
     font-family: 'Inter', sans-serif;
+    position: relative;
 }
 .container {
     max-width: 800px;
@@ -243,4 +244,33 @@ body {
 
 .intro-text li {
     margin-bottom: 0.5rem;
+}
+
+.language-selector {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1000;
+}
+
+.language-dropdown {
+    padding: 0.5rem 0.75rem;
+    background-color: #ffffff;
+    border: 2px solid #d1d5db;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.language-dropdown:hover {
+    border-color: #4f46e5;
+}
+
+.language-dropdown:focus {
+    outline: none;
+    border-color: #4f46e5;
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }

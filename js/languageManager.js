@@ -38,6 +38,9 @@ class LanguageManager {
         const t = this.translations[this.currentLanguage];
         if (!t) return;
 
+        // Update page title
+        document.title = t.page.title;
+
         // Update welcome section
         this.updateElement('welcomeTitle', t.welcome.title);
         this.updateElement('welcomeIntro', t.welcome.introduction);
