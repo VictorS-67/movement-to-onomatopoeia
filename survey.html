@@ -115,17 +115,12 @@
         const questionText = document.getElementById("questionText");
         const languageSelect = document.getElementById("languageSelect");
 
-        // Initialize language manager
-        langManager.initialize().then(() => {
-            console.log('Language manager initialized on survey page');
-        }).catch(error => {
-            console.error('Failed to initialize language manager on survey page:', error);
-        });
-
         // Language switching functionality
         languageSelect.addEventListener("change", async (event) => {
             const selectedLanguage = event.target.value;
             await langManager.switchLanguage(selectedLanguage);
+            // Update participant name when language changes
+            nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
         });
 
         
@@ -163,7 +158,16 @@
 
         let currentVideoName;
 
-        nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
+        // Initialize language manager first, then set participant name
+        langManager.initialize().then(() => {
+            console.log('Language manager initialized on survey page');
+            // Set participant name after language manager is ready
+            nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
+        }).catch(error => {
+            console.error('Failed to initialize language manager on survey page:', error);
+            // Fallback to English text if language manager fails
+            nameDisplay.textContent = "Participant: " + participantName;
+        });
 
         // Load configuration from sheet-info.json
         // and populate the dropdown dynamically from SelectedVideos sheet
