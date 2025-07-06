@@ -82,7 +82,7 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     
     // docElts contain onomatopoeiaInput, startDisplay,
     // endDisplay, recordOnomatopoeia, buttonVisibility, 
-    // inputVisibility
+    // inputVisibility, questionText
     docElts["onomatopoeiaInput"].value = "";
     docElts["startDisplay"].textContent = "-.--";
     docElts["endDisplay"].textContent = "-.--";
@@ -119,6 +119,9 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
         });
     }
     docElts["recordOnomatopoeia"].innerHTML = recordMessage;
+
+    docElts["questionText"].textContent = "Are there any more moments in this video that make you think of an onomatopoeia?";
+
 }
 
 async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = true) {

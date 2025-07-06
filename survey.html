@@ -54,22 +54,24 @@
         <!-- Onomatopoeia -->
         <div class="input-group">
             <div id="buttonVisibility">
-                <p>Are there moments in this video that make you think of an onomatopoeia?</p>
+                <p id="questionText">Are there moments in this video that make you think of an onomatopoeia?</p>
                 <div class="yes-no-buttons">
                     <button id="hasOnomatopoeiaButtonYes" class="button">Yes</button>
                     <button id="hasOnomatopoeiaButtonNo" class="button">No</button>
                 </div>
             </div>
             <div id ="inputVisibility">
+                <p>1) Please write the onomatopoeia you are thinking of:</p>
+
                 <label for="onomatopoeiaInput">Onomatopoeia:</label>
                 <textarea id="onomatopoeiaInput" name="onomatopoeiaInput" placeholder="Write your onomatopoeia"></textarea>
-            
-                <p>To log the start (end) time of the onomatopoeia, please pause the video at the start (end) of the movement corresponding to the onomatopoeia. Then click on the "Get starting (ending) time" button.</p>
-    
+
+                <p>2) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia begins and press the "Get starting time" button</p>
                 <button id="getStart" class="button">Get starting time</button>
                 <p>Onomatopoeia Start Time:</p>
                 <p id="startDisplay">-.--</p>
-    
+
+                <p>3) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia ends and press the "Get ending time" button</p>
                 <button id="getEnd" class="button">Get ending time</button>
                 <p>Onomatopoeia End Time:</p>
                 <p id="endDisplay">-.--</p>
@@ -102,6 +104,7 @@
         const saveOnomatopoeiaButton = document.getElementById("saveOnomatopoeia");
         const messageDisplay = document.getElementById("message");
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
+        const questionText = document.getElementById("questionText");
 
         
         const participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
@@ -178,6 +181,7 @@
                     "recordOnomatopoeia": recordOnomatopoeia,
                     "buttonVisibility": buttonVisibility,
                     "inputVisibility": inputVisibility,
+                    "questionText": questionText
                 }
                 //reset the display
                 resetDisplay(currentVideoName, filteredData, docElts);
