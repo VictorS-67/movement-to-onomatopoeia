@@ -75,6 +75,33 @@ class LanguageManager {
         this.updateElement('emailLabel', t.ui.email_label);
         this.updateElement('emailInput', t.ui.email_placeholder, 'placeholder');
         this.updateElement('nextButton', t.ui.next_button);
+
+        // Update survey elements (if they exist on the page)
+        if (t.survey) {
+            this.updateElement('buttonLogout', t.survey.logout_button);
+            this.updateElement('videoTitle', t.survey.video_title);
+            this.updateElement('selectVideoTitle', t.survey.select_video_title);
+            this.updateElement('savedOnomatopoeiaTitle', t.survey.saved_onomatopoeia_title);
+            this.updateElement('recordOnomatopoeia', t.survey.no_saved_onomatopoeia);
+            this.updateElement('questionText', t.survey.question_text);
+            this.updateElement('hasOnomatopoeiaButtonYes', t.survey.yes_button);
+            this.updateElement('hasOnomatopoeiaButtonNo', t.survey.no_button);
+            this.updateElement('step1Text', t.survey.step1_text);
+            this.updateElement('onomatopoeiaLabel', t.survey.onomatopoeia_label);
+            this.updateElement('onomatopoeiaInput', t.survey.onomatopoeia_placeholder, 'placeholder');
+            this.updateElement('step2Text', t.survey.step2_text);
+            this.updateElement('getStart', t.survey.get_start_button);
+            this.updateElement('startTimeLabel', t.survey.start_time_label);
+            this.updateElement('step3Text', t.survey.step3_text);
+            this.updateElement('getEnd', t.survey.get_end_button);
+            this.updateElement('endTimeLabel', t.survey.end_time_label);
+            this.updateElement('saveOnomatopoeia', t.survey.save_button);
+            
+            // Update page title for survey page
+            if (document.querySelector('#myVideo')) {
+                document.title = t.survey.page_title;
+            }
+        }
     }
 
     updateElement(id, text, attribute = 'textContent') {

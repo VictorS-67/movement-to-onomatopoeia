@@ -17,7 +17,14 @@
     
 <body class="bg-gray-100">
     
-    <div class="container">        
+    <div class="container">
+        <!-- Language selector at top of container, aligned right -->
+        <div class="language-selector-container">
+            <select id="languageSelect" class="language-dropdown">
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+            </select>
+        </div>        
         
         <div class="input-group">
             <p id="nameDisplay"></p>
@@ -39,13 +46,13 @@
 
         <!-- Video Selection Buttons -->
         <div class="video-buttons-container">
-            <h3>Select a video:</h3>
+            <h3 id="selectVideoTitle">Select a video:</h3>
             <div id="videoButtons" class="video-buttons">
                 <!-- Buttons will be populated here -->
             </div>
         </div>
 
-        <h3>Onomatopoeia already saved for this video:</h3>
+        <h3 id="savedOnomatopoeiaTitle">Onomatopoeia already saved for this video:</h3>
         <p id="recordOnomatopoeia">None</p>
         <p id="output"></p>
 
@@ -61,19 +68,19 @@
                 </div>
             </div>
             <div id ="inputVisibility">
-                <p>1) Please write the onomatopoeia you are thinking of:</p>
+                <p id="step1Text">1) Please write the onomatopoeia you are thinking of:</p>
 
-                <label for="onomatopoeiaInput">Onomatopoeia:</label>
+                <label id="onomatopoeiaLabel" for="onomatopoeiaInput">Onomatopoeia:</label>
                 <textarea id="onomatopoeiaInput" name="onomatopoeiaInput" placeholder="Write your onomatopoeia"></textarea>
 
-                <p>2) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia begins and press the "Get starting time" button</p>
+                <p id="step2Text">2) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia begins and press the "Get starting time" button</p>
                 <button id="getStart" class="button">Get starting time</button>
-                <p>Onomatopoeia Start Time:</p>
+                <p id="startTimeLabel">Onomatopoeia Start Time:</p>
                 <p id="startDisplay">-.--</p>
 
-                <p>3) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia ends and press the "Get ending time" button</p>
+                <p id="step3Text">3) Place the cursor of the video player at where the movement that corresponds to the onomatopoeia ends and press the "Get ending time" button</p>
                 <button id="getEnd" class="button">Get ending time</button>
-                <p>Onomatopoeia End Time:</p>
+                <p id="endTimeLabel">Onomatopoeia End Time:</p>
                 <p id="endDisplay">-.--</p>
     
                 <button id="saveOnomatopoeia" class="button">Save Onomatopoeia</button>
@@ -83,6 +90,7 @@
 
     </div>
 
+    <script src="./js/languageManager.js"></script>
     <script src="./js/sheetFun.js"></script>
     <script src="./js/fun.js"></script>
     <script>
@@ -105,6 +113,20 @@
         const messageDisplay = document.getElementById("message");
         const recordOnomatopoeia = document.getElementById("recordOnomatopoeia");
         const questionText = document.getElementById("questionText");
+        const languageSelect = document.getElementById("languageSelect");
+
+        // Initialize language manager
+        langManager.initialize().then(() => {
+            console.log('Language manager initialized on survey page');
+        }).catch(error => {
+            console.error('Failed to initialize language manager on survey page:', error);
+        });
+
+        // Language switching functionality
+        languageSelect.addEventListener("change", async (event) => {
+            const selectedLanguage = event.target.value;
+            await langManager.switchLanguage(selectedLanguage);
+        });
 
         
         const participantInfo = JSON.parse(localStorage.getItem("participantInfo"));

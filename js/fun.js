@@ -108,7 +108,7 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     const nonNullVideoData = currentVideoData.filter(elt => elt["onomatopoeia"] !== "null");
 
     if (!nonNullVideoData.length) {
-        recordMessage = "None";
+        recordMessage = langManager.getText('survey.no_saved_onomatopoeia');
     } else {
         // write any onomatopoeia data that was not null
         nonNullVideoData.forEach(elt => {
@@ -120,7 +120,7 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     }
     docElts["recordOnomatopoeia"].innerHTML = recordMessage;
 
-    docElts["questionText"].textContent = "Are there any more moments in this video that make you think of an onomatopoeia?";
+    docElts["questionText"].textContent = langManager.getText('survey.question_text_more');
 
 }
 
@@ -135,28 +135,28 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     
     if (onomatopoeia === "") {
         if (verbose) {
-            messageDisplay.textContent = "Please enter your onomatopoeia.";
+            messageDisplay.textContent = langManager.getText('survey.error_enter_onomatopoeia');
             messageDisplay.style.color = "red";
         }
         throw new Error("Onomatopoeia is required");
     }
     if (startTime === "-.--") {
         if (verbose) {
-            messageDisplay.textContent = "Please record the start of the onomatopoeia.";
+            messageDisplay.textContent = langManager.getText('survey.error_record_start');
             messageDisplay.style.color = "red";
         }
         throw new Error("Start time is required");
     }
     if (endTime === "-.--") {
         if (verbose) {
-            messageDisplay.textContent = "Please record the end of the onomatopoeia.";
+            messageDisplay.textContent = langManager.getText('survey.error_record_end');
             messageDisplay.style.color = "red";
         }
         throw new Error("End time is required");
     }
     if (!participantId || !video || !answeredTimestamp) {
         if (verbose) {
-            messageDisplay.textContent = "Something went wrong when saving the data";
+            messageDisplay.textContent = langManager.getText('survey.error_saving_general');
             messageDisplay.style.color = "red";
         }
         throw new Error("Missing required data");
@@ -176,7 +176,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
 
     if (!appendResult) {
         if (verbose) {
-            messageDisplay.textContent = "Failed to save data to the sheet.";
+            messageDisplay.textContent = langManager.getText('survey.error_saving_sheet');
             messageDisplay.style.color = "red";
         }
         throw new Error("Failed to save to sheet");
@@ -189,7 +189,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
 
     // Display a success message
     if (verbose) {
-        messageDisplay.textContent = "Onomatopoeia and start-end saved!";
+        messageDisplay.textContent = langManager.getText('survey.success_saved');
         messageDisplay.style.color = "green";
     }
 }
@@ -307,7 +307,7 @@ function goToNextVideo(currentButton) {
         nextButton.click();
     } else {
         // Reached the end - show completion message instead of looping
-        messageDisplay.textContent = "You have reached the end of all videos. Thank you for your participation!";
+        messageDisplay.textContent = langManager.getText('survey.all_videos_complete');
         messageDisplay.style.color = "green";
     }
 }

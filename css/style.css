@@ -246,11 +246,10 @@ body {
     margin-bottom: 0.5rem;
 }
 
-.language-selector {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
-    z-index: 1000;
+.language-selector-container {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 1.5rem;
 }
 
 .language-dropdown {
