@@ -85,6 +85,20 @@
         "error_saving_general": "Something went wrong when saving the data",
         "error_saving_sheet": "Failed to save data to the sheet.",
         "success_saved": "Onomatopoeia and start-end saved!",
-        "all_videos_complete": "You have reached the end of all videos. Thank you for your participation!"
+        "success_saved_with_audio": "Onomatopoeia, timing, and audio saved!",
+        "all_videos_complete": "You have reached the end of all videos. Thank you for your participation!",
+        "audio_section_title": "4) Optional: Record audio of you pronouncing the onomatopoeia",
+        "audio_record_button": "Start Recording",
+        "audio_stop_button": "Stop Recording",
+        "audio_play_button": "Play Recording",
+        "audio_delete_button": "Delete Recording",
+        "audio_status_ready": "Ready to record",
+        "audio_status_recording": "Recording...",
+        "audio_status_recorded": "Audio recorded successfully",
+        "audio_status_playing": "Playing...",
+        "audio_permission_denied": "Microphone permission denied. Audio recording is optional.",
+        "audio_not_supported": "Audio recording is not supported in this browser.",
+        "audio_upload_error": "Failed to upload audio. Your response was saved without audio.",
+        "audio_recording_error": "Error during audio recording. Please try again."
     }
 }

@@ -94,6 +94,11 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
     const messageDisplay = document.getElementById("message");
     UIUtils.clearMessage(messageDisplay);
 
+    // Reset audio recording if function is available
+    if (typeof window.resetAudioRecording === 'function') {
+        window.resetAudioRecording();
+    }
+
     let recordMessage = "";
 
     // ----- color in green all buttons where we have data for the video
@@ -119,7 +124,9 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
             const startTime = elt["startTime"];
             const endTime = elt["endTime"];
             const onomatopoeia = elt["onomatopoeia"];
-            recordMessage += `-"${onomatopoeia}" from ${startTime} to ${endTime};<br>`;
+            const hasAudio = elt["hasAudio"];
+            const audioIcon = hasAudio === "yes" ? " 🎵" : "";
+            recordMessage += `-"${onomatopoeia}"${audioIcon} from ${startTime} to ${endTime};<br>`;
         });
     }
     docElts["recordOnomatopoeia"].innerHTML = recordMessage;
@@ -136,6 +143,8 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     const startTime = infoDict["startTime"];
     const endTime = infoDict["endTime"];
     const answeredTimestamp = infoDict["answeredTimestamp"];
+    const hasAudio = infoDict["hasAudio"] || "no";
+    const audioBlob = infoDict["audioBlob"];
     
     if (onomatopoeia === "") {
         if (verbose) {
@@ -162,7 +171,21 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
         throw new Error("Missing required data");
     }
 
-    // store the data in the sheet online
+    // Handle audio upload if present
+    let audioFileName = null;
+    if (audioBlob && hasAudio === "yes") {
+        try {
+            audioFileName = await uploadAudioFile(audioBlob, participantId, video, onomatopoeia, answeredTimestamp);
+        } catch (audioError) {
+            console.error("Audio upload failed:", audioError);
+            if (verbose) {
+                UIUtils.showError(messageDisplay, langManager.getText('survey.audio_upload_error'));
+            }
+            // Continue saving without audio - don't fail the entire operation
+        }
+    }
+
+    // store the data in the sheet online (now includes hasAudio column)
     const newData = [
         parseInt(participantId),          // Convert to integer
         participantName,                  // Keep as string
@@ -170,7 +193,9 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
         onomatopoeia,                     // Keep as string
         parseFloat(startTime),            // Convert to decimal number
         parseFloat(endTime),              // Convert to decimal number
-        answeredTimestamp                 // Keep as string
+        answeredTimestamp,                // Keep as string
+        hasAudio,                         // Keep as string ("yes" or "no")
+        audioFileName || ""               // Audio filename or empty string
     ];
     const appendResult = await appendSheetData(spreadsheetId, OnomatopoeiaSheet, newData);
 
@@ -183,12 +208,62 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     // Log the result of the append operation
     // console.log('Append Result:', appendResult);
 
-    // update the local filteredData
-    filteredData.push(infoDict);
+    // update the local filteredData (add hasAudio field)
+    const updatedInfoDict = {
+        ...infoDict,
+        hasAudio: hasAudio,
+        audioFileName: audioFileName
+    };
+    delete updatedInfoDict.audioBlob; // Remove blob from stored data
+    filteredData.push(updatedInfoDict);
 
     // Display a success message
     if (verbose) {
-        UIUtils.showSuccess(messageDisplay, langManager.getText('survey.success_saved'));
+        const successMessage = hasAudio === "yes" && audioFileName ? 
+            langManager.getText('survey.success_saved_with_audio') :
+            langManager.getText('survey.success_saved');
+        UIUtils.showSuccess(messageDisplay, successMessage);
+    }
+}
+
+// Function to upload audio file to Google Drive
+async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia, timestamp) {
+    try {
+        // Convert blob to base64
+        const arrayBuffer = await audioBlob.arrayBuffer();
+        const base64Audio = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+        
+        // Generate filename: participant_video_onomatopoeia_timestamp.webm
+        const sanitizedOnomatopoeia = onomatopoeia.replace(/[^a-zA-Z0-9]/g, '_');
+        const filename = `${participantId}_${videoName.replace('.mp4', '')}_${sanitizedOnomatopoeia}_${timestamp}.webm`;
+        
+        const response = await fetch('/.netlify/functions/upload-audio', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                audioData: base64Audio,
+                filename: filename,
+                participantId: participantId,
+                videoName: videoName
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const result = await response.json();
+        
+        if (result.success) {
+            return result.fileName;
+        } else {
+            throw new Error(result.error || 'Upload failed');
+        }
+    } catch (error) {
+        console.error('Error uploading audio:', error);
+        throw error;
     }
 }
 

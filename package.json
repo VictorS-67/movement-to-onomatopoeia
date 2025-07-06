@@ -1,0 +1,22 @@
+{
+  "name": "movement-to-onomatopoeia",
+  "version": "1.0.0",
+  "description": "Web app for collecting onomatopoeia descriptions of videos with Google Sheets/Drive integration",
+  "dependencies": {
+    "googleapis": "^137.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "python3 -m http.server 8080",
+    "build": "echo 'No build step required'"
+  },
+  "keywords": [
+    "onomatopoeia",
+    "movement",
+    "survey",
+    "google-sheets",
+    "audio-recording"
+  ],
+  "author": "",
+  "license": "MIT"
+}

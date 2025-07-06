@@ -85,6 +85,20 @@
         "error_saving_general": "データの保存中にエラーが発生しました",
         "error_saving_sheet": "シートへのデータ保存に失敗しました。",
         "success_saved": "オノマトペと開始・終了時間が保存されました！",
-        "all_videos_complete": "すべての動画が終了しました。ご参加いただきありがとうございました！"
+        "success_saved_with_audio": "オノマトペ、タイミング、音声が保存されました！",
+        "all_videos_complete": "すべての動画が終了しました。ご参加いただきありがとうございました！",
+        "audio_section_title": "4) オプション：オノマトペを発音した音声を録音",
+        "audio_record_button": "録音開始",
+        "audio_stop_button": "録音停止",
+        "audio_play_button": "再生",
+        "audio_delete_button": "録音削除",
+        "audio_status_ready": "録音準備完了",
+        "audio_status_recording": "録音中...",
+        "audio_status_recorded": "音声録音が完了しました",
+        "audio_status_playing": "再生中...",
+        "audio_permission_denied": "マイクへのアクセスが拒否されました。音声録音は任意です。",
+        "audio_not_supported": "このブラウザでは音声録音がサポートされていません。",
+        "audio_upload_error": "音声のアップロードに失敗しました。回答は音声なしで保存されました。",
+        "audio_recording_error": "音声録音中にエラーが発生しました。もう一度お試しください。"
     }
 }

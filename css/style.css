@@ -312,3 +312,91 @@ body {
 #participantForm button {
     margin-top: 1.5rem;
 }
+
+/* Audio Recording Styles */
+.audio-section {
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    background-color: var(--bg-light);
+}
+
+.audio-controls {
+    display: flex;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: var(--spacing-md) 0;
+}
+
+.audio-button {
+    min-width: 120px;
+    transition: all 0.3s ease;
+}
+
+.audio-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.audio-delete {
+    background-color: var(--error-color);
+    border-color: var(--error-color);
+}
+
+.audio-delete:hover:not(:disabled) {
+    background-color: #dc2626;
+    border-color: #dc2626;
+}
+
+.audio-status {
+    text-align: center;
+    margin-top: var(--spacing-md);
+}
+
+.audio-status p {
+    margin: var(--spacing-sm) 0;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.audio-waveform {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 3px;
+    height: 30px;
+    margin-top: var(--spacing-sm);
+}
+
+.wave-bar {
+    width: 4px;
+    background-color: var(--primary-color);
+    border-radius: 2px;
+    animation: wave 1.2s ease-in-out infinite;
+}
+
+.wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes wave {
+    0%, 40%, 100% {
+        height: 5px;
+        background-color: var(--border-color);
+    }
+    20% {
+        height: 20px;
+        background-color: var(--primary-color);
+    }
+}
+
+.audio-recording .wave-bar {
+    background-color: var(--error-color);
+}
+
+.audio-playing .wave-bar {
+    background-color: var(--success-color);
+}

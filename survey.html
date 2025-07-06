@@ -82,6 +82,27 @@
                 <button id="getEnd" class="button">Get ending time</button>
                 <p id="endTimeLabel">Onomatopoeia End Time:</p>
                 <p id="endDisplay">-.--</p>
+
+                <!-- Audio Recording Section -->
+                <div id="audioSection" class="audio-section">
+                    <p id="audioSectionTitle">4) Optional: Record audio of you pronouncing the onomatopoeia</p>
+                    <div class="audio-controls">
+                        <button id="audioRecord" class="button audio-button">Start Recording</button>
+                        <button id="audioStop" class="button audio-button" style="display: none;">Stop Recording</button>
+                        <button id="audioPlay" class="button audio-button" style="display: none;">Play Recording</button>
+                        <button id="audioDelete" class="button audio-button audio-delete" style="display: none;">Delete Recording</button>
+                    </div>
+                    <div class="audio-status">
+                        <p id="audioStatus">Ready to record</p>
+                        <div id="audioWaveform" class="audio-waveform" style="display: none;">
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                            <div class="wave-bar"></div>
+                        </div>
+                    </div>
+                </div>
     
                 <button id="saveOnomatopoeia" class="button">Save Onomatopoeia</button>
             </div>
@@ -115,12 +136,30 @@
         const questionText = document.getElementById("questionText");
         const languageSelect = document.getElementById("languageSelect");
 
+        // Audio recording elements
+        const audioRecord = document.getElementById("audioRecord");
+        const audioStop = document.getElementById("audioStop");
+        const audioPlay = document.getElementById("audioPlay");
+        const audioDelete = document.getElementById("audioDelete");
+        const audioStatus = document.getElementById("audioStatus");
+        const audioWaveform = document.getElementById("audioWaveform");
+
+        // Audio recording variables
+        let mediaRecorder;
+        let audioChunks = [];
+        let recordedAudioBlob = null;
+        let audioUrl = null;
+
         // Language switching functionality
         languageSelect.addEventListener("change", async (event) => {
             const selectedLanguage = event.target.value;
             await langManager.switchLanguage(selectedLanguage);
             // Update participant name when language changes
             nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
+            // Update audio status text if it exists
+            if (audioStatus && !recordedAudioBlob) {
+                audioStatus.textContent = langManager.getText('survey.audio_status_ready');
+            }
         });
 
         
@@ -242,6 +281,7 @@
                 videoTitle.textContent = `Video: ${selectedVideo}`;
                 currentVideoName = selectedVideo.split("/").pop();
                 resetDisplay(currentVideoName, filteredData, docElts);
+                resetAudioRecording(); // Reset audio recording when changing videos
                 
                 // Update button styles to show active state
                 videoButtons.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
@@ -256,6 +296,7 @@
             
             buttonVisibility.style.display = "none";
             inputVisibility.style.display = "block";
+            resetAudioRecording(); // Reset audio when starting new input
         });
 
         // when click on the button No (no onomatopoeia), save null entry if needed and go to next video
@@ -273,7 +314,8 @@
                     "onomatopoeia": "null",
                     "startTime": "0",
                     "endTime": "0",
-                    "answeredTimestamp": obtainDate()
+                    "answeredTimestamp": obtainDate(),
+                    "hasAudio": "no"
                 };
                 
                 // Wait for the save to complete before proceeding
@@ -317,7 +359,9 @@
                 "onomatopoeia": onomatopoeiaInput.value.trim(),
                 "startTime": startDisplay.textContent,
                 "endTime": endDisplay.textContent,
-                "answeredTimestamp": obtainDate()
+                "answeredTimestamp": obtainDate(),
+                "hasAudio": recordedAudioBlob ? "yes" : "no",
+                "audioBlob": recordedAudioBlob
             };
 
             saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay).then(() => {
@@ -327,6 +371,133 @@
                 console.error("Error saving onomatopoeia:", error);
             });
         });
+
+        // Audio recording event listeners
+        audioRecord.addEventListener("click", async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
+                
+                audioChunks = [];
+                
+                mediaRecorder.ondataavailable = event => {
+                    audioChunks.push(event.data);
+                };
+                
+                mediaRecorder.onstop = () => {
+                    recordedAudioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioUrl = URL.createObjectURL(recordedAudioBlob);
+                    
+                    // Update UI
+                    audioStatus.textContent = langManager.getText('survey.audio_status_recorded');
+                    audioWaveform.style.display = 'none';
+                    audioWaveform.classList.remove('audio-recording');
+                    
+                    // Show control buttons
+                    audioRecord.style.display = 'none';
+                    audioStop.style.display = 'none';
+                    audioPlay.style.display = 'inline-block';
+                    audioDelete.style.display = 'inline-block';
+                    
+                    // Stop all tracks to free up microphone
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                mediaRecorder.start();
+                
+                // Update UI
+                audioStatus.textContent = langManager.getText('survey.audio_status_recording');
+                audioWaveform.style.display = 'flex';
+                audioWaveform.classList.add('audio-recording');
+                
+                // Show/hide buttons
+                audioRecord.style.display = 'none';
+                audioStop.style.display = 'inline-block';
+                audioPlay.style.display = 'none';
+                audioDelete.style.display = 'none';
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                if (error.name === 'NotAllowedError') {
+                    audioStatus.textContent = langManager.getText('survey.audio_permission_denied');
+                } else {
+                    audioStatus.textContent = langManager.getText('survey.audio_not_supported');
+                }
+            }
+        });
+
+        audioStop.addEventListener("click", () => {
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+        });
+
+        audioPlay.addEventListener("click", () => {
+            if (audioUrl) {
+                const audio = new Audio(audioUrl);
+                audioStatus.textContent = langManager.getText('survey.audio_status_playing');
+                audioWaveform.style.display = 'flex';
+                audioWaveform.classList.add('audio-playing');
+                
+                audio.onended = () => {
+                    audioStatus.textContent = langManager.getText('survey.audio_status_recorded');
+                    audioWaveform.style.display = 'none';
+                    audioWaveform.classList.remove('audio-playing');
+                };
+                
+                audio.play();
+            }
+        });
+
+        audioDelete.addEventListener("click", () => {
+            // Clean up audio data
+            if (audioUrl) {
+                URL.revokeObjectURL(audioUrl);
+                audioUrl = null;
+            }
+            recordedAudioBlob = null;
+            audioChunks = [];
+            
+            // Reset UI
+            audioStatus.textContent = langManager.getText('survey.audio_status_ready');
+            audioWaveform.style.display = 'none';
+            audioWaveform.classList.remove('audio-recording', 'audio-playing');
+            
+            // Reset buttons
+            audioRecord.style.display = 'inline-block';
+            audioStop.style.display = 'none';
+            audioPlay.style.display = 'none';
+            audioDelete.style.display = 'none';
+        });
+
+        // Reset audio recording when changing videos
+        function resetAudioRecording() {
+            // Clean up audio data
+            if (audioUrl) {
+                URL.revokeObjectURL(audioUrl);
+                audioUrl = null;
+            }
+            recordedAudioBlob = null;
+            audioChunks = [];
+            
+            // Reset UI
+            if (audioStatus) {
+                audioStatus.textContent = langManager.getText('survey.audio_status_ready');
+            }
+            if (audioWaveform) {
+                audioWaveform.style.display = 'none';
+                audioWaveform.classList.remove('audio-recording', 'audio-playing');
+            }
+            
+            // Reset buttons
+            if (audioRecord) audioRecord.style.display = 'inline-block';
+            if (audioStop) audioStop.style.display = 'none';
+            if (audioPlay) audioPlay.style.display = 'none';
+            if (audioDelete) audioDelete.style.display = 'none';
+        }
+
+        // Make resetAudioRecording available globally
+        window.resetAudioRecording = resetAudioRecording;
 
     
     </script>
