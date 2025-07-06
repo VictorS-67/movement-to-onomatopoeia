@@ -174,9 +174,8 @@ class LanguageManager {
     }
 
     async initialize() {
-        // Load default language (English)
+        // Load only default language initially
         await this.loadLanguage('en');
-        await this.loadLanguage('ja');
         this.updateUI();
     }
 }

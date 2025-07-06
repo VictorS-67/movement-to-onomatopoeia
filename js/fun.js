@@ -92,10 +92,7 @@ function resetDisplay(currentVideoName, filteredData, docElts) {
 
     // Clear any existing messages when resetting display
     const messageDisplay = document.getElementById("message");
-    if (messageDisplay) {
-        messageDisplay.textContent = "";
-        messageDisplay.style.color = "";
-    }
+    UIUtils.clearMessage(messageDisplay);
 
     let recordMessage = "";
 
@@ -142,29 +139,25 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
     
     if (onomatopoeia === "") {
         if (verbose) {
-            messageDisplay.textContent = langManager.getText('survey.error_enter_onomatopoeia');
-            messageDisplay.style.color = "red";
+            UIUtils.showError(messageDisplay, langManager.getText('survey.error_enter_onomatopoeia'));
         }
         throw new Error("Onomatopoeia is required");
     }
     if (startTime === "-.--") {
         if (verbose) {
-            messageDisplay.textContent = langManager.getText('survey.error_record_start');
-            messageDisplay.style.color = "red";
+            UIUtils.showError(messageDisplay, langManager.getText('survey.error_record_start'));
         }
         throw new Error("Start time is required");
     }
     if (endTime === "-.--") {
         if (verbose) {
-            messageDisplay.textContent = langManager.getText('survey.error_record_end');
-            messageDisplay.style.color = "red";
+            UIUtils.showError(messageDisplay, langManager.getText('survey.error_record_end'));
         }
         throw new Error("End time is required");
     }
     if (!participantId || !video || !answeredTimestamp) {
         if (verbose) {
-            messageDisplay.textContent = langManager.getText('survey.error_saving_general');
-            messageDisplay.style.color = "red";
+            UIUtils.showError(messageDisplay, langManager.getText('survey.error_saving_general'));
         }
         throw new Error("Missing required data");
     }
@@ -183,8 +176,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
 
     if (!appendResult) {
         if (verbose) {
-            messageDisplay.textContent = langManager.getText('survey.error_saving_sheet');
-            messageDisplay.style.color = "red";
+            UIUtils.showError(messageDisplay, langManager.getText('survey.error_saving_sheet'));
         }
         throw new Error("Failed to save to sheet");
     }
@@ -196,8 +188,7 @@ async function saveOnomatopoeia(filteredData, infoDict, spreadsheetId, Onomatopo
 
     // Display a success message
     if (verbose) {
-        messageDisplay.textContent = langManager.getText('survey.success_saved');
-        messageDisplay.style.color = "green";
+        UIUtils.showSuccess(messageDisplay, langManager.getText('survey.success_saved'));
     }
 }
 
@@ -312,10 +303,6 @@ function obtainDate(){
     return `${year}:${month}:${day}:${hours}:${minutes}:${seconds}`;
 }
 
-function padStart(number, length) {
-    return String(number).padStart(length, '0');
-}
-
 function goToNextVideo(currentButton) {
     let nextButton = currentButton ? currentButton.nextElementSibling : null;
     if (nextButton) {
@@ -323,8 +310,10 @@ function goToNextVideo(currentButton) {
         nextButton.click();
     } else {
         // Reached the end - show completion message instead of looping
-        messageDisplay.textContent = langManager.getText('survey.all_videos_complete');
-        messageDisplay.style.color = "green";
+        const messageDisplay = document.getElementById("message");
+        if (messageDisplay) {
+            UIUtils.showSuccess(messageDisplay, langManager.getText('survey.all_videos_complete'));
+        }
     }
 }
 
