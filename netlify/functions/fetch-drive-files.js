@@ -1,34 +1,44 @@
-// drive path: https://drive.google.com/drive/folders/1ZwOflO2NC7h2eKu5yow6BnwBuLQXr0lS
-const { google } = require('googleapis');
-
-const driveID = '1ZwOflO2NC7h2eKu5yow6BnwBuLQXr0lS';
-exports.handler = async () => {
+exports.handler = async (event, context) => {
   try {
-    // Read service account creds from environment variable (or from a file)
-    const credentials = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_CONTENT);
+    const { accessToken, folderId } = JSON.parse(event.body);
 
-    // Initialize the JWT auth
-    const auth = new google.auth.JWT(
-      credentials.client_email,
-      null,
-      credentials.private_key,
-      ['https://www.googleapis.com/auth/drive.readonly']
+    if (!accessToken || !folderId) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Missing accessToken or folderId' }),
+      };
+    }
+
+    // Use direct API call instead of googleapis
+    const response = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=parents+in+'${folderId}'+and+trashed=false&fields=files(id,name,mimeType)`,
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
+        }
+      }
     );
 
-    await auth.authorize();
+    if (!response.ok) {
+      throw new Error(`Google Drive API error: ${response.status}`);
+    }
 
-    const drive = google.drive({ version: 'v3', auth });
-    // put the folder ID here
-    const { data } = await drive.files.list({
-      q: `'${driveID}' in parents and trashed=false`,
-      fields: 'files(id, name)',
-    });
-
+    const data = await response.json();
+    
     return {
       statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify(data.files || []),
     };
+    
   } catch (error) {
-    return { statusCode: 500, body: JSON.stringify({ error: error.message }) };
+    console.error('Error fetching Drive files:', error);
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ error: 'Failed to fetch files' }),
+    };
   }
 };
