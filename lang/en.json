@@ -1,0 +1,56 @@
+{
+    "welcome": {
+        "title": "Welcome to the Movement to Onomatopoeia Study",
+        "introduction": "Thank you for agreeing to participate in this survey. As a dancer or a movement practitioner we consider you an expert and it is in this capacity that we would like you to help our research on movement onomatopoeia in Japanese. Onomatopoeia are sounds such as XXXX or YYYY that, while not being officially a word in Japanese, can convey meaning (animal sound, feeling, sensation, movement, shape, texture…) through the quality of the sound itself.",
+        "description": "We will be presenting you short animations (based on movement capture of actual persons). Each animation depicts an expressive whole body movement."
+    },
+    "instructions": {
+        "title": "What you'll do:",
+        "steps": [
+            "First watch the full video.",
+            "Upon a second viewing, come up with an onomatopoeia that you feel, intuitively, that fits the animated motion sequence or a part of it.",
+            "Write down the onomatopoeia and mark the time when it occurs (it could correspond to the entire sequence as well).",
+            "You can describe multiple moments in each video if you want"
+        ]
+    },
+    "additional_info": {
+        "no_onomatopoeia": "It is also possible that some of the animated sequences do not evoke any onomatopeia for you. This is fine too. You can watch and re-watch the video as many times as necessary before passing to the next one.",
+        "about_onomatopoeia": "Regarding the onomatopeia: some onomatopeia in Japanese have a very specific and established meaning (for example: XXXX means for many people YYYY). This will most probably not be the case in these videos. What we ask you to do is to freely associate these sequences with onomatopeia (it doesn't matter if the chosen onomatopoeia has already an established meaning in a different context).",
+        "intuition_emphasis": "Please follow your own intuition! There is no right or wrong answer!"
+    },
+    "form": {
+        "profile_title": "Welcome! Please complete your profile:",
+        "name_label": "Your name/pseudo:",
+        "name_placeholder": "Enter your name or pseudonym",
+        "age_label": "Your age:",
+        "age_placeholder": "Enter your age",
+        "gender_label": "Your gender:",
+        "gender_options": {
+            "placeholder": "Please select...",
+            "female": "Female",
+            "male": "Male",
+            "other": "Other",
+            "prefer_not_to_say": "Prefer not to say"
+        },
+        "movement_practice_label": "Your movement practice (optional):",
+        "movement_practice_placeholder": "e.g., dance, somatics, manual therapy, movement analysis...",
+        "native_language_label": "Your native language:",
+        "native_language_options": {
+            "placeholder": "Please select...",
+            "japanese": "Japanese",
+            "english": "English",
+            "other": "Other"
+        },
+        "submit_button": "Start the survey"
+    },
+    "ui": {
+        "email_label": "Your email address:",
+        "email_placeholder": "Enter your email address",
+        "next_button": "Next",
+        "checking_participant": "Checking participant...",
+        "creating_profile": "Creating your profile...",
+        "welcome_message": "Welcome! Please read the information below and complete your profile to start.",
+        "error_checking": "Error checking participant. Please try again.",
+        "error_creating": "Error creating profile. Please try again."
+    }
+}

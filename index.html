@@ -15,27 +15,55 @@
     
     <div class="container">        
         <form id="emailForm" class="input-group">
-            <label for="emailInput">Your email address:</label>
+            <label id="emailLabel" for="emailInput">Your email address:</label>
             <input type="email" id="emailInput"
              name="emailInput" placeholder="Enter your email address"
              required>
-            <button type="submit" id="checkEmail" class="button">Next</button>
+            <button type="submit" id="nextButton" class="button">Next</button>
         </form>
 
-        <!-- New participant form (initially hidden) -->
+        <!-- Language selection and introductory text -->
+        <div id="introSection" style="display: none;">
+            <div class="language-buttons">
+                <button id="englishBtn" class="language-button active">English</button>
+                <button id="japaneseBtn" class="language-button">日本語</button>
+            </div>
+            
+            <div id="introText" class="intro-text">
+                <h2 id="welcomeTitle">Welcome to the Movement to Onomatopoeia Study</h2>
+                <p>
+                    <span id="welcomeIntro">Loading...</span>
+                    <br>
+                    <span id="welcomeDescription">Loading...</span>
+                </p>
+                
+                <h3 id="instructionsTitle">What you'll do:</h3>
+                <ul id="instructionsList">
+                    <li>Loading...</li>
+                </ul>
+
+                <p id="noOnomatopoeia">Loading...</p>
+                
+                <p>
+                    <span id="aboutOnomatopoeia">Loading...</span>
+                    <strong id="intuitionEmphasis">Loading...</strong>
+                </p>
+            </div>
+        </div>
+        
         <form id="participantForm" class="input-group" style="display: none;">
-            <h2>Welcome! Please complete your profile:</h2>
-            <label for="nameInput">Your name/pseudo:</label>
+            <h2 id="profileTitle">Welcome! Please complete your profile:</h2>
+            <label id="nameLabel" for="nameInput">Your name/pseudo:</label>
             <input type="text" id="nameInput" name="nameInput" 
                    placeholder="Enter your name or pseudonym" 
                    required minlength="2" maxlength="50">
             
-            <label for="ageInput">Your age:</label>
+            <label id="ageLabel" for="ageInput">Your age:</label>
             <input type="number" id="ageInput" name="ageInput" 
                    placeholder="Enter your age" 
                    min="1" max="120" required>
 
-            <label for="genderInput">Your gender:</label>
+            <label id="genderLabel" for="genderInput">Your gender:</label>
             <select id="genderInput" name="genderInput" required>
                 <option value="">Please select...</option>
                 <option value="Female">Female</option>
@@ -44,12 +72,12 @@
                 <option value="Prefer not to say">Prefer not to say</option>
             </select>
 
-            <label for="movementPracticeInput">Your movement practice (optional):</label>
+            <label id="movementPracticeLabel" for="movementPracticeInput">Your movement practice (optional):</label>
             <input type="text" id="movementPracticeInput" name="movementPracticeInput" 
                    placeholder="e.g., dance, somatics, manual therapy, movement analysis..." 
                    maxlength="100">
 
-            <label for="nativeLanguageInput">Your native language:</label>
+            <label id="nativeLanguageLabel" for="nativeLanguageInput">Your native language:</label>
             <select id="nativeLanguageInput" name="nativeLanguageInput" required>
                 <option value="">Please select...</option>
                 <option value="Japanese">Japanese</option>
@@ -57,19 +85,23 @@
                 <option value="Other">Other</option>
             </select>
 
-            <button type="submit" id="startSurvey" class="button">Start the survey</button>
+            <button type="submit" id="submitButton" class="button">Start the survey</button>
         </form>
 
         <div id="message" class="mt-4 text-gray-700"></div>
     </div>
 
     
+    <script src="./js/languageManager.js"></script>
     <script src="./js/sheetFun.js"></script>
     <script src="./js/fun.js"></script>
     <script>
 
         const emailForm = document.getElementById("emailForm");
         const participantForm = document.getElementById("participantForm");
+        const introSection = document.getElementById("introSection");
+        const englishBtn = document.getElementById("englishBtn");
+        const japaneseBtn = document.getElementById("japaneseBtn");
         const emailInput = document.getElementById("emailInput");
         const nameInput = document.getElementById("nameInput");
         const ageInput = document.getElementById("ageInput");
@@ -77,6 +109,13 @@
         const movementPracticeInput = document.getElementById("movementPracticeInput");
         const nativeLanguageInput = document.getElementById("nativeLanguageInput");
         const messageDisplay = document.getElementById("message");
+
+        // Initialize language manager
+        langManager.initialize().then(() => {
+            console.log('Language manager initialized');
+        }).catch(error => {
+            console.error('Failed to initialize language manager:', error);
+        });
 
         // Load configuration from sheet-info.json
         let spreadsheetId, OnomatopoeiaSheet, videoSheet, ParticipantSheet;
@@ -95,13 +134,26 @@
 
         let data = []
 
+        // Language switching functionality
+        englishBtn.addEventListener("click", async () => {
+            englishBtn.classList.add("active");
+            japaneseBtn.classList.remove("active");
+            await langManager.switchLanguage('en');
+        });
+
+        japaneseBtn.addEventListener("click", async () => {
+            japaneseBtn.classList.add("active");
+            englishBtn.classList.remove("active");
+            await langManager.switchLanguage('ja');
+        });
+
         emailForm.addEventListener("submit", async (event) => {
             event.preventDefault(); // Prevent default form submission
             
             const email = emailInput.value.trim();
 
             try {
-                messageDisplay.textContent = "Checking participant...";
+                messageDisplay.textContent = langManager.getText('ui.checking_participant');
                 messageDisplay.style.color = "blue";
 
                 // Check if participant exists
@@ -119,13 +171,14 @@
                     // Redirect to survey
                     window.location.href = "survey.html";
                 } else {
-                    // New participant - show registration form
+                    // New participant - show intro section and registration form
+                    introSection.style.display = "block";
                     participantForm.style.display = "block";
-                    messageDisplay.textContent = "Welcome! Please complete your profile to start.";
+                    messageDisplay.textContent = langManager.getText('ui.welcome_message');
                     messageDisplay.style.color = "green";
                 }
             } catch (error) {
-                messageDisplay.textContent = "Error checking participant. Please try again.";
+                messageDisplay.textContent = langManager.getText('ui.error_checking');
                 messageDisplay.style.color = "red";
                 console.error("Error:", error);
             }
@@ -142,7 +195,7 @@
             const nativeLanguage = nativeLanguageInput.value;
 
             try {
-                messageDisplay.textContent = "Creating your profile...";
+                messageDisplay.textContent = langManager.getText('ui.creating_profile');
                 messageDisplay.style.color = "blue";
 
                 
@@ -169,7 +222,7 @@
                 // Redirect to survey
                 window.location.href = "survey.html";
             } catch (error) {
-                messageDisplay.textContent = "Error creating profile. Please try again.";
+                messageDisplay.textContent = langManager.getText('ui.error_creating');
                 messageDisplay.style.color = "red";
                 console.error("Error:", error);
             }
