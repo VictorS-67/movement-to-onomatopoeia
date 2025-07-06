@@ -1,8 +1,24 @@
 class LanguageManager {
+    static instance = null;
+    
     constructor() {
+        if (LanguageManager.instance) {
+            return LanguageManager.instance;
+        }
+        
         this.currentLanguage = 'en';
         this.translations = {};
         this.elements = {};
+        this.isInitialized = false;
+        
+        LanguageManager.instance = this;
+    }
+    
+    static getInstance() {
+        if (!LanguageManager.instance) {
+            LanguageManager.instance = new LanguageManager();
+        }
+        return LanguageManager.instance;
     }
 
     async loadLanguage(language) {
@@ -106,15 +122,11 @@ class LanguageManager {
 
     updateElement(id, text, attribute = 'textContent') {
         const element = document.getElementById(id);
-        if (element) {
-            const currentValue = attribute === 'textContent' ? element.textContent : element.getAttribute(attribute);
-            // Only update if the value has changed
-            if (currentValue !== text) {
-                if (attribute === 'textContent') {
-                    element.textContent = text;
-                } else {
-                    element.setAttribute(attribute, text);
-                }
+        if (element && text !== undefined && text !== null) {
+            if (attribute === 'textContent') {
+                element.textContent = text;
+            } else {
+                element.setAttribute(attribute, text);
             }
         }
     }
@@ -166,19 +178,37 @@ class LanguageManager {
 
     getText(path) {
         const t = this.translations[this.currentLanguage];
+        // Check if translations exist before attempting property access
+        if (!t) {
+            console.warn(`Translations not loaded for language: ${this.currentLanguage}`);
+            return path; // Return the path as fallback
+        }
         return this.getNestedProperty(t, path) || path;
-    }
+    }   
+
 
     getNestedProperty(obj, path) {
         return path.split('.').reduce((current, key) => current && current[key], obj);
     }
 
     async initialize() {
+        if (this.isInitialized) {
+            return; // Already initialized
+        }
+        
         // Load only default language initially
         await this.loadLanguage('en');
         this.updateUI();
+        this.isInitialized = true;
+    }
+
+    async ensureInitialized() {
+        if (!this.isInitialized) {
+            await this.initialize();
+        }
+        return this.isInitialized;
     }
 }
 
-// Create global language manager instance
-const langManager = new LanguageManager();
+// Create global language manager instance using singleton
+const langManager = LanguageManager.getInstance();

@@ -54,7 +54,12 @@
         "creating_profile": "プロフィールを作成中...",
         "welcome_message": "ようこそ！下記の情報をお読みいただき、プロフィールを完成させて開始してください。",
         "error_checking": "参加者の確認でエラーが発生しました。もう一度お試しください。",
-        "error_creating": "プロフィール作成でエラーが発生しました。もう一度お試しください。"
+        "error_creating": "プロフィール作成でエラーが発生しました。もう一度お試しください。",
+        "error_invalid_email": "有効なメールアドレスを入力してください。",
+        "error_name_required": "お名前を入力してください。",
+        "error_invalid_age": "有効な年齢（1-149歳）を入力してください。",
+        "error_gender_required": "性別を選択してください。",
+        "error_language_required": "母語を選択してください。"
     },
     "survey": {
         "page_title": "オノマトペを使った動作の描写",
@@ -99,6 +104,7 @@
         "audio_permission_denied": "マイクへのアクセスが拒否されました。音声録音は任意です。",
         "audio_not_supported": "このブラウザでは音声録音がサポートされていません。",
         "audio_upload_error": "音声のアップロードに失敗しました。回答は音声なしで保存されました。",
-        "audio_recording_error": "音声録音中にエラーが発生しました。もう一度お試しください。"
+        "audio_recording_error": "音声録音中にエラーが発生しました。もう一度お試しください。",
+        "audio_too_large": "録音が最大サイズ（10MB）を超えています。より短いサンプルを録音してください。"
     }
 }

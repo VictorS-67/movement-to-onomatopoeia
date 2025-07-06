@@ -1,7 +1,8 @@
 const { JWT } = require('google-auth-library');
 
 /**
- * Netlify Function to obtain an access token using a service account.
+ * Netlify Function to obtain a Google API access token using a service account.
+ * This token can be used for both Google Sheets and Google Drive operations.
  */
 exports.handler = async (event) => {
   try {
@@ -23,7 +24,10 @@ exports.handler = async (event) => {
       credentials.client_email,
       null, 
       credentials.private_key,
-      ['https://www.googleapis.com/auth/spreadsheets']
+      [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive.file'
+      ]
     );
 
     // 4. Authorize the client and get an access token

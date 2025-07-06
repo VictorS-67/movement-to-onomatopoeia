@@ -47,7 +47,7 @@ Added optional audio recording functionality to the movement-to-onomatopoeia web
 
 ### Core Application Files
 - `survey.html`: Added audio recording UI and JavaScript functionality
-- `js/fun.js`: Updated saveOnomatopoeia function, resetDisplay, audio upload logic
+- `js/app.js`: Updated saveOnomatopoeia function, resetDisplay, audio upload logic
 - `css/style.css`: Added comprehensive audio recording styles and animations
 
 ### Configuration Files

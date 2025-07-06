@@ -54,7 +54,12 @@
         "creating_profile": "Creating your profile...",
         "welcome_message": "Welcome! Please read the information below and complete your profile to start.",
         "error_checking": "Error checking participant. Please try again.",
-        "error_creating": "Error creating profile. Please try again."
+        "error_creating": "Error creating profile. Please try again.",
+        "error_invalid_email": "Please enter a valid email address.",
+        "error_name_required": "Please enter your name.",
+        "error_invalid_age": "Please enter a valid age (1-149).",
+        "error_gender_required": "Please select your gender.",
+        "error_language_required": "Please select your native language."
     },
     "survey": {
         "page_title": "Movement description using onomatopoeia",
@@ -99,6 +104,7 @@
         "audio_permission_denied": "Microphone permission denied. Audio recording is optional.",
         "audio_not_supported": "Audio recording is not supported in this browser.",
         "audio_upload_error": "Failed to upload audio. Your response was saved without audio.",
-        "audio_recording_error": "Error during audio recording. Please try again."
+        "audio_recording_error": "Error during audio recording. Please try again.",
+        "audio_too_large": "Audio recording exceeds maximum size (10MB). Please record a shorter sample."
     }
 }

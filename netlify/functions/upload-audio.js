@@ -1,5 +1,3 @@
-const { google } = require('googleapis');
-
 exports.handler = async (event, context) => {
     // Set CORS headers
     const headers = {
@@ -26,34 +24,15 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { audioData, filename, participantId, videoName } = JSON.parse(event.body);
+        const { audioData, filename, participantId, videoName, accessToken } = JSON.parse(event.body);
 
-        if (!audioData || !filename || !participantId || !videoName) {
+        if (!audioData || !filename || !participantId || !videoName || !accessToken) {
             return {
                 statusCode: 400,
                 headers,
-                body: JSON.stringify({ error: 'Missing required parameters' })
+                body: JSON.stringify({ error: 'Missing required parameters (including accessToken)' })
             };
         }
-
-        // Set up Google API credentials
-        const auth = new google.auth.GoogleAuth({
-            credentials: {
-                type: 'service_account',
-                project_id: process.env.GOOGLE_PROJECT_ID,
-                private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
-                private_key: process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-                client_email: process.env.GOOGLE_CLIENT_EMAIL,
-                client_id: process.env.GOOGLE_CLIENT_ID,
-                auth_uri: 'https://accounts.google.com/o/oauth2/auth',
-                token_uri: 'https://oauth2.googleapis.com/token',
-                auth_provider_x509_cert_url: 'https://www.googleapis.com/oauth2/v1/certs',
-                client_x509_cert_url: `https://www.googleapis.com/robot/v1/metadata/x509/${encodeURIComponent(process.env.GOOGLE_CLIENT_EMAIL)}`
-            },
-            scopes: ['https://www.googleapis.com/auth/drive.file']
-        });
-
-        const drive = google.drive({ version: 'v3', auth });
 
         // Convert base64 audio data to buffer
         const audioBuffer = Buffer.from(audioData, 'base64');
@@ -64,66 +43,138 @@ exports.handler = async (event, context) => {
 
         // Check if Audio folder exists, create if not
         let audioFolderId;
-        const audioFolderSearch = await drive.files.list({
-            q: `name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false`,
-            fields: 'files(id, name)'
-        });
+        const audioFolderSearchResponse = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+        );
 
-        if (audioFolderSearch.data.files.length > 0) {
-            audioFolderId = audioFolderSearch.data.files[0].id;
+        if (!audioFolderSearchResponse.ok) {
+            throw new Error(`Failed to search for Audio folder: ${audioFolderSearchResponse.status}`);
+        }
+
+        const audioFolderData = await audioFolderSearchResponse.json();
+        
+        if (audioFolderData.files && audioFolderData.files.length > 0) {
+            audioFolderId = audioFolderData.files[0].id;
         } else {
-            const audioFolderCreate = await drive.files.create({
-                requestBody: {
-                    name: folderName,
-                    mimeType: 'application/vnd.google-apps.folder'
-                },
-                fields: 'id'
-            });
-            audioFolderId = audioFolderCreate.data.id;
+            // Create Audio folder
+            const createFolderResponse = await fetch(
+                'https://www.googleapis.com/drive/v3/files',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: folderName,
+                        mimeType: 'application/vnd.google-apps.folder'
+                    })
+                }
+            );
+
+            if (!createFolderResponse.ok) {
+                throw new Error(`Failed to create Audio folder: ${createFolderResponse.status}`);
+            }
+
+            const newFolder = await createFolderResponse.json();
+            audioFolderId = newFolder.id;
         }
 
         // Check if participant folder exists under Audio folder, create if not
         let participantFolderId;
-        const participantFolderSearch = await drive.files.list({
-            q: `name='${participantFolder}' and mimeType='application/vnd.google-apps.folder' and '${audioFolderId}' in parents and trashed=false`,
-            fields: 'files(id, name)'
-        });
+        const participantFolderSearchResponse = await fetch(
+            `https://www.googleapis.com/drive/v3/files?q=name='${participantFolder}' and mimeType='application/vnd.google-apps.folder' and '${audioFolderId}' in parents and trashed=false&fields=files(id,name)`,
+            {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            }
+        );
 
-        if (participantFolderSearch.data.files.length > 0) {
-            participantFolderId = participantFolderSearch.data.files[0].id;
-        } else {
-            const participantFolderCreate = await drive.files.create({
-                requestBody: {
-                    name: participantFolder,
-                    mimeType: 'application/vnd.google-apps.folder',
-                    parents: [audioFolderId]
-                },
-                fields: 'id'
-            });
-            participantFolderId = participantFolderCreate.data.id;
+        if (!participantFolderSearchResponse.ok) {
+            throw new Error(`Failed to search for participant folder: ${participantFolderSearchResponse.status}`);
         }
 
-        // Upload the audio file
-        const uploadResponse = await drive.files.create({
-            requestBody: {
-                name: filename,
-                parents: [participantFolderId]
-            },
-            media: {
-                mimeType: 'audio/webm',
-                body: audioBuffer
-            },
-            fields: 'id, name, webViewLink'
-        });
+        const participantFolderData = await participantFolderSearchResponse.json();
+
+        if (participantFolderData.files && participantFolderData.files.length > 0) {
+            participantFolderId = participantFolderData.files[0].id;
+        } else {
+            // Create participant folder
+            const createParticipantFolderResponse = await fetch(
+                'https://www.googleapis.com/drive/v3/files',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        name: participantFolder,
+                        mimeType: 'application/vnd.google-apps.folder',
+                        parents: [audioFolderId]
+                    })
+                }
+            );
+
+            if (!createParticipantFolderResponse.ok) {
+                throw new Error(`Failed to create participant folder: ${createParticipantFolderResponse.status}`);
+            }
+
+            const newParticipantFolder = await createParticipantFolderResponse.json();
+            participantFolderId = newParticipantFolder.id;
+        }
+
+        // Upload the audio file using multipart upload
+        const boundary = '-------314159265358979323846';
+        const delimiter = `\r\n--${boundary}\r\n`;
+        const closeDelimiter = `\r\n--${boundary}--`;
+
+        const metadata = {
+            name: filename,
+            parents: [participantFolderId]
+        };
+
+        const multipartRequestBody = 
+            delimiter +
+            'Content-Type: application/json\r\n\r\n' +
+            JSON.stringify(metadata) +
+            delimiter +
+            'Content-Type: audio/webm\r\n\r\n' +
+            audioBuffer.toString('binary') +
+            closeDelimiter;
+
+        const uploadResponse = await fetch(
+            'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
+            {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': `multipart/related; boundary="${boundary}"`
+                },
+                body: multipartRequestBody
+            }
+        );
+
+        if (!uploadResponse.ok) {
+            throw new Error(`Failed to upload audio file: ${uploadResponse.status}`);
+        }
+
+        const uploadResult = await uploadResponse.json();
 
         return {
             statusCode: 200,
             headers,
             body: JSON.stringify({
                 success: true,
-                fileId: uploadResponse.data.id,
-                fileName: uploadResponse.data.name,
-                webViewLink: uploadResponse.data.webViewLink
+                fileId: uploadResult.id,
+                fileName: uploadResult.name,
+                webViewLink: uploadResult.webViewLink
             })
         };
 
