@@ -560,9 +560,7 @@ class SurveyApp {
                     infoDict.participantId, 
                     infoDict.video, 
                     infoDict.onomatopoeia, 
-                    infoDict.answeredTimestamp, 
-                    spreadsheetId, 
-                    OnomatopoeiaSheet
+                    infoDict.answeredTimestamp
                 );
             } catch (audioError) {
                 console.error("Audio upload failed:", audioError);

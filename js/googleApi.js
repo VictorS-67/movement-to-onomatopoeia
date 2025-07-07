@@ -6,8 +6,8 @@ let tokenCache = {
     expiry: null
 };
 
-// Function to get an OAuth 2.0 access token with caching
-async function getAccessToken(spreadsheetId, sheetName) {
+// Generic function to get access token (works for both Sheets and Drive)
+async function getAccessToken() {
     try {
         // Check if we have a valid cached token
         if (tokenCache.token && tokenCache.expiry && new Date() < tokenCache.expiry) {
@@ -19,10 +19,7 @@ async function getAccessToken(spreadsheetId, sheetName) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                spreadsheetId: spreadsheetId,
-                sheetName: sheetName,
-            }),
+            body: JSON.stringify({}) // Empty body since we just need a token
         });
 
         if (!response.ok) {
@@ -35,28 +32,24 @@ async function getAccessToken(spreadsheetId, sheetName) {
             throw new Error('Invalid response format: missing access_token');
         }
         
-        // Cache the token for 50 minutes (tokens expire in 1 hour)
+        // Cache the token for 50 minutes
         tokenCache.token = data.access_token;
         tokenCache.expiry = new Date(Date.now() + 50 * 60 * 1000);
         
         return data.access_token;
     } catch (error) {
         console.error('Error getting access token:', error);
-        // Add retry logic for network errors
-        if (error.message.includes('NetworkError') || error.message.includes('Failed to fetch')) {
-            console.log('Network error, retrying in 3 seconds...');
-            await new Promise(resolve => setTimeout(resolve, 3000));
-            return getAccessToken(spreadsheetId, sheetName); // Retry once
-        }
         throw error;
     }
 }
 
+
 // Function to upload audio file to Google Drive
-async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia, timestamp, spreadsheetId, sheetName) {
+async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia, timestamp) {
     try {
         // First get an access token (reuse the existing token caching system)
-        const accessToken = await getAccessToken(spreadsheetId, sheetName);
+        const accessToken = await getAccessToken();
+        const config = await ConfigManager.getSheetConfig();
         
         // Convert blob to base64 more efficiently using FileReader
         const base64Audio = await new Promise((resolve, reject) => {
@@ -83,7 +76,8 @@ async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia
                 filename: filename,
                 participantId: participantId,
                 videoName: videoName,
-                accessToken: accessToken
+                accessToken: accessToken,
+                parentFolderId: config.audioDriveFolderId
             })
         });
 

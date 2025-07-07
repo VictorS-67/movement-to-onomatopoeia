@@ -24,9 +24,9 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { audioData, filename, participantId, videoName, accessToken } = JSON.parse(event.body);
+        const { audioData, filename, participantId, videoName, accessToken, parentFolderId} = JSON.parse(event.body);
 
-        if (!audioData || !filename || !participantId || !videoName || !accessToken) {
+        if (!audioData || !filename || !participantId || !videoName || !accessToken || !parentFolderId) {
             return {
                 statusCode: 400,
                 headers,
@@ -44,7 +44,7 @@ exports.handler = async (event, context) => {
         // Check if Audio folder exists, create if not
         let audioFolderId;
         const audioFolderSearchResponse = await fetch(
-            `https://www.googleapis.com/drive/v3/files?q=name='${folderName}' and mimeType='application/vnd.google-apps.folder' and trashed=false&fields=files(id,name)`,
+            `https://www.googleapis.com/drive/v3/files?q=name='Audio' and mimeType='application/vnd.google-apps.folder' and '${parentFolderId}' in parents and trashed=false&fields=files(id,name)`,
             {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
@@ -72,7 +72,8 @@ exports.handler = async (event, context) => {
                     },
                     body: JSON.stringify({
                         name: folderName,
-                        mimeType: 'application/vnd.google-apps.folder'
+                        mimeType: 'application/vnd.google-apps.folder',
+                        parents: [parentFolderId]  // Specify where to create it
                     })
                 }
             );

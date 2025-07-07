@@ -4,7 +4,7 @@
 // Function to get data from the sheet
 async function getSheetData(spreadsheetId, sheetName) {
     try {
-        const accessToken = await getAccessToken(spreadsheetId, sheetName);
+        const accessToken = await getAccessToken();
         const response = await fetch(
             `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}`,
             {
@@ -24,7 +24,7 @@ async function getSheetData(spreadsheetId, sheetName) {
 // Function to append data to the sheet
 async function appendSheetData(spreadsheetId, sheetName, newData) {
     try {
-        const accessToken = await getAccessToken(spreadsheetId, sheetName);
+        const accessToken = await getAccessToken();
         const response = await fetch(
             `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${sheetName}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`,
             {
