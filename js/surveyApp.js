@@ -558,6 +558,7 @@ class SurveyApp {
                 audioFileName = await uploadAudioFile(
                     infoDict.audioBlob, 
                     infoDict.participantId, 
+                    infoDict.participantName,
                     infoDict.video, 
                     infoDict.onomatopoeia, 
                     infoDict.answeredTimestamp

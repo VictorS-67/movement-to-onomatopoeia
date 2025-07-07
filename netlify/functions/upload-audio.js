@@ -24,9 +24,9 @@ exports.handler = async (event, context) => {
     }
 
     try {
-        const { audioData, filename, participantId, videoName, accessToken, parentFolderId} = JSON.parse(event.body);
+        const { audioData, filename, participantId, participantName, participantFolderName, videoName, accessToken, parentFolderId} = JSON.parse(event.body);
 
-        if (!audioData || !filename || !participantId || !videoName || !accessToken || !parentFolderId) {
+        if (!audioData || !filename || !participantId || !participantName || !participantFolderName || !videoName || !accessToken || !parentFolderId) {
             return {
                 statusCode: 400,
                 headers,
@@ -39,7 +39,7 @@ exports.handler = async (event, context) => {
 
         // Create folder structure: Audio/{participantId}/
         const folderName = 'Audio';
-        const participantFolder = `${participantId}`;
+        const participantFolder = participantFolderName || `${participantId}_${participantName ? participantName.replace(/[^a-zA-Z0-9]/g, '_') : 'unknown'}`;
 
         // Check if Audio folder exists, create if not
         let audioFolderId;
@@ -141,14 +141,27 @@ exports.handler = async (event, context) => {
             parents: [participantFolderId]
         };
 
-        const multipartRequestBody = 
+        // Create multipart body as Buffer to preserve binary data
+        const metadataPart = Buffer.from(
             delimiter +
             'Content-Type: application/json\r\n\r\n' +
-            JSON.stringify(metadata) +
+            JSON.stringify(metadata)
+        );
+
+        const dataPart = Buffer.from(
             delimiter +
-            'Content-Type: audio/webm\r\n\r\n' +
-            audioBuffer.toString('binary') +
-            closeDelimiter;
+            'Content-Type: audio/webm\r\n\r\n'
+        );
+
+        const closePart = Buffer.from(closeDelimiter);
+
+        // Combine all parts as binary data
+        const multipartRequestBody = Buffer.concat([
+            metadataPart,
+            dataPart,
+            audioBuffer,
+            closePart
+        ]);
 
         const uploadResponse = await fetch(
             'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink',
@@ -163,10 +176,18 @@ exports.handler = async (event, context) => {
         );
 
         if (!uploadResponse.ok) {
-            throw new Error(`Failed to upload audio file: ${uploadResponse.status}`);
+            const errorText = await uploadResponse.text();
+            console.error(`Upload failed with status ${uploadResponse.status}:`, errorText);
+            throw new Error(`Failed to upload audio file: ${uploadResponse.status} - ${errorText}`);
         }
 
         const uploadResult = await uploadResponse.json();
+
+        console.log('Audio file uploaded successfully:', {
+            fileId: uploadResult.id,
+            fileName: uploadResult.name,
+            size: audioBuffer.length
+        });
 
         return {
             statusCode: 200,

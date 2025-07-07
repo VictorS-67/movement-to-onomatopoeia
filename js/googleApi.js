@@ -45,7 +45,7 @@ async function getAccessToken() {
 
 
 // Function to upload audio file to Google Drive
-async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia, timestamp) {
+async function uploadAudioFile(audioBlob, participantId, participantName, videoName, onomatopoeia, timestamp) {
     try {
         // First get an access token (reuse the existing token caching system)
         const accessToken = await getAccessToken();
@@ -61,6 +61,10 @@ async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia
             reader.onerror = reject;
             reader.readAsDataURL(audioBlob);
         });
+
+        // Create safe folder name: remove special characters and limit length
+        const safeName = participantName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 20);
+        const participantFolderName = `${participantId}_${safeName}`;
         
         // Generate filename: participant_video_onomatopoeia_timestamp.webm
         const sanitizedOnomatopoeia = onomatopoeia.replace(/[^a-zA-Z0-9]/g, '_');
@@ -75,6 +79,8 @@ async function uploadAudioFile(audioBlob, participantId, videoName, onomatopoeia
                 audioData: base64Audio,
                 filename: filename,
                 participantId: participantId,
+                participantName: participantName,
+                participantFolderName: participantFolderName,
                 videoName: videoName,
                 accessToken: accessToken,
                 parentFolderId: config.audioDriveFolderId
