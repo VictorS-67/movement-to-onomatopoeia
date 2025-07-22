@@ -2,7 +2,7 @@
 
 // Utility function to get current timestamp
 function obtainDate() {
-    return new Date().toISOString();
+    return new Date().toISOString().split('.')[0] + 'Z';
 }
 
 // Utility classes for consistent UI operations
@@ -86,14 +86,14 @@ class ValidationUtils {
             };
         }
         
-        if (infoDict.startTime === "-.--" || infoDict.startTime === "null") {
+        if (infoDict.startTime === "-.--") {
             return {
                 isValid: false,
                 errorMessage: langManager.getText('survey.error_record_start')
             };
         }
         
-        if (infoDict.endTime === "-.--" || infoDict.endTime === "null") {
+        if (infoDict.endTime === "-.--") {
             return {
                 isValid: false,
                 errorMessage: langManager.getText('survey.error_record_end')
