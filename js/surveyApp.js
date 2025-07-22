@@ -253,29 +253,34 @@ class SurveyApp {
     updateIntroductionContent() {
         // Update all introduction text elements with current language
         if (this.elements.welcomeTitle) {
-            this.elements.welcomeTitle.textContent = langManager.getText('index.welcome_title');
+            this.elements.welcomeTitle.textContent = langManager.getText('welcome.title');
         }
         if (this.elements.welcomeIntro) {
-            this.elements.welcomeIntro.textContent = langManager.getText('index.welcome_intro');
+            this.elements.welcomeIntro.textContent = langManager.getText('welcome.introduction');
         }
         if (this.elements.welcomeDescription) {
-            this.elements.welcomeDescription.textContent = langManager.getText('index.welcome_description');
+            this.elements.welcomeDescription.textContent = langManager.getText('welcome.description');
         }
         if (this.elements.instructionsTitle) {
-            this.elements.instructionsTitle.textContent = langManager.getText('index.instructions_title');
+            this.elements.instructionsTitle.textContent = langManager.getText('instructions.title');
         }
         if (this.elements.instructionsList) {
-            const instructions = langManager.getText('index.instructions_list');
-            this.elements.instructionsList.innerHTML = instructions.map(item => `<li>${item}</li>`).join('');
+            const instructions = langManager.getText('instructions.steps');
+            if (Array.isArray(instructions)) {
+                this.elements.instructionsList.innerHTML = instructions.map(item => `<li>${item}</li>`).join('');
+            } else {
+                // Fallback if instructions is not an array
+                this.elements.instructionsList.innerHTML = '<li>Loading instructions...</li>';
+            }
         }
         if (this.elements.noOnomatopoeia) {
-            this.elements.noOnomatopoeia.textContent = langManager.getText('index.no_onomatopoeia');
+            this.elements.noOnomatopoeia.textContent = langManager.getText('additional_info.no_onomatopoeia');
         }
         if (this.elements.aboutOnomatopoeia) {
-            this.elements.aboutOnomatopoeia.textContent = langManager.getText('index.about_onomatopoeia');
+            this.elements.aboutOnomatopoeia.textContent = langManager.getText('additional_info.about_onomatopoeia');
         }
         if (this.elements.intuitionEmphasis) {
-            this.elements.intuitionEmphasis.textContent = langManager.getText('index.intuition_emphasis');
+            this.elements.intuitionEmphasis.textContent = langManager.getText('additional_info.intuition_emphasis');
         }
         
         // Update button text based on current state
