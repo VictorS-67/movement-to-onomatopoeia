@@ -272,7 +272,7 @@ class SurveyApp {
                         startTime: "null",
                         endTime: "null",
                         answeredTimestamp: obtainDate(),
-                        hasAudio: "no"
+                        hasAudio: 0
                     };
 
                     await this.saveOnomatopoeia(
@@ -527,7 +527,7 @@ class SurveyApp {
             recordMessage = langManager.getText('survey.no_saved_onomatopoeia');
         } else {
             relevantData.forEach(item => {
-                const audioIcon = item["hasAudio"] === "yes" ? " 🎵" : "";
+                const audioIcon = item["hasAudio"] === 1 ? " 🎵" : "";
                 recordMessage += `-"${item["onomatopoeia"]}"${audioIcon} from ${item["startTime"]} to ${item["endTime"]};<br>`;
             });
         }
@@ -553,7 +553,7 @@ class SurveyApp {
 
         // Handle audio upload if present
         let audioFileName = null;
-        if (infoDict.audioBlob && infoDict.hasAudio === "yes") {
+        if (infoDict.audioBlob && infoDict.hasAudio === 1) {
             try {
                 audioFileName = await uploadAudioFile(
                     infoDict.audioBlob, 
@@ -580,7 +580,7 @@ class SurveyApp {
             parseFloat(infoDict.startTime),
             parseFloat(infoDict.endTime),
             infoDict.answeredTimestamp,
-            infoDict.hasAudio || "no",
+            infoDict.hasAudio || 0,
             audioFileName || ""
         ];
 
@@ -596,7 +596,7 @@ class SurveyApp {
         // Update local data
         const updatedInfoDict = {
             ...infoDict,
-            hasAudio: infoDict.hasAudio || "no",
+            hasAudio: infoDict.hasAudio || 0,
             audioFileName: audioFileName
         };
         delete updatedInfoDict.audioBlob;
@@ -604,7 +604,7 @@ class SurveyApp {
 
         // Show success message
         if (verbose) {
-            const successMessage = (infoDict.hasAudio === "yes" && audioFileName) ? 
+            const successMessage = (infoDict.hasAudio === 1 && audioFileName) ? 
                 langManager.getText('survey.success_saved_with_audio') :
                 langManager.getText('survey.success_saved');
             UIUtils.showSuccess(messageDisplay, successMessage);
@@ -628,13 +628,6 @@ class SurveyApp {
         }
     }
 }
-
-// Global function for compatibility with existing code
-window.resetAudioRecording = function() {
-    if (window.surveyApp) {
-        window.surveyApp.resetAudioRecording();
-    }
-};
 
 // Initialize the app when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
