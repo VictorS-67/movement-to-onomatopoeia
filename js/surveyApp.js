@@ -12,6 +12,7 @@ class SurveyApp {
             recordedAudioBlob: null,
             audioUrl: null
         };
+        this.introExpanded = false; // Track introduction toggle state
         
         this.initializeElements();
         this.initialize();
@@ -38,6 +39,18 @@ class SurveyApp {
             recordOnomatopoeia: DOMUtils.getElement("recordOnomatopoeia"),
             questionText: DOMUtils.getElement("questionText"),
             languageSelect: DOMUtils.getElement("languageSelect"),
+            // Introduction toggle elements
+            introToggleButton: DOMUtils.getElement("introToggleButton"),
+            collapsibleIntro: DOMUtils.getElement("collapsibleIntro"),
+            // Introduction content elements (for language updates)
+            welcomeTitle: DOMUtils.getElement("welcomeTitle"),
+            welcomeIntro: DOMUtils.getElement("welcomeIntro"),
+            welcomeDescription: DOMUtils.getElement("welcomeDescription"),
+            instructionsTitle: DOMUtils.getElement("instructionsTitle"),
+            instructionsList: DOMUtils.getElement("instructionsList"),
+            noOnomatopoeia: DOMUtils.getElement("noOnomatopoeia"),
+            aboutOnomatopoeia: DOMUtils.getElement("aboutOnomatopoeia"),
+            intuitionEmphasis: DOMUtils.getElement("intuitionEmphasis"),
             // Audio elements
             audioRecord: DOMUtils.getElement("audioRecord"),
             audioStop: DOMUtils.getElement("audioStop"),
@@ -76,6 +89,9 @@ class SurveyApp {
 
             // Update participant name display
             this.updateParticipantDisplay();
+
+            // Initialize introduction content
+            this.updateIntroductionContent();
 
         } catch (error) {
             console.error('Failed to initialize survey app:', error);
@@ -126,6 +142,7 @@ class SurveyApp {
                 await langManager.switchLanguage(selectedLanguage);
                 this.updateParticipantDisplay();
                 this.updateAudioStatusText();
+                this.updateIntroductionContent();
             });
         }
 
@@ -141,6 +158,11 @@ class SurveyApp {
 
         if (this.elements.hasOnomatopoeiaButtonNo) {
             this.elements.hasOnomatopoeiaButtonNo.addEventListener('click', this.handleNoOnomatopoeia.bind(this));
+        }
+
+        // Introduction toggle button
+        if (this.elements.introToggleButton) {
+            this.elements.introToggleButton.addEventListener('click', this.toggleIntroduction.bind(this));
         }
 
         // Time capture buttons
@@ -191,6 +213,76 @@ class SurveyApp {
     updateAudioStatusText() {
         if (this.elements.audioStatus && !this.audioRecording.recordedAudioBlob) {
             this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_ready');
+        }
+    }
+
+    toggleIntroduction() {
+        this.introExpanded = !this.introExpanded;
+        
+        if (this.introExpanded) {
+            // Show introduction
+            if (this.elements.collapsibleIntro) {
+                this.elements.collapsibleIntro.style.display = 'block';
+                // Force reflow for animation
+                this.elements.collapsibleIntro.offsetHeight;
+                this.elements.collapsibleIntro.classList.add('expanded');
+            }
+            if (this.elements.introToggleButton) {
+                this.elements.introToggleButton.textContent = langManager.getText('survey.hide_introduction');
+            }
+        } else {
+            // Hide introduction
+            if (this.elements.collapsibleIntro) {
+                this.elements.collapsibleIntro.classList.remove('expanded');
+                // Wait for animation to complete before hiding
+                setTimeout(() => {
+                    if (!this.introExpanded && this.elements.collapsibleIntro) {
+                        this.elements.collapsibleIntro.style.display = 'none';
+                    }
+                }, 200);
+            }
+            if (this.elements.introToggleButton) {
+                this.elements.introToggleButton.textContent = langManager.getText('survey.show_introduction');
+            }
+        }
+        
+        // Update introduction content with current language
+        this.updateIntroductionContent();
+    }
+
+    updateIntroductionContent() {
+        // Update all introduction text elements with current language
+        if (this.elements.welcomeTitle) {
+            this.elements.welcomeTitle.textContent = langManager.getText('index.welcome_title');
+        }
+        if (this.elements.welcomeIntro) {
+            this.elements.welcomeIntro.textContent = langManager.getText('index.welcome_intro');
+        }
+        if (this.elements.welcomeDescription) {
+            this.elements.welcomeDescription.textContent = langManager.getText('index.welcome_description');
+        }
+        if (this.elements.instructionsTitle) {
+            this.elements.instructionsTitle.textContent = langManager.getText('index.instructions_title');
+        }
+        if (this.elements.instructionsList) {
+            const instructions = langManager.getText('index.instructions_list');
+            this.elements.instructionsList.innerHTML = instructions.map(item => `<li>${item}</li>`).join('');
+        }
+        if (this.elements.noOnomatopoeia) {
+            this.elements.noOnomatopoeia.textContent = langManager.getText('index.no_onomatopoeia');
+        }
+        if (this.elements.aboutOnomatopoeia) {
+            this.elements.aboutOnomatopoeia.textContent = langManager.getText('index.about_onomatopoeia');
+        }
+        if (this.elements.intuitionEmphasis) {
+            this.elements.intuitionEmphasis.textContent = langManager.getText('index.intuition_emphasis');
+        }
+        
+        // Update button text based on current state
+        if (this.elements.introToggleButton) {
+            this.elements.introToggleButton.textContent = this.introExpanded ? 
+                langManager.getText('survey.hide_introduction') : 
+                langManager.getText('survey.show_introduction');
         }
     }
 

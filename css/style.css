@@ -418,6 +418,28 @@ body {
     }
 }
 
+/* Introduction Toggle Styles */
+.intro-toggle-section {
+    margin: 1.5rem 0;
+}
+
+.intro-section {
+    overflow: hidden;
+    transition: all 0.2s ease-in-out;
+    max-height: 0;
+    opacity: 0;
+}
+
+.intro-section.expanded {
+    max-height: 1000px; /* Large enough to accommodate content */
+    opacity: 1;
+    margin-top: 1rem;
+}
+
+.intro-section .intro-text {
+    margin-bottom: 0; /* Remove bottom margin when inside toggle */
+}
+
 .audio-recording .wave-bar {
     background-color: var(--error-color);
 }

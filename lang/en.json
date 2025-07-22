@@ -105,6 +105,8 @@
         "audio_not_supported": "Audio recording is not supported in this browser.",
         "audio_upload_error": "Failed to upload audio. Your response was saved without audio.",
         "audio_recording_error": "Error during audio recording. Please try again.",
-        "audio_too_large": "Audio recording exceeds maximum size (10MB). Please record a shorter sample."
+        "audio_too_large": "Audio recording exceeds maximum size (10MB). Please record a shorter sample.",
+        "show_introduction": "Show Introduction",
+        "hide_introduction": "Hide Introduction"
     }
 }

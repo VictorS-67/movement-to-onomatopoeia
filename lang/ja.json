@@ -105,6 +105,8 @@
         "audio_not_supported": "このブラウザでは音声録音がサポートされていません。",
         "audio_upload_error": "音声のアップロードに失敗しました。回答は音声なしで保存されました。",
         "audio_recording_error": "音声録音中にエラーが発生しました。もう一度お試しください。",
-        "audio_too_large": "録音が最大サイズ（10MB）を超えています。より短いサンプルを録音してください。"
+        "audio_too_large": "録音が最大サイズ（10MB）を超えています。より短いサンプルを録音してください。",
+        "show_introduction": "説明を表示",
+        "hide_introduction": "説明を非表示"
     }
 }
