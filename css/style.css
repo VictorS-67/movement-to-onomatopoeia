@@ -253,6 +253,20 @@ body {
     margin-bottom: 1.5rem;
 }
 
+.header-controls {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.button-small {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
 .language-dropdown {
     padding: var(--spacing-sm) 0.75rem;
     background-color: #ffffff;
