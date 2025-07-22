@@ -152,6 +152,17 @@ body {
     border-color: var(--success-hover);
 }
 
+.video-button.no-onomatopoeia {
+    background-color: #f59e0b;
+    color: #ffffff;
+    border-color: #f59e0b;
+}
+
+.video-button.no-onomatopoeia:hover {
+    background-color: #d97706;
+    border-color: #d97706;
+}
+
 #buttonVisibility {
     text-align: center;
 }

@@ -512,8 +512,23 @@ class SurveyApp {
             const videoButtons = this.elements.videoButtons.querySelectorAll('.video-button');
             videoButtons.forEach(button => {
                 const buttonVideo = DOMUtils.safeGetDataset(button, 'video')?.split("/").pop();
-                if (buttonVideo && filteredData.some(item => item["video"] === buttonVideo)) {
-                    button.classList.add('completed');
+                if (buttonVideo) {
+                    const videoData = filteredData.filter(item => item["video"] === buttonVideo);
+                    if (videoData.length > 0) {
+                        // Check if there are any actual onomatopoeia (not "null")
+                        const hasActualOnomatopoeia = videoData.some(item => item["onomatopoeia"] !== "null");
+                        
+                        // Remove any existing completion classes
+                        button.classList.remove('completed', 'no-onomatopoeia');
+                        
+                        if (hasActualOnomatopoeia) {
+                            // User has saved at least one onomatopoeia - green
+                            button.classList.add('completed');
+                        } else {
+                            // User said no onomatopoeia in this video - yellow
+                            button.classList.add('no-onomatopoeia');
+                        }
+                    }
                 }
             });
         }
