@@ -315,7 +315,7 @@ class SurveyApp {
                 startTime: this.elements.startDisplay?.textContent || "-.--",
                 endTime: this.elements.endDisplay?.textContent || "-.--",
                 answeredTimestamp: obtainDate(),
-                hasAudio: this.audioRecording.recordedAudioBlob ? "yes" : "no",
+                hasAudio: this.audioRecording.recordedAudioBlob ? 1 : 0,
                 audioBlob: this.audioRecording.recordedAudioBlob
             };
 
