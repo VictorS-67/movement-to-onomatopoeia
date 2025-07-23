@@ -107,7 +107,10 @@
         "audio_recording_error": "Error during audio recording. Please try again.",
         "audio_too_large": "Audio recording exceeds maximum size (10MB). Please record a shorter sample.",
         "show_introduction": "Show Introduction",
-        "hide_introduction": "Hide Introduction"
+        "hide_introduction": "Hide Introduction",
+        "completion_title": "Congratulations!",
+        "completion_text": "Well done! You have finished all the videos. Let's start the second part of the experiment.",
+        "continue_to_reasoning": "Continue to Part 2"
     },
     "tutorial": {
         "title": "Tutorial - Learning the Survey",
@@ -151,5 +154,20 @@
         "step12_text": "Now we are viewing video 2, with no saved onomatopoeia. If you don't find any onomatopoeia in this video, you can click 'No'. Click 'No' to continue the tutorial.",
         "step13_title": "Button Color Changed!",
         "step13_text": "Great! Notice how the video button turned yellow after clicking 'No'. This indicates that you've completed this video but didn't find any onomatopoeia in it."
+    },
+    "reasoning": {
+        "page_title": "Explain Your Onomatopoeia",
+        "participant_name": "Participant: ",
+        "section_title": "Your Onomatopoeia for this video:",
+        "reasoning_label": "Explain why you chose this onomatopoeia:",
+        "reasoning_placeholder": "Please explain your reasoning (minimum 5 characters)...",
+        "show_button": "Show it",
+        "save_button": "Save Explanation",
+        "time_range": "from {start} to {end}",
+        "no_onomatopoeia": "No onomatopoeia saved for this video.",
+        "progress": "{completed} of {total} explanations provided",
+        "success_saved": "Reasoning saved successfully!",
+        "error_saving": "Failed to save reasoning. Please try again.",
+        "error_min_characters": "Please provide at least 5 characters for your explanation."
     }
 }

@@ -111,7 +111,10 @@
         "audio_recording_error": "音声録音中にエラーが発生しました。もう一度お試しください。",
         "audio_too_large": "録音が最大サイズ（10MB）を超えています。より短いサンプルを録音してください。",
         "show_introduction": "説明を表示", 
-        "hide_introduction": "説明を非表示"
+        "hide_introduction": "説明を非表示",
+        "completion_title": "おめでとうございます！",
+        "completion_text": "素晴らしい！すべての動画を完了しました。実験の第2部を始めましょう。",
+        "continue_to_reasoning": "パート2に進む"
     },
     "tutorial": {
         "title": "チュートリアル - アンケートの使い方",
@@ -154,5 +157,20 @@
         "step12_text": "現在、オノマトペが保存されていない動画2を視聴しています。この動画でオノマトペが見つからない場合は「いいえ」をクリックできます。チュートリアルを続行するには「いいえ」をクリックしてください。",
         "step13_title": "ボタンの色が変わりました！",
         "step13_text": "素晴らしい！「いいえ」をクリックした後、動画ボタンが黄色に変わったことに注目してください。これは、この動画を完了したがオノマトペが見つからなかったことを示しています。"
+    },
+    "reasoning": {
+        "page_title": "オノマトペの説明",
+        "participant_name": "参加者: ",
+        "section_title": "この動画のあなたのオノマトペ:",
+        "reasoning_label": "なぜこのオノマトペを選んだのか説明してください:",
+        "reasoning_placeholder": "理由を説明してください（最低5文字）...",
+        "show_button": "表示",
+        "save_button": "説明を保存",
+        "time_range": "{start}から{end}まで",
+        "no_onomatopoeia": "この動画には保存されたオノマトペがありません。",
+        "progress": "{total}個中{completed}個の説明が提供されました",
+        "success_saved": "理由が正常に保存されました！",
+        "error_saving": "理由の保存に失敗しました。もう一度お試しください。",
+        "error_min_characters": "説明は最低5文字以上入力してください。"
     }
 }

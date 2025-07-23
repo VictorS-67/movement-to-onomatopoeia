@@ -447,3 +447,231 @@ body {
 .audio-playing .wave-bar {
     background-color: var(--success-color);
 }
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: #ffffff;
+    border-radius: var(--border-radius);
+    padding: 2rem;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.modal-content p {
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.modal-content .button {
+    min-width: 150px;
+}
+
+/* Reasoning Page Styles */
+.progress-section {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-light);
+}
+
+.progress-section h2 {
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.progress-section p {
+    color: var(--text-secondary);
+    font-size: 1rem;
+}
+
+.reasoning-section {
+    margin-top: 2rem;
+}
+
+.reasoning-section h3 {
+    color: var(--text-primary);
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.onomatopoeia-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.reasoning-entry {
+    background-color: #ffffff;
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.onomatopoeia-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-light);
+}
+
+.onomatopoeia-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.onomatopoeia-text {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.time-range {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
+
+.audio-icon {
+    font-size: 0.875rem;
+}
+
+.show-button {
+    padding: 0.5rem 1rem;
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.show-button:hover {
+    background-color: var(--primary-hover);
+}
+
+.reasoning-input-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.reasoning-label {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+}
+
+.reasoning-textarea {
+    min-height: 4rem;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-family: inherit;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+}
+
+.reasoning-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.reasoning-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.save-reasoning-button {
+    padding: 0.5rem 1rem;
+    background-color: var(--success-color);
+    color: #ffffff;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.save-reasoning-button:hover:not(:disabled) {
+    background-color: var(--success-hover);
+}
+
+.save-reasoning-button:disabled {
+    background-color: #9ca3af;
+    cursor: not-allowed;
+}
+
+.character-count {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.no-onomatopoeia-message {
+    text-align: center;
+    padding: 2rem;
+    background-color: var(--bg-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-light);
+}
+
+.no-onomatopoeia-message p {
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Responsive design for reasoning entries */
+@media (max-width: 768px) {
+    .onomatopoeia-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    
+    .reasoning-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
+    
+    .character-count {
+        text-align: center;
+    }
+}

@@ -49,3 +49,32 @@ async function appendSheetData(spreadsheetId, sheetName, newData) {
         throw error;
     }
 }
+
+// Function to update specific cells in the sheet
+async function updateSheetData(spreadsheetId, range, values) {
+    try {
+        const accessToken = await getAccessToken();
+        const response = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}?valueInputOption=RAW`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+                body: JSON.stringify({
+                    values: values,
+                }),
+            }
+        );
+        const result = await response.json();
+        if (result.error) {
+            console.error('Error updating data:', result.error);
+            throw new Error('Failed to update data in sheet.');
+        }
+        return result;
+    } catch (error) {
+        console.error('Error:', error);
+        throw error;
+    }
+}

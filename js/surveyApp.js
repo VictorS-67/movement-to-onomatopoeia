@@ -726,6 +726,55 @@ class SurveyApp {
         }
     }
 
+    checkAllVideosCompleted() {
+        if (!this.elements.videoButtons) return false;
+        
+        const allButtons = this.elements.videoButtons.querySelectorAll('.video-button');
+        
+        // Check if all videos have been addressed (either have onomatopoeia or marked as no-onomatopoeia)
+        let allAddressed = true;
+        allButtons.forEach(button => {
+            const buttonVideo = DOMUtils.safeGetDataset(button, 'video')?.split("/").pop();
+            if (buttonVideo) {
+                // Check if this video has any data (onomatopoeia or "no" response)
+                const hasData = this.filteredData.some(item => item.video === buttonVideo);
+                if (!hasData) {
+                    allAddressed = false;
+                }
+            }
+        });
+        
+        return allAddressed && allButtons.length > 0;
+    }
+
+    showCompletionModal() {
+        // Add completion modal elements to the elements object if not already added
+        if (!this.elements.surveyCompletion) {
+            this.elements.surveyCompletion = DOMUtils.getElement("surveyCompletion");
+            this.elements.startReasoningButton = DOMUtils.getElement("startReasoningButton");
+            
+            // Set up event listener for the reasoning button
+            if (this.elements.startReasoningButton) {
+                this.elements.startReasoningButton.addEventListener('click', () => {
+                    this.startReasoningPhase();
+                });
+            }
+        }
+        
+        // Show the completion modal
+        if (this.elements.surveyCompletion) {
+            this.elements.surveyCompletion.style.display = 'flex';
+        }
+    }
+
+    startReasoningPhase() {
+        // Store current completion state
+        localStorage.setItem("surveyCompleted", "true");
+        
+        // Redirect to reasoning page
+        window.location.href = "reasoning.html";
+    }
+
     goToNextVideo(currentButton) {
         if (!this.elements.videoButtons) return;
         
@@ -736,9 +785,15 @@ class SurveyApp {
             const nextButton = allButtons[currentIndex + 1];
             DOMUtils.safeClick(nextButton);
         } else {
-            // Reached the end
-            if (this.elements.messageDisplay) {
-                UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('survey.all_videos_complete'));
+            // Reached the end - check if all videos are completed
+            if (this.checkAllVideosCompleted()) {
+                // All videos completed - show completion modal
+                this.showCompletionModal();
+            } else {
+                // Not all videos completed yet - show regular message
+                if (this.elements.messageDisplay) {
+                    UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('survey.all_videos_complete'));
+                }
             }
         }
     }

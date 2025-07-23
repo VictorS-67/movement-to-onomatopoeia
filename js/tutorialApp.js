@@ -471,7 +471,7 @@ class TutorialApp {
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
             10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: true },
             11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', required: false },
-            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false },
+            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: true },
             13: { title: 'tutorial.step13_title', text: 'tutorial.step13_text', required: false }
         };
         

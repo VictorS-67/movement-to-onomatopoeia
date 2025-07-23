@@ -113,9 +113,26 @@ class LanguageManager {
             this.updateElement('endTimeLabel', t.survey.end_time_label);
             this.updateElement('saveOnomatopoeia', t.survey.save_button);
             
+            // Update completion modal elements (if they exist)
+            this.updateElement('surveyCompletionTitle', t.survey.completion_title);
+            this.updateElement('surveyCompletionText', t.survey.completion_text);
+            this.updateElement('startReasoningButton', t.survey.continue_to_reasoning);
+            
             // Update page title for survey page
             if (document.querySelector('#myVideo')) {
                 document.title = t.survey.page_title;
+            }
+        }
+
+        // Update reasoning page elements (if they exist)
+        if (t.reasoning) {
+            this.updateElement('reasoningPageTitle', t.reasoning.page_title);
+            this.updateElement('reasoningSectionTitle', t.reasoning.section_title);
+            this.updateElement('noOnomatopoeiaText', t.reasoning.no_onomatopoeia);
+            
+            // Update page title for reasoning page
+            if (document.querySelector('#onomatopoeiaList')) {
+                document.title = t.reasoning.page_title;
             }
         }
     }
