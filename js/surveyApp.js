@@ -649,7 +649,10 @@ class SurveyApp {
         }
 
         if (docElts.questionText) {
-            docElts.questionText.textContent = langManager.getText('survey.question_text_more');
+            // Use different text based on whether user has already provided onomatopoeia for this video
+            const hasExistingOnomatopoeia = relevantData.length > 0;
+            const questionKey = hasExistingOnomatopoeia ? 'survey.question_text_more' : 'survey.question_text';
+            docElts.questionText.textContent = langManager.getText(questionKey);
         }
     }
 

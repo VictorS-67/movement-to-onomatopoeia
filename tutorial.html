@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutorial - Movement to Onomatopoeia</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/tutorial.css">
+</head>
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="language-selector">
+                <label for="languageSelect" data-lang="ui.language">Language:</label>
+                <select id="languageSelect">
+                    <option value="en">English</option>
+                    <option value="ja">日本語</option>
+                </select>
+            </div>
+        </div>
+        <div class="header-center">
+            <h1 data-lang="tutorial.title">Tutorial - Learning the Survey</h1>
+        </div>
+        <div class="header-right">
+            <div id="nameDisplay"></div>
+            <button id="buttonLogout" class="logout-button" data-lang="ui.logout">Logout</button>
+        </div>
+    </div>
+
+    <!-- Tutorial Progress Indicator -->
+    <div class="tutorial-progress">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        <div class="progress-text">
+            <span data-lang="tutorial.step">Step</span> <span id="currentStep">1</span> <span data-lang="tutorial.of">of</span> <span id="totalSteps">12</span>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Message display -->
+        <div id="message" class="message"></div>
+
+        <!-- Video section -->
+        <div class="video-section">
+            <h2 id="videoTitle">Video: videos/1.mp4</h2>
+            <video id="myVideo" width="640" height="360" controls>
+                <source src="videos/1.mp4" type="video/mp4">
+                <span data-lang="ui.video_not_supported">Your browser does not support the video tag.</span>
+            </video>
+        </div>
+
+        <!-- Video selection buttons -->
+        <div class="video-buttons" id="videoButtons">
+            <button class="video-button active" data-video="videos/1.mp4">1</button>
+            <button class="video-button" data-video="videos/2.mp4">2</button>
+            <button class="video-button" data-video="videos/3.mp4">3</button>
+        </div>
+
+        <!-- Question and input section -->
+        <div class="survey-section">
+            <div id="questionText" class="question-text" data-lang="survey.question_text">
+                Do you hear any moments in this video that make you think of an onomatopoeia?
+            </div>
+
+            <!-- Yes/No buttons -->
+            <div id="buttonVisibility" class="button-group">
+                <button id="hasOnomatopoeiaButtonYes" class="btn btn-yes" data-lang="survey.yes_button">
+                    Yes
+                </button>
+                <button id="hasOnomatopoeiaButtonNo" class="btn btn-no" data-lang="survey.no_button">
+                    No
+                </button>
+            </div>
+
+            <!-- Input form (hidden initially) -->
+            <div id="inputVisibility" class="input-section" style="display: none;">
+                <div class="form-group">
+                    <label for="onomatopoeiaInput" data-lang="survey.onomatopoeia_label">
+                        Onomatopoeia:
+                    </label>
+                    <input type="text" id="onomatopoeiaInput" class="form-control" 
+                           data-lang-placeholder="survey.onomatopoeia_placeholder">
+                </div>
+
+                <div class="time-controls">
+                    <div class="time-group">
+                        <button id="getStart" class="btn btn-time" data-lang="survey.get_start_button">
+                            Get Start Time
+                        </button>
+                        <span id="startDisplay" class="time-display">-.--</span>
+                    </div>
+                    
+                    <div class="time-group">
+                        <button id="getEnd" class="btn btn-time" data-lang="survey.get_end_button">
+                            Get End Time
+                        </button>
+                        <span id="endDisplay" class="time-display">-.--</span>
+                    </div>
+                </div>
+
+                <!-- Audio recording section -->
+                <div class="audio-section">
+                    <h4 data-lang="survey.audio_section_title">Audio Recording (Optional)</h4>
+                    <div class="audio-controls">
+                        <button id="audioRecord" class="btn btn-audio" data-lang="survey.audio_record_button">🎤 Record</button>
+                        <button id="audioStop" class="btn btn-audio" data-lang="survey.audio_stop_button" style="display: none;">⏹️ Stop</button>
+                        <button id="audioPlay" class="btn btn-audio" data-lang="survey.audio_play_button" style="display: none;">▶️ Play</button>
+                        <button id="audioDelete" class="btn btn-audio" data-lang="survey.audio_delete_button" style="display: none;">🗑️ Delete</button>
+                    </div>
+                    <div id="audioStatus" class="audio-status" data-lang="survey.audio_status_ready">Ready to record</div>
+                    <div id="audioWaveform" class="audio-waveform" style="display: none;">
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                        <div class="wave-bar"></div>
+                    </div>
+                </div>
+
+                <button id="saveOnomatopoeia" class="btn btn-primary" data-lang="survey.save_button">
+                    Save Onomatopoeia
+                </button>
+            </div>
+        </div>
+
+        <!-- Saved onomatopoeia display -->
+        <div class="saved-section">
+            <h3 data-lang="survey.saved_onomatopoeia_title">Saved Onomatopoeia for this video:</h3>
+            <div id="recordOnomatopoeia" class="saved-list"></div>
+        </div>
+    </div>
+
+    <!-- Tutorial Overlay -->
+    <div id="tutorialOverlay" class="tutorial-overlay">
+        <div id="tutorialBubble" class="tutorial-bubble">
+            <div class="bubble-content">
+                <div id="bubbleTitle" class="bubble-title"></div>
+                <div id="bubbleText" class="bubble-text"></div>
+                <div class="bubble-actions">
+                    <button id="bubblePrevious" class="btn-tutorial-secondary" data-lang="tutorial.previous" style="display: none;">Previous</button>
+                    <button id="bubbleNext" class="btn-tutorial" data-lang="tutorial.next">Next</button>
+                    <button id="bubbleSkip" class="btn-tutorial-secondary" data-lang="tutorial.skip_tutorial">Skip Tutorial</button>
+                </div>
+            </div>
+            <div class="bubble-arrow"></div>
+        </div>
+    </div>
+
+    <!-- Tutorial Completion Modal -->
+    <div id="tutorialCompletion" class="tutorial-completion" style="display: none;">
+        <div class="completion-content">
+            <h2 data-lang="tutorial.completion_title">Tutorial Complete!</h2>
+            <p data-lang="tutorial.completion_text">Great job! You've learned how to use the survey interface. Now you're ready to start the real survey and help us collect onomatopoeia descriptions.</p>
+            <button id="startSurveyButton" class="btn-start-survey" data-lang="tutorial.start_survey">Start Survey</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/languageManager.js"></script>
+    <script src="js/googleSheets.js"></script>
+    <script src="js/googleApi.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/tutorialApp.js"></script>
+</body>
+</html>

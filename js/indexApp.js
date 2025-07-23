@@ -87,7 +87,7 @@ class IndexApp {
             );
 
             if (existingParticipantInfo) {
-                // Returning participant
+                // Returning participant - go directly to survey
                 localStorage.setItem("participantInfo", JSON.stringify(existingParticipantInfo));
 
                 // Get their existing data
@@ -131,8 +131,8 @@ class IndexApp {
             localStorage.setItem("participantInfo", JSON.stringify(participantInfo));
             localStorage.setItem("filteredData", JSON.stringify([]));
 
-            // Redirect to survey
-            window.location.href = "survey.html";
+            // New participants should go to tutorial first
+            window.location.href = "tutorial.html";
 
         } catch (error) {
             UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_creating'));
