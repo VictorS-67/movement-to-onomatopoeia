@@ -144,9 +144,9 @@
         "step9_text": "Once you've filled in the details, click this button to save your onomatopoeia description. In the tutorial, data is saved locally only. Click to continue.",
         "step10_title": "'No' Button",
         "step10_text": "If you don't hear any sounds that make you think of onomatopoeia in a video, you can click 'No' instead of 'Yes'.",
-        "step11_title": "When There's No Onomatopoeia",
-        "step11_text": "It's completely fine if you don't hear onomatopoeia in every video. Just click 'No' and the system will record that response.",
-        "step12_title": "Video Button Colors",
-        "step12_text": "The video buttons change color to show your progress: Grey = not yet completed. Green = you've saved at least one onomatopoeia. Another possible color is Yellow. It appears when you don't think a video has any onomatopoeia. Let's try it with this second video, with no onomatopoeia saved."
+        "step11_title": "Video Button Colors",
+        "step11_text": "The video buttons change color to show your progress: Grey = not yet completed. Green = you've saved at least one onomatopoeia. Another possible color is Yellow. It appears when you don't think a video has any onomatopoeia. Let's try it with this second video, with no onomatopoeia saved.",        
+        "step12_title": "Try the 'No' Button",
+        "step12_text": "Now try clicking the 'No' button to see how it works. This will mark the current video as having no onomatopoeia and automatically load the next video."
     }
 }

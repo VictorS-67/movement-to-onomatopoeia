@@ -5,7 +5,7 @@ class TutorialApp {
         this.participantInfo = null;
         this.tutorialData = []; // Local storage for tutorial data
         this.currentStep = 1;
-        this.totalSteps = 11; // Reduced from 12 after removing duplicate step 11
+        this.totalSteps = 12; // Added step 12 for the No button
         this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
@@ -232,7 +232,8 @@ class TutorialApp {
                     8: this.elements.audioRecord,
                     9: this.elements.saveOnomatopoeiaButton,
                     10: this.elements.hasOnomatopoeiaButtonNo,
-                    11: this.elements.videoButtons // Video buttons (was step 12)
+                    11: this.elements.videoButtons,
+                    12: this.elements.hasOnomatopoeiaButtonNo
                 };
                 
                 const targetElement = elementMap[step];
@@ -441,7 +442,8 @@ class TutorialApp {
             8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', required: false },
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
             10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: true },
-            11: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false } // This was step 12, now step 11
+            11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', required: false },
+            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false }
         };
         
         const stepData = stepKeys[step];
@@ -464,7 +466,8 @@ class TutorialApp {
             8: this.elements.audioRecord, // Audio record button
             9: this.elements.saveOnomatopoeiaButton, // Save button
             10: this.elements.hasOnomatopoeiaButtonNo, // No button
-            11: this.elements.videoButtons // Video buttons (was step 12)
+            11: this.elements.videoButtons, // Video buttons
+            12: this.elements.hasOnomatopoeiaButtonNo // No button again for step 12
         };
         
         const targetElement = elementMap[step];
@@ -636,7 +639,8 @@ class TutorialApp {
             8: this.elements.audioRecord,
             9: this.elements.saveOnomatopoeiaButton,
             10: this.elements.hasOnomatopoeiaButtonNo,
-            11: this.elements.videoButtons // Video buttons (was step 12)
+            11: this.elements.videoButtons,
+            12: this.elements.hasOnomatopoeiaButtonNo
         };
         
         const targetElement = elementMap[step];
@@ -689,7 +693,9 @@ class TutorialApp {
         }
         
         this.resetDisplay();
-    }    captureStartTime() {
+    }
+
+    captureStartTime() {
         if (this.elements.videoPlayer && this.elements.startDisplay) {
             this.elements.startDisplay.textContent = this.elements.videoPlayer.currentTime.toFixed(2);
         }
