@@ -445,27 +445,39 @@ class TutorialApp {
         // Calculate preferred position (bottom-right of target)
         let left = targetRect.right + 20;
         let top = targetRect.top;
-        let arrowClass = 'arrow-left';
+        let arrowClass = 'arrow-left'; // Arrow points left toward the target
         
         // Adjust if bubble goes off-screen horizontally
         if (left + bubbleRect.width > viewportWidth - 20) {
             left = targetRect.left - bubbleRect.width - 20;
-            arrowClass = 'arrow-right';
+            arrowClass = 'arrow-right'; // Arrow points right toward the target
         }
         
-        // Adjust if bubble goes off-screen vertically
+        // Check if we need to position above the target
         if (top + bubbleRect.height > viewportHeight - 20) {
-            top = targetRect.bottom - bubbleRect.height;
-            if (top < 20) {
-                top = targetRect.top - bubbleRect.height - 20;
-                arrowClass = arrowClass.includes('left') ? 'arrow-bottom-left' : 'arrow-bottom-right';
+            // Try positioning above the target
+            const topAbove = targetRect.top - bubbleRect.height - 20;
+            if (topAbove >= 20) {
+                top = topAbove;
+                // Determine if bubble is to the left or right of target
+                if (left + bubbleRect.width/2 < targetRect.left + targetRect.width/2) {
+                    arrowClass = 'arrow-bottom-right'; // Arrow points down-right toward target
+                } else {
+                    arrowClass = 'arrow-bottom-left'; // Arrow points down-left toward target
+                }
+            } else {
+                // Can't fit above, position as low as possible
+                top = Math.max(20, viewportHeight - bubbleRect.height - 20);
             }
         }
         
         // Ensure bubble doesn't go off left edge
         if (left < 20) {
             left = 20;
-            arrowClass = 'arrow-left';
+            // If we moved the bubble right, check if we need to adjust arrow
+            if (targetRect.left + targetRect.width/2 > left + bubbleRect.width/2) {
+                arrowClass = 'arrow-left'; // Arrow points left toward target
+            }
         }
         
         // Ensure bubble doesn't go off top edge
@@ -489,8 +501,7 @@ class TutorialApp {
             el.classList.remove('tutorial-highlight');
         });
         
-        // Add tutorial-active class to body for dimming effect
-        document.body.classList.add('tutorial-active');
+        // Note: Removed tutorial-active class addition for better UX
         
         const elementMap = {
             1: this.elements.languageSelect?.parentElement,
@@ -660,7 +671,7 @@ class TutorialApp {
         document.querySelectorAll('.tutorial-highlight').forEach(el => {
             el.classList.remove('tutorial-highlight');
         });
-        document.body.classList.remove('tutorial-active');
+        // Note: Removed tutorial-active class removal as it's no longer added
         
         // Show completion modal
         if (this.elements.tutorialCompletion) {

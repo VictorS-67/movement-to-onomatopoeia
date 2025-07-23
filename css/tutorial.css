@@ -239,7 +239,8 @@
     z-index: -1;
 }
 
-/* Tutorial dimming for non-highlighted elements */
+/* Tutorial dimming for non-highlighted elements - DISABLED for better UX */
+/* 
 .tutorial-active .container > *:not(.tutorial-highlight) {
     opacity: 0.3;
     transition: opacity 0.3s ease;
@@ -252,6 +253,7 @@
 .tutorial-active .tutorial-progress {
     opacity: 1 !important;
 }
+*/
 
 /* Action completion indicators */
 .tutorial-step-complete::after {
