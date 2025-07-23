@@ -239,7 +239,6 @@
     z-index: -1;
 }
 
-/* Tutorial dimming for non-highlighted elements - DISABLED for better UX */
 /* 
 .tutorial-active .container > *:not(.tutorial-highlight) {
     opacity: 0.3;
@@ -336,6 +335,29 @@
 .btn-start-survey:hover {
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+}
+
+/* Video button completion states (matching survey.html styles) */
+.video-button.completed {
+    background-color: #10b981 !important; /* Success green */
+    color: #ffffff !important;
+    border-color: #10b981 !important;
+}
+
+.video-button.completed:hover {
+    background-color: #059669 !important; /* Darker green on hover */
+    border-color: #059669 !important;
+}
+
+.video-button.no-onomatopoeia {
+    background-color: #f59e0b !important; /* Warning yellow/orange */
+    color: #ffffff !important;
+    border-color: #f59e0b !important;
+}
+
+.video-button.no-onomatopoeia:hover {
+    background-color: #d97706 !important; /* Darker orange on hover */
+    border-color: #d97706 !important;
 }
 
 /* Responsive design */

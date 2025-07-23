@@ -675,6 +675,9 @@ class TutorialApp {
         
         this.tutorialData.push(tutorialData);
         
+        // Update video button color to yellow (completed without onomatopoeia)
+        this.updateActiveVideoButtonState('no-onomatopoeia');
+        
         if (this.elements.messageDisplay) {
             UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
         }
@@ -707,6 +710,9 @@ class TutorialApp {
         
         this.tutorialData.push(tutorialData);
         
+        // Update video button color to green (completed with onomatopoeia)
+        this.updateActiveVideoButtonState('completed');
+        
         if (this.elements.messageDisplay) {
             UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
         }
@@ -733,6 +739,22 @@ class TutorialApp {
         }
         
         this.resetDisplay();
+    }
+
+    updateActiveVideoButtonState(state) {
+        // Find the currently active video button
+        const activeButton = this.elements.videoButtons?.querySelector('.video-button.active');
+        if (activeButton) {
+            // Remove any existing completion state classes
+            activeButton.classList.remove('completed', 'no-onomatopoeia');
+            
+            // Add the new state class
+            if (state === 'completed') {
+                activeButton.classList.add('completed');
+            } else if (state === 'no-onomatopoeia') {
+                activeButton.classList.add('no-onomatopoeia');
+            }
+        }
     }
 
     resetDisplay() {
