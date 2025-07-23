@@ -113,12 +113,6 @@ class TutorialApp {
                 this.lastVideoPlayTime = Date.now();
                 this.checkStepValidation('video_played');
             });
-            
-            this.elements.videoPlayer.addEventListener('timeupdate', () => {
-                if (this.elements.videoPlayer.currentTime > 2) {
-                    this.checkStepValidation('video_played_2s');
-                }
-            });
         }
 
         // Button interactions
@@ -231,7 +225,6 @@ class TutorialApp {
         // Initialize step validation tracking
         this.stepValidation = {
             video_played: false,
-            video_played_2s: false,
             clicked_yes: false,
             entered_text: false,
             clicked_start_time: false,
@@ -278,7 +271,7 @@ class TutorialApp {
         
         // Define required actions for each step
         const requirements = {
-            2: () => this.stepValidation.video_played_2s, // Video must be played for 2s
+            2: () => this.stepValidation.video_played, // Video must be played (no time requirement)
             4: () => this.stepValidation.clicked_yes, // Must click Yes
             5: () => this.stepValidation.entered_text, // Must enter text
             6: () => this.stepValidation.clicked_start_time, // Must click start time
@@ -301,7 +294,7 @@ class TutorialApp {
 
     showRequiredActionMessage(step) {
         const messages = {
-            2: "Please play the video for at least 2 seconds to continue.",
+            2: "Please play the video to continue.",
             4: "Please click the 'Yes' button to continue.",
             5: "Please enter some text in the onomatopoeia field to continue.",
             6: "Please click the 'Get Start Time' button to continue.",
@@ -438,51 +431,89 @@ class TutorialApp {
     positionBubbleNearElement(targetElement, bubble) {
         // Get target element position and dimensions
         const targetRect = targetElement.getBoundingClientRect();
-        const bubbleRect = bubble.getBoundingClientRect();
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         
-        // Calculate preferred position (bottom-right of target)
-        let left = targetRect.right + 20;
-        let top = targetRect.top;
-        let arrowClass = 'arrow-left'; // Arrow points left toward the target
+        // Get bubble dimensions by temporarily showing it
+        bubble.style.visibility = 'hidden';
+        bubble.style.display = 'block';
+        const bubbleRect = bubble.getBoundingClientRect();
+        bubble.style.visibility = 'visible';
         
-        // Adjust if bubble goes off-screen horizontally
-        if (left + bubbleRect.width > viewportWidth - 20) {
-            left = targetRect.left - bubbleRect.width - 20;
-            arrowClass = 'arrow-right'; // Arrow points right toward the target
+        // Calculate target center
+        const targetCenterX = targetRect.left + targetRect.width / 2;
+        const targetCenterY = targetRect.top + targetRect.height / 2;
+        
+        // Try different positions in order of preference
+        const positions = [
+            // Right of target
+            {
+                left: targetRect.right + 20,
+                top: targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2),
+                arrow: 'arrow-left'
+            },
+            // Left of target
+            {
+                left: targetRect.left - bubbleRect.width - 20,
+                top: targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2),
+                arrow: 'arrow-right'
+            },
+            // Below target
+            {
+                left: targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2),
+                top: targetRect.bottom + 20,
+                arrow: 'arrow-top'
+            },
+            // Above target
+            {
+                left: targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2),
+                top: targetRect.top - bubbleRect.height - 20,
+                arrow: 'arrow-bottom'
+            }
+        ];
+        
+        // Find the first position that fits within the viewport
+        let bestPosition = positions[0]; // Default to right
+        
+        for (const position of positions) {
+            const fitsHorizontally = position.left >= 20 && position.left + bubbleRect.width <= viewportWidth - 20;
+            const fitsVertically = position.top >= 20 && position.top + bubbleRect.height <= viewportHeight - 20;
+            
+            if (fitsHorizontally && fitsVertically) {
+                bestPosition = position;
+                break;
+            }
         }
         
-        // Check if we need to position above the target
-        if (top + bubbleRect.height > viewportHeight - 20) {
-            // Try positioning above the target
-            const topAbove = targetRect.top - bubbleRect.height - 20;
-            if (topAbove >= 20) {
-                top = topAbove;
-                // Determine if bubble is to the left or right of target
-                if (left + bubbleRect.width/2 < targetRect.left + targetRect.width/2) {
-                    arrowClass = 'arrow-bottom-right'; // Arrow points down-right toward target
-                } else {
-                    arrowClass = 'arrow-bottom-left'; // Arrow points down-left toward target
-                }
+        // If no position fits perfectly, adjust the best one
+        let { left, top, arrow } = bestPosition;
+        
+        // Constrain to viewport bounds
+        left = Math.max(20, Math.min(left, viewportWidth - bubbleRect.width - 20));
+        top = Math.max(20, Math.min(top, viewportHeight - bubbleRect.height - 20));
+        
+        // Adjust arrow based on actual final position relative to target
+        const bubbleCenterX = left + bubbleRect.width / 2;
+        const bubbleCenterY = top + bubbleRect.height / 2;
+        
+        // Determine arrow direction based on bubble position relative to target
+        const deltaX = bubbleCenterX - targetCenterX;
+        const deltaY = bubbleCenterY - targetCenterY;
+        
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+            // Horizontal positioning is dominant
+            if (deltaX > 0) {
+                arrow = 'arrow-left'; // Bubble is to the right, arrow points left
             } else {
-                // Can't fit above, position as low as possible
-                top = Math.max(20, viewportHeight - bubbleRect.height - 20);
+                arrow = 'arrow-right'; // Bubble is to the left, arrow points right
             }
-        }
-        
-        // Ensure bubble doesn't go off left edge
-        if (left < 20) {
-            left = 20;
-            // If we moved the bubble right, check if we need to adjust arrow
-            if (targetRect.left + targetRect.width/2 > left + bubbleRect.width/2) {
-                arrowClass = 'arrow-left'; // Arrow points left toward target
+        } else {
+            // Vertical positioning is dominant
+            if (deltaY > 0) {
+                arrow = 'arrow-top'; // Bubble is below, arrow points up
+            } else {
+                arrow = 'arrow-bottom'; // Bubble is above, arrow points down
             }
-        }
-        
-        // Ensure bubble doesn't go off top edge
-        if (top < 20) {
-            top = 20;
         }
         
         // Apply position
@@ -492,7 +523,7 @@ class TutorialApp {
         
         // Update arrow direction
         bubble.className = bubble.className.replace(/arrow-\w+(-\w+)?/g, '');
-        bubble.classList.add(arrowClass);
+        bubble.classList.add(arrow);
     }
 
     highlightElementForStep(step) {
