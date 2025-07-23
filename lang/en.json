@@ -123,6 +123,7 @@
         "completion_text": "Great job! You've learned how to use the survey interface. Now you're ready to start the real survey and help us collect onomatopoeia descriptions.",
         "start_survey": "Start Survey",
         "saved_locally": "Tutorial data saved locally (not sent to server)",
+        "all_videos_complete": "You have reached the end of all videos in the tutorial.",
         "step1_title": "Language Selection",
         "step1_text": "You can change the language of the interface using this dropdown menu. The survey is available in English and Japanese.",
         "step2_title": "Video Player",
@@ -146,6 +147,6 @@
         "step11_title": "When There's No Onomatopoeia",
         "step11_text": "It's completely fine if you don't hear onomatopoeia in every video. Just click 'No' and the system will record that response.",
         "step12_title": "Video Button Colors",
-        "step12_text": "The video buttons change color to show your progress: Green = you've saved onomatopoeia, Yellow = you clicked 'No', Grey = not yet completed."
+        "step12_text": "The video buttons change color to show your progress: Grey = not yet completed. Green = you've saved at least one onomatopoeia. Another possible color is Yellow. It appears when you don't think a video has any onomatopoeia. Let's try it with this second video, with no onomatopoeia saved."
     }
 }

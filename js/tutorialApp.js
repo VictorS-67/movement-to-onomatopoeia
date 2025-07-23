@@ -308,7 +308,8 @@ class TutorialApp {
             6: () => this.stepValidation.clicked_start_time, // Must click start time
             7: () => this.stepValidation.clicked_end_time, // Must click end time
             9: () => this.stepValidation.clicked_save, // Must click save
-            // Steps 1, 3, 8, 10, 11, 12 have no requirements
+            10: () => this.stepValidation.clicked_no, // Must click No
+            // Steps 1, 3, 8, 11 have no requirements
         };
         
         if (requirements[step]) {
@@ -330,7 +331,8 @@ class TutorialApp {
             5: "Please enter some text in the onomatopoeia field to continue.",
             6: "Please click the 'Get Start Time' button to continue.",
             7: "Please click the 'Get End Time' button to continue.",
-            9: "Please click the 'Save Onomatopoeia' button to continue."
+            9: "Please click the 'Save Onomatopoeia' button to continue.",
+            10: "Please click the 'No' button to continue."
         };
         
         if (this.elements.messageDisplay && messages[step]) {
@@ -358,10 +360,8 @@ class TutorialApp {
             
             // Check if current step should auto-advance for this action
             if (autoAdvanceSteps[this.currentStep] === action) {
-                // Small delay to let user see the action was registered
-                setTimeout(() => {
-                    this.nextStep();
-                }, 800);
+                // Auto-advance immediately when action is completed
+                this.nextStep();
             }
         }
     }
@@ -440,7 +440,7 @@ class TutorialApp {
             7: { title: 'tutorial.step7_title', text: 'tutorial.step7_text', required: true },
             8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', required: false },
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
-            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: false },
+            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: true },
             11: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false } // This was step 12, now step 11
         };
         
@@ -676,16 +676,20 @@ class TutorialApp {
         this.tutorialData.push(tutorialData);
         
         // Update video button color to yellow (completed without onomatopoeia)
-        this.updateActiveVideoButtonState('no-onomatopoeia');
+        // if not already completed
+        if (!this.elements.videoButtons.querySelector('.video-button.active').classList.contains('completed')) {
+            this.updateActiveVideoButtonState('no-onomatopoeia');
+        }
         
+        // Load the next video automatically
+        this.goToNextVideo();
+                
         if (this.elements.messageDisplay) {
             UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
         }
         
         this.resetDisplay();
-    }
-
-    captureStartTime() {
+    }    captureStartTime() {
         if (this.elements.videoPlayer && this.elements.startDisplay) {
             this.elements.startDisplay.textContent = this.elements.videoPlayer.currentTime.toFixed(2);
         }
@@ -753,6 +757,26 @@ class TutorialApp {
                 activeButton.classList.add('completed');
             } else if (state === 'no-onomatopoeia') {
                 activeButton.classList.add('no-onomatopoeia');
+            }
+        }
+    }
+
+    goToNextVideo() {
+        if (!this.elements.videoButtons) return;
+        
+        const currentButton = this.elements.videoButtons.querySelector('.video-button.active');
+        if (!currentButton) return;
+        
+        const allButtons = Array.from(this.elements.videoButtons.querySelectorAll('.video-button'));
+        const currentIndex = allButtons.indexOf(currentButton);
+        
+        if (currentIndex < allButtons.length - 1) {
+            const nextButton = allButtons[currentIndex + 1];
+            DOMUtils.safeClick(nextButton);
+        } else {
+            // Reached the end - just show message but don't auto-advance
+            if (this.elements.messageDisplay) {
+                UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.all_videos_complete'));
             }
         }
     }
