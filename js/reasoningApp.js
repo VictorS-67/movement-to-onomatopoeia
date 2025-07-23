@@ -164,10 +164,7 @@ class ReasoningApp {
             localStorage.setItem("reasoningData", JSON.stringify(this.reasoningData));
             
             console.log(`Loaded ${sheetReasoningData.length} reasoning entries from Google Sheets`);
-            
-            if (sheetReasoningData.length > 0) {
-                console.log('Sample reasoning entry:', sheetReasoningData[0]);
-            }
+
             
         } catch (error) {
             console.error('Error loading existing reasoning data from Google Sheets:', error);
