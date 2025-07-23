@@ -57,6 +57,10 @@ class TutorialApp {
             currentStep: DOMUtils.getElement("currentStep"),
             totalSteps: DOMUtils.getElement("totalSteps"),
             
+            // Tutorial welcome
+            tutorialWelcome: DOMUtils.getElement("tutorialWelcome"),
+            startTutorialButton: DOMUtils.getElement("startTutorialButton"),
+            
             // Tutorial completion
             tutorialCompletion: DOMUtils.getElement("tutorialCompletion"),
             startSurveyButton: DOMUtils.getElement("startSurveyButton")
@@ -86,8 +90,8 @@ class TutorialApp {
             // Initialize tutorial
             this.initializeTutorial();
             
-            // Start tutorial
-            this.startTutorial();
+            // Show welcome modal instead of starting tutorial immediately
+            this.showWelcomeModal();
 
         } catch (error) {
             console.error('Failed to initialize tutorial app:', error);
@@ -182,6 +186,13 @@ class TutorialApp {
             });
         }
 
+        // Tutorial welcome
+        if (this.elements.startTutorialButton) {
+            this.elements.startTutorialButton.addEventListener('click', () => {
+                this.startTutorialFromWelcome();
+            });
+        }
+
         // Tutorial completion
         if (this.elements.startSurveyButton) {
             this.elements.startSurveyButton.addEventListener('click', () => {
@@ -268,6 +279,28 @@ class TutorialApp {
         
         // Reset display
         this.resetDisplay();
+    }
+
+    showWelcomeModal() {
+        // Hide tutorial overlay initially
+        if (this.elements.tutorialOverlay) {
+            this.elements.tutorialOverlay.classList.add('hidden');
+        }
+        
+        // Show welcome modal
+        if (this.elements.tutorialWelcome) {
+            this.elements.tutorialWelcome.style.display = 'flex';
+        }
+    }
+
+    startTutorialFromWelcome() {
+        // Hide welcome modal
+        if (this.elements.tutorialWelcome) {
+            this.elements.tutorialWelcome.style.display = 'none';
+        }
+        
+        // Start the actual tutorial
+        this.startTutorial();
     }
 
     startTutorial() {
