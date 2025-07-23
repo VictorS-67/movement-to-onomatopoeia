@@ -219,11 +219,6 @@ class TutorialApp {
         // Scroll handler to reposition bubbles when user scrolls
         window.addEventListener('scroll', () => {
             if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
-                // Skip repositioning for step 13 (centered bubble)
-                if (this.currentStep === 13) {
-                    return;
-                }
-                
                 // Only reposition, don't auto-scroll again
                 const step = this.currentStep;
                 const elementMap = {
@@ -238,7 +233,8 @@ class TutorialApp {
                     9: this.elements.saveOnomatopoeiaButton,
                     10: this.elements.hasOnomatopoeiaButtonNo,
                     11: this.elements.videoButtons,
-                    12: this.elements.hasOnomatopoeiaButtonNo
+                    12: this.elements.hasOnomatopoeiaButtonNo,
+                    13: this.elements.videoButtons
                 };
                 
                 const targetElement = elementMap[step];
@@ -462,12 +458,6 @@ class TutorialApp {
     }
 
     positionBubbleForStep(step) {
-        // Step 13 is positioned under the progress bar
-        if (step === 13) {
-            this.positionBubbleUnderProgressBar();
-            return;
-        }
-        
         const elementMap = {
             1: this.elements.languageSelect?.parentElement, // Language selector
             2: this.elements.videoPlayer, // Video player
@@ -480,7 +470,8 @@ class TutorialApp {
             9: this.elements.saveOnomatopoeiaButton, // Save button
             10: this.elements.hasOnomatopoeiaButtonNo, // No button
             11: this.elements.videoButtons, // Video buttons
-            12: this.elements.hasOnomatopoeiaButtonNo // No button again for step 12
+            12: this.elements.hasOnomatopoeiaButtonNo, // No button again for step 12
+            13: this.elements.videoButtons // Step 13: Point at video buttons to show color change
         };
         
         const targetElement = elementMap[step];
@@ -533,65 +524,6 @@ class TutorialApp {
                 resolve();
             }, 500); // Give enough time for smooth scroll to complete
         });
-    }
-
-    positionBubbleUnderProgressBar() {
-        if (!this.elements.tutorialBubble) return;
-        
-        // Find the progress bar container (look for the tutorial overlay's progress area)
-        const progressContainer = document.querySelector('.tutorial-progress');
-        if (!progressContainer) {
-            // Fallback to centering if progress bar not found
-            this.centerBubbleOnScreen();
-            return;
-        }
-        
-        const progressRect = progressContainer.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        
-        // Get bubble dimensions
-        this.elements.tutorialBubble.style.visibility = 'hidden';
-        this.elements.tutorialBubble.style.display = 'block';
-        const bubbleRect = this.elements.tutorialBubble.getBoundingClientRect();
-        this.elements.tutorialBubble.style.visibility = 'visible';
-        
-        // Position bubble centered horizontally and just below the progress bar
-        const left = (viewportWidth - bubbleRect.width) / 2;
-        const top = progressRect.bottom + 20; // 20px gap below progress bar
-        
-        // Apply position
-        this.elements.tutorialBubble.style.position = 'fixed';
-        this.elements.tutorialBubble.style.left = `${left}px`;
-        this.elements.tutorialBubble.style.top = `${top}px`;
-        
-        // Add arrow pointing up to the progress bar
-        this.elements.tutorialBubble.className = this.elements.tutorialBubble.className.replace(/arrow-\w+(-\w+)?/g, '');
-        this.elements.tutorialBubble.classList.add('arrow-top');
-    }
-
-    centerBubbleOnScreen() {
-        if (!this.elements.tutorialBubble) return;
-        
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Get bubble dimensions
-        this.elements.tutorialBubble.style.visibility = 'hidden';
-        this.elements.tutorialBubble.style.display = 'block';
-        const bubbleRect = this.elements.tutorialBubble.getBoundingClientRect();
-        this.elements.tutorialBubble.style.visibility = 'visible';
-        
-        // Center the bubble on screen
-        const left = (viewportWidth - bubbleRect.width) / 2;
-        const top = (viewportHeight - bubbleRect.height) / 2;
-        
-        // Apply position
-        this.elements.tutorialBubble.style.position = 'fixed';
-        this.elements.tutorialBubble.style.left = `${left}px`;
-        this.elements.tutorialBubble.style.top = `${top}px`;
-        
-        // Remove all arrow classes for centered bubble
-        this.elements.tutorialBubble.className = this.elements.tutorialBubble.className.replace(/arrow-\w+(-\w+)?/g, '');
     }
 
     positionBubbleNearElement(targetElement, bubble) {
@@ -698,11 +630,6 @@ class TutorialApp {
             el.classList.remove('tutorial-highlight');
         });
         
-        // Step 13 is centered with no specific element to highlight
-        if (step === 13) {
-            return;
-        }
-        
         // Note: Removed tutorial-active class addition for better UX
         
         const elementMap = {
@@ -717,7 +644,8 @@ class TutorialApp {
             9: this.elements.saveOnomatopoeiaButton,
             10: this.elements.hasOnomatopoeiaButtonNo,
             11: this.elements.videoButtons,
-            12: this.elements.hasOnomatopoeiaButtonNo
+            12: this.elements.hasOnomatopoeiaButtonNo,
+            13: this.elements.videoButtons // Step 13: Highlight video buttons
         };
         
         const targetElement = elementMap[step];
