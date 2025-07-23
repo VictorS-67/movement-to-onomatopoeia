@@ -5,7 +5,7 @@ class TutorialApp {
         this.participantInfo = null;
         this.tutorialData = []; // Local storage for tutorial data
         this.currentStep = 1;
-        this.totalSteps = 12;
+        this.totalSteps = 11; // Reduced from 12 after removing duplicate step 11
         this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
@@ -232,8 +232,7 @@ class TutorialApp {
                     8: this.elements.audioRecord,
                     9: this.elements.saveOnomatopoeiaButton,
                     10: this.elements.hasOnomatopoeiaButtonNo,
-                    11: this.elements.hasOnomatopoeiaButtonNo,
-                    12: this.elements.videoButtons
+                    11: this.elements.videoButtons // Video buttons (was step 12)
                 };
                 
                 const targetElement = elementMap[step];
@@ -346,6 +345,24 @@ class TutorialApp {
         if (this.stepValidation.hasOwnProperty(action)) {
             this.stepValidation[action] = true;
             this.updateNextButtonState();
+            
+            // Auto-advance for specific steps when their action is completed
+            const autoAdvanceSteps = {
+                2: 'video_played',        // Step 2: Auto-advance when video is played
+                4: 'clicked_yes',         // Step 4: Auto-advance when Yes is clicked
+                6: 'clicked_start_time',  // Step 6: Auto-advance when start time is captured
+                7: 'clicked_end_time',    // Step 7: Auto-advance when end time is captured
+                9: 'clicked_save',        // Step 9: Auto-advance when save is clicked
+                10: 'clicked_no'          // Step 10: Auto-advance when No is clicked
+            };
+            
+            // Check if current step should auto-advance for this action
+            if (autoAdvanceSteps[this.currentStep] === action) {
+                // Small delay to let user see the action was registered
+                setTimeout(() => {
+                    this.nextStep();
+                }, 800);
+            }
         }
     }
 
@@ -424,8 +441,7 @@ class TutorialApp {
             8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', required: false },
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
             10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: false },
-            11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', required: false },
-            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false }
+            11: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false } // This was step 12, now step 11
         };
         
         const stepData = stepKeys[step];
@@ -448,8 +464,7 @@ class TutorialApp {
             8: this.elements.audioRecord, // Audio record button
             9: this.elements.saveOnomatopoeiaButton, // Save button
             10: this.elements.hasOnomatopoeiaButtonNo, // No button
-            11: this.elements.hasOnomatopoeiaButtonNo, // No button (same as step 10)
-            12: this.elements.videoButtons // Video buttons
+            11: this.elements.videoButtons // Video buttons (was step 12)
         };
         
         const targetElement = elementMap[step];
@@ -621,8 +636,7 @@ class TutorialApp {
             8: this.elements.audioRecord,
             9: this.elements.saveOnomatopoeiaButton,
             10: this.elements.hasOnomatopoeiaButtonNo,
-            11: this.elements.hasOnomatopoeiaButtonNo,
-            12: this.elements.videoButtons
+            11: this.elements.videoButtons // Video buttons (was step 12)
         };
         
         const targetElement = elementMap[step];
