@@ -8,6 +8,7 @@ class TutorialApp {
         this.totalSteps = 12;
         this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
+        this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
         
         this.initializeElements();
         this.initialize();
@@ -212,6 +213,37 @@ class TutorialApp {
                 setTimeout(() => {
                     this.positionBubbleForStep(this.currentStep);
                 }, 100);
+            }
+        });
+
+        // Scroll handler to reposition bubbles when user scrolls
+        window.addEventListener('scroll', () => {
+            if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
+                // Only reposition, don't auto-scroll again
+                const step = this.currentStep;
+                const elementMap = {
+                    1: this.elements.languageSelect?.parentElement,
+                    2: this.elements.videoPlayer,
+                    3: this.elements.videoPlayer,
+                    4: this.elements.hasOnomatopoeiaButtonYes,
+                    5: this.elements.onomatopoeiaInput,
+                    6: this.elements.getStart,
+                    7: this.elements.getEnd,
+                    8: this.elements.audioRecord,
+                    9: this.elements.saveOnomatopoeiaButton,
+                    10: this.elements.hasOnomatopoeiaButtonNo,
+                    11: this.elements.hasOnomatopoeiaButtonNo,
+                    12: this.elements.videoButtons
+                };
+                
+                const targetElement = elementMap[step];
+                if (targetElement && this.elements.tutorialBubble) {
+                    // Debounce the repositioning to avoid too many calls
+                    clearTimeout(this.scrollTimeout);
+                    this.scrollTimeout = setTimeout(() => {
+                        this.positionBubbleNearElement(targetElement, this.elements.tutorialBubble);
+                    }, 50);
+                }
             }
         });
     }
@@ -425,7 +457,51 @@ class TutorialApp {
             return;
         }
         
-        this.positionBubbleNearElement(targetElement, this.elements.tutorialBubble);
+        // First, scroll the target element into view
+        this.scrollElementIntoView(targetElement).then(() => {
+            // After scrolling is complete, position the bubble
+            this.positionBubbleNearElement(targetElement, this.elements.tutorialBubble);
+        });
+    }
+
+    scrollElementIntoView(element) {
+        return new Promise((resolve) => {
+            // Check if element is already fully visible
+            const rect = element.getBoundingClientRect();
+            const viewportHeight = window.innerHeight;
+            const viewportWidth = window.innerWidth;
+            
+            const isFullyVisible = rect.top >= 0 && 
+                                  rect.left >= 0 && 
+                                  rect.bottom <= viewportHeight && 
+                                  rect.right <= viewportWidth;
+            
+            if (isFullyVisible) {
+                // Element is already visible, no need to scroll
+                resolve();
+                return;
+            }
+            
+            // Calculate the desired scroll position to center the element in viewport
+            const elementCenter = rect.top + rect.height / 2;
+            const viewportCenter = viewportHeight / 2;
+            const scrollOffset = elementCenter - viewportCenter;
+            
+            // Get current scroll position
+            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+            const targetScroll = Math.max(0, currentScroll + scrollOffset);
+            
+            // Smooth scroll to the calculated position
+            window.scrollTo({
+                top: targetScroll,
+                behavior: 'smooth'
+            });
+            
+            // Wait for scroll animation to complete
+            setTimeout(() => {
+                resolve();
+            }, 500); // Give enough time for smooth scroll to complete
+        });
     }
 
     positionBubbleNearElement(targetElement, bubble) {
