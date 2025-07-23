@@ -48,8 +48,19 @@
         <!-- Reasoning Section -->
         <div class="reasoning-section">
             <h3 id="reasoningSectionTitle">Your Onomatopoeia for this video:</h3>
-            <div id="onomatopoeiaList" class="onomatopoeia-list">
-                <!-- Dynamic content will be inserted here -->
+            <div class="onomatopoeia-carousel-container">
+                <button id="prevOnomatopoeia" class="carousel-arrow carousel-arrow-left" style="display: none;" aria-label="Previous onomatopoeia">
+                    <span>‹</span>
+                </button>
+                <div id="onomatopoeiaList" class="onomatopoeia-list">
+                    <!-- Dynamic content will be inserted here -->
+                </div>
+                <button id="nextOnomatopoeia" class="carousel-arrow carousel-arrow-right" style="display: none;" aria-label="Next onomatopoeia">
+                    <span>›</span>
+                </button>
+            </div>
+            <div class="onomatopoeia-counter" id="onomatopoeiaCounter" style="display: none;">
+                <span id="currentOnomatopoeiaIndex">1</span> / <span id="totalOnomatopoeia">1</span>
             </div>
             <div id="noOnomatopoeiaMessage" class="no-onomatopoeia-message" style="display: none;">
                 <p id="noOnomatopoeiaText">No onomatopoeia saved for this video.</p>

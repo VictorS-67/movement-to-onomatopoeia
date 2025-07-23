@@ -172,6 +172,8 @@
         "progress": "{total}個中{completed}個の説明が提供されました",
         "success_saved": "理由が正常に保存されました！",
         "error_saving": "理由の保存に失敗しました。もう一度お試しください。",
-        "error_min_characters": "説明は最低5文字以上入力してください。"
+        "error_min_characters": "説明は最低5文字以上入力してください。",
+        "prev_onomatopoeia": "前のオノマトペ",
+        "next_onomatopoeia": "次のオノマトペ"
     }
 }

@@ -169,6 +169,8 @@
         "progress": "{completed} of {total} explanations provided",
         "success_saved": "Reasoning saved successfully!",
         "error_saving": "Failed to save reasoning. Please try again.",
-        "error_min_characters": "Please provide at least 5 characters for your explanation."
+        "error_min_characters": "Please provide at least 5 characters for your explanation.",
+        "prev_onomatopoeia": "Previous onomatopoeia",
+        "next_onomatopoeia": "Next onomatopoeia"
     }
 }

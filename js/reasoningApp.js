@@ -7,6 +7,8 @@ class ReasoningApp {
         this.onomatopoeiaData = [];
         this.reasoningData = [];
         this.currentVideoName = null;
+        this.currentVideoOnomatopoeia = [];
+        this.currentOnomatopoeiaIndex = 0;
         
         this.initializeElements();
         this.initialize();
@@ -26,7 +28,12 @@ class ReasoningApp {
             reasoningSectionTitle: DOMUtils.getElement("reasoningSectionTitle"),
             onomatopoeiaList: DOMUtils.getElement("onomatopoeiaList"),
             noOnomatopoeiaMessage: DOMUtils.getElement("noOnomatopoeiaMessage"),
-            noOnomatopoeiaText: DOMUtils.getElement("noOnomatopoeiaText")
+            noOnomatopoeiaText: DOMUtils.getElement("noOnomatopoeiaText"),
+            prevOnomatopoeia: DOMUtils.getElement("prevOnomatopoeia"),
+            nextOnomatopoeia: DOMUtils.getElement("nextOnomatopoeia"),
+            onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter"),
+            currentOnomatopoeiaIndex: DOMUtils.getElement("currentOnomatopoeiaIndex"),
+            totalOnomatopoeia: DOMUtils.getElement("totalOnomatopoeia")
         };
     }
 
@@ -144,6 +151,32 @@ class ReasoningApp {
         if (this.elements.buttonLogout) {
             this.elements.buttonLogout.addEventListener('click', this.handleLogout.bind(this));
         }
+
+        // Carousel navigation
+        if (this.elements.prevOnomatopoeia) {
+            this.elements.prevOnomatopoeia.addEventListener('click', () => {
+                this.navigateOnomatopoeia(-1);
+            });
+        }
+
+        if (this.elements.nextOnomatopoeia) {
+            this.elements.nextOnomatopoeia.addEventListener('click', () => {
+                this.navigateOnomatopoeia(1);
+            });
+        }
+
+        // Keyboard navigation for carousel
+        document.addEventListener('keydown', (event) => {
+            if (this.currentVideoOnomatopoeia.length > 1) {
+                if (event.key === 'ArrowLeft' && !this.elements.prevOnomatopoeia.disabled) {
+                    event.preventDefault();
+                    this.navigateOnomatopoeia(-1);
+                } else if (event.key === 'ArrowRight' && !this.elements.nextOnomatopoeia.disabled) {
+                    event.preventDefault();
+                    this.navigateOnomatopoeia(1);
+                }
+            }
+        });
     }
 
     updateParticipantDisplay() {
@@ -195,30 +228,82 @@ class ReasoningApp {
 
     displayReasoningForCurrentVideo() {
         // Filter onomatopoeia for current video
-        const currentVideoOnomatopoeia = this.onomatopoeiaData.filter(item => 
+        this.currentVideoOnomatopoeia = this.onomatopoeiaData.filter(item => 
             item.video === this.currentVideoName
         );
 
-        if (currentVideoOnomatopoeia.length === 0) {
+        if (this.currentVideoOnomatopoeia.length === 0) {
             // No onomatopoeia for this video
             this.elements.onomatopoeiaList.style.display = 'none';
             this.elements.noOnomatopoeiaMessage.style.display = 'block';
+            this.hideCarouselControls();
         } else {
-            // Show onomatopoeia list
+            // Show onomatopoeia carousel
             this.elements.onomatopoeiaList.style.display = 'block';
             this.elements.noOnomatopoeiaMessage.style.display = 'none';
             
-            // Clear existing content
-            this.elements.onomatopoeiaList.innerHTML = '';
-            
-            // Create reasoning entries for each onomatopoeia
-            currentVideoOnomatopoeia.forEach((item, index) => {
-                this.createReasoningEntry(item, index);
-            });
+            // Reset to first onomatopoeia
+            this.currentOnomatopoeiaIndex = 0;
+            this.displayCurrentOnomatopoeia();
+            this.updateCarouselControls();
         }
 
         // Mark video buttons with completion status
         this.updateVideoButtonStates();
+    }
+
+    displayCurrentOnomatopoeia() {
+        // Clear existing content
+        this.elements.onomatopoeiaList.innerHTML = '';
+        
+        // Display only the current onomatopoeia
+        if (this.currentVideoOnomatopoeia.length > 0 && 
+            this.currentOnomatopoeiaIndex < this.currentVideoOnomatopoeia.length) {
+            const currentItem = this.currentVideoOnomatopoeia[this.currentOnomatopoeiaIndex];
+            this.createReasoningEntry(currentItem, this.currentOnomatopoeiaIndex);
+        }
+    }
+
+    updateCarouselControls() {
+        const totalCount = this.currentVideoOnomatopoeia.length;
+        
+        if (totalCount <= 1) {
+            // Hide carousel controls for single or no items
+            this.hideCarouselControls();
+        } else {
+            // Show carousel controls
+            this.elements.prevOnomatopoeia.style.display = 'flex';
+            this.elements.nextOnomatopoeia.style.display = 'flex';
+            this.elements.onomatopoeiaCounter.style.display = 'block';
+            
+            // Update aria-labels
+            this.elements.prevOnomatopoeia.setAttribute('aria-label', langManager.getText('reasoning.prev_onomatopoeia'));
+            this.elements.nextOnomatopoeia.setAttribute('aria-label', langManager.getText('reasoning.next_onomatopoeia'));
+            
+            // Update counter
+            this.elements.currentOnomatopoeiaIndex.textContent = this.currentOnomatopoeiaIndex + 1;
+            this.elements.totalOnomatopoeia.textContent = totalCount;
+            
+            // Update button states
+            this.elements.prevOnomatopoeia.disabled = this.currentOnomatopoeiaIndex === 0;
+            this.elements.nextOnomatopoeia.disabled = this.currentOnomatopoeiaIndex === totalCount - 1;
+        }
+    }
+
+    hideCarouselControls() {
+        this.elements.prevOnomatopoeia.style.display = 'none';
+        this.elements.nextOnomatopoeia.style.display = 'none';
+        this.elements.onomatopoeiaCounter.style.display = 'none';
+    }
+
+    navigateOnomatopoeia(direction) {
+        const newIndex = this.currentOnomatopoeiaIndex + direction;
+        
+        if (newIndex >= 0 && newIndex < this.currentVideoOnomatopoeia.length) {
+            this.currentOnomatopoeiaIndex = newIndex;
+            this.displayCurrentOnomatopoeia();
+            this.updateCarouselControls();
+        }
     }
 
     createReasoningEntry(onomatopoeiaItem, index) {

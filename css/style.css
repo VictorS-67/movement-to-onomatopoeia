@@ -522,10 +522,63 @@ body {
     margin-bottom: 1rem;
 }
 
+.onomatopoeia-carousel-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    min-height: 40px; /* Ensures consistent height even without arrows */
+}
+
+.carousel-arrow {
+    background-color: var(--primary-color);
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.5rem;
+    font-weight: bold;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    z-index: 10;
+}
+
+.carousel-arrow:hover {
+    background-color: var(--primary-hover);
+    transform: scale(1.05);
+}
+
+.carousel-arrow:disabled {
+    background-color: var(--border-color);
+    cursor: not-allowed;
+    transform: none;
+}
+
+.carousel-arrow-left {
+    margin-right: 1rem;
+}
+
+.carousel-arrow-right {
+    margin-left: 1rem;
+}
+
+.onomatopoeia-counter {
+    text-align: center;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+}
+
 .onomatopoeia-list {
+    flex: 1;
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
+    transition: opacity 0.2s ease;
 }
 
 .reasoning-entry {
@@ -534,6 +587,39 @@ body {
     border-radius: var(--border-radius);
     padding: 1.5rem;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive design for carousel */
+@media (max-width: 768px) {
+    .carousel-arrow {
+        width: 35px;
+        height: 35px;
+        font-size: 1.3rem;
+    }
+    
+    .carousel-arrow-left {
+        margin-right: 0.5rem;
+    }
+    
+    .carousel-arrow-right {
+        margin-left: 0.5rem;
+    }
+    
+    .onomatopoeia-counter {
+        font-size: 0.8rem;
+    }
 }
 
 .onomatopoeia-header {
