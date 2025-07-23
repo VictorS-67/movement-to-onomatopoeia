@@ -675,3 +675,16 @@ body {
         text-align: center;
     }
 }
+
+/* Reasoning Access Button */
+.reasoning-access-button {
+    background-color: #10b981;
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+    min-width: 180px;
+}
+
+.reasoning-access-button:hover {
+    background-color: #059669;
+}

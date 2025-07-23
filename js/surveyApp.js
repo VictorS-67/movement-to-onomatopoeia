@@ -57,7 +57,9 @@ class SurveyApp {
             audioPlay: DOMUtils.getElement("audioPlay"),
             audioDelete: DOMUtils.getElement("audioDelete"),
             audioStatus: DOMUtils.getElement("audioStatus"),
-            audioWaveform: DOMUtils.getElement("audioWaveform")
+            audioWaveform: DOMUtils.getElement("audioWaveform"),
+            // Reasoning access button
+            continueToReasoningButton: DOMUtils.getElement("continueToReasoningButton")
         };
     }
 
@@ -184,6 +186,11 @@ class SurveyApp {
             this.elements.buttonLogout.addEventListener('click', this.handleLogout.bind(this));
         }
 
+        // Continue to reasoning button
+        if (this.elements.continueToReasoningButton) {
+            this.elements.continueToReasoningButton.addEventListener('click', this.goToReasoningPage.bind(this));
+        }
+
         // Audio recording buttons
         this.setupAudioEventListeners();
     }
@@ -208,6 +215,29 @@ class SurveyApp {
             const participantName = this.participantInfo.name || this.participantInfo.email;
             this.elements.nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
         }
+
+        // Check if all videos are completed and show/hide reasoning button
+        this.updateReasoningButtonVisibility();
+    }
+
+    updateReasoningButtonVisibility() {
+        if (!this.elements.continueToReasoningButton) return;
+
+        const allCompleted = this.checkAllVideosCompleted();
+        if (allCompleted) {
+            this.elements.continueToReasoningButton.style.display = 'inline-block';
+            this.elements.continueToReasoningButton.textContent = langManager.getText('survey.continue_to_reasoning');
+        } else {
+            this.elements.continueToReasoningButton.style.display = 'none';
+        }
+    }
+
+    goToReasoningPage() {
+        // Store completion state
+        localStorage.setItem("surveyCompleted", "true");
+        
+        // Redirect to reasoning page
+        window.location.href = "reasoning.html";
     }
 
     updateAudioStatusText() {
@@ -654,6 +684,9 @@ class SurveyApp {
             const questionKey = hasExistingOnomatopoeia ? 'survey.question_text_more' : 'survey.question_text';
             docElts.questionText.textContent = langManager.getText(questionKey);
         }
+
+        // Update reasoning button visibility
+        this.updateReasoningButtonVisibility();
     }
 
     async saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = true) {

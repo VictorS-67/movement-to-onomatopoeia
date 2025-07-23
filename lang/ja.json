@@ -114,7 +114,8 @@
         "hide_introduction": "説明を非表示",
         "completion_title": "おめでとうございます！",
         "completion_text": "素晴らしい！すべての動画を完了しました。実験の第2部を始めましょう。",
-        "continue_to_reasoning": "パート2に進む"
+        "continue_to_reasoning": "パート2に進む",
+        "continue_to_reasoning_button": "理由説明に進む"
     },
     "tutorial": {
         "title": "チュートリアル - アンケートの使い方",

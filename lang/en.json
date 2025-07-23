@@ -110,7 +110,8 @@
         "hide_introduction": "Hide Introduction",
         "completion_title": "Congratulations!",
         "completion_text": "Well done! You have finished all the videos. Let's start the second part of the experiment.",
-        "continue_to_reasoning": "Continue to Part 2"
+        "continue_to_reasoning": "Continue to Part 2",
+        "continue_to_reasoning_button": "Continue to Reasoning"
     },
     "tutorial": {
         "title": "Tutorial - Learning the Survey",
