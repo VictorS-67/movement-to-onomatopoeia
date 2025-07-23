@@ -462,9 +462,9 @@ class TutorialApp {
     }
 
     positionBubbleForStep(step) {
-        // Step 13 is centered on screen, no specific element to target
+        // Step 13 is positioned under the progress bar
         if (step === 13) {
-            this.centerBubbleOnScreen();
+            this.positionBubbleUnderProgressBar();
             return;
         }
         
@@ -533,6 +533,40 @@ class TutorialApp {
                 resolve();
             }, 500); // Give enough time for smooth scroll to complete
         });
+    }
+
+    positionBubbleUnderProgressBar() {
+        if (!this.elements.tutorialBubble) return;
+        
+        // Find the progress bar container (look for the tutorial overlay's progress area)
+        const progressContainer = document.querySelector('.tutorial-progress');
+        if (!progressContainer) {
+            // Fallback to centering if progress bar not found
+            this.centerBubbleOnScreen();
+            return;
+        }
+        
+        const progressRect = progressContainer.getBoundingClientRect();
+        const viewportWidth = window.innerWidth;
+        
+        // Get bubble dimensions
+        this.elements.tutorialBubble.style.visibility = 'hidden';
+        this.elements.tutorialBubble.style.display = 'block';
+        const bubbleRect = this.elements.tutorialBubble.getBoundingClientRect();
+        this.elements.tutorialBubble.style.visibility = 'visible';
+        
+        // Position bubble centered horizontally and just below the progress bar
+        const left = (viewportWidth - bubbleRect.width) / 2;
+        const top = progressRect.bottom + 20; // 20px gap below progress bar
+        
+        // Apply position
+        this.elements.tutorialBubble.style.position = 'fixed';
+        this.elements.tutorialBubble.style.left = `${left}px`;
+        this.elements.tutorialBubble.style.top = `${top}px`;
+        
+        // Add arrow pointing up to the progress bar
+        this.elements.tutorialBubble.className = this.elements.tutorialBubble.className.replace(/arrow-\w+(-\w+)?/g, '');
+        this.elements.tutorialBubble.classList.add('arrow-top');
     }
 
     centerBubbleOnScreen() {
