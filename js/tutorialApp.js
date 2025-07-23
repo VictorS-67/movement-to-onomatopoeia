@@ -52,7 +52,6 @@ class TutorialApp {
             bubbleText: DOMUtils.getElement("bubbleText"),
             bubbleNext: DOMUtils.getElement("bubbleNext"),
             bubblePrevious: DOMUtils.getElement("bubblePrevious"),
-            bubbleSkip: DOMUtils.getElement("bubbleSkip"),
             progressFill: DOMUtils.getElement("progressFill"),
             currentStep: DOMUtils.getElement("currentStep"),
             totalSteps: DOMUtils.getElement("totalSteps"),
@@ -177,12 +176,6 @@ class TutorialApp {
         if (this.elements.bubblePrevious) {
             this.elements.bubblePrevious.addEventListener('click', () => {
                 this.previousStep();
-            });
-        }
-
-        if (this.elements.bubbleSkip) {
-            this.elements.bubbleSkip.addEventListener('click', () => {
-                this.skipTutorial();
             });
         }
 
@@ -863,12 +856,6 @@ class TutorialApp {
         if (this.elements.nameDisplay && this.participantInfo) {
             const participantName = this.participantInfo.name || this.participantInfo.email;
             this.elements.nameDisplay.textContent = langManager.getText('tutorial.participant_name') + participantName;
-        }
-    }
-
-    skipTutorial() {
-        if (confirm(langManager.getText('tutorial.skip_confirm'))) {
-            this.completeTutorialAndStartSurvey();
         }
     }
 
