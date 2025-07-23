@@ -76,6 +76,9 @@ class ReasoningApp {
             ]);
             
             this.config = config;
+
+            // Load existing reasoning data from Google Sheets
+            await this.loadExistingReasoningData();
             
             // Set up event listeners
             this.setupEventListeners();
@@ -89,11 +92,86 @@ class ReasoningApp {
             // Update progress display
             this.updateProgressDisplay();
 
+            // Update video button states now that reasoning data is loaded
+            this.updateVideoButtonStates();
+
         } catch (error) {
             console.error('Failed to initialize reasoning app:', error);
             if (this.elements.messageDisplay) {
                 UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize reasoning page');
             }
+        }
+    }
+
+    async loadExistingReasoningData() {
+        try {
+            // Get the existing onomatopoeia data from Google Sheets
+            const existingData = await getSheetData(this.config.spreadsheetId, this.config.OnomatopoeiaSheet);
+            
+            if (!existingData || existingData.length <= 1) {
+                console.log('No existing reasoning data found in Google Sheets');
+                return;
+            }
+
+            // Process the sheet data to extract reasoning information
+            const sheetReasoningData = [];
+            
+            // Skip header row (index 0)
+            for (let i = 1; i < existingData.length; i++) {
+                const row = existingData[i];
+                
+                // Check if this row belongs to the current participant and has reasoning data
+                if (row[0] == this.participantInfo.participantId && // participantId (column A)
+                    row[9] && // reasoning column (column J, index 9)
+                    row[9].trim() !== '') { // has non-empty reasoning
+                    
+                    const reasoningEntry = {
+                        participantId: row[0], // participantId column (column A)
+                        participantName: row[1], // participantName column (column B)
+                        video: row[2], // video column (column C)
+                        onomatopoeia: row[3], // onomatopoeia column (column D)
+                        startTime: parseFloat(row[4]), // startTime column (column E)
+                        endTime: parseFloat(row[5]), // endTime column (column F)
+                        answeredTimestamp: row[6], // answeredTimestamp column (column G)
+                        reasoning: row[9], // reasoning column (column J)
+                    };
+                    
+                    sheetReasoningData.push(reasoningEntry);
+                }
+            }
+
+            // Merge with local data, prioritizing sheet data for conflicts
+            const mergedData = [...sheetReasoningData];
+            
+            // Add any local reasoning data that's not in the sheet
+            this.reasoningData.forEach(localEntry => {
+                const existsInSheet = sheetReasoningData.some(sheetEntry => 
+                    sheetEntry.participantId === localEntry.participantId &&
+                    sheetEntry.video === localEntry.video &&
+                    sheetEntry.onomatopoeia === localEntry.onomatopoeia &&
+                    sheetEntry.startTime === localEntry.startTime &&
+                    sheetEntry.endTime === localEntry.endTime
+                );
+                
+                if (!existsInSheet) {
+                    mergedData.push(localEntry);
+                }
+            });
+
+            this.reasoningData = mergedData;
+            
+            // Update local storage with merged data
+            localStorage.setItem("reasoningData", JSON.stringify(this.reasoningData));
+            
+            console.log(`Loaded ${sheetReasoningData.length} reasoning entries from Google Sheets`);
+            
+            if (sheetReasoningData.length > 0) {
+                console.log('Sample reasoning entry:', sheetReasoningData[0]);
+            }
+            
+        } catch (error) {
+            console.error('Error loading existing reasoning data from Google Sheets:', error);
+            console.warn('Continuing with local reasoning data only');
         }
     }
 
@@ -312,11 +390,11 @@ class ReasoningApp {
         
         // Find existing reasoning for this onomatopoeia
         const existingReasoning = this.reasoningData.find(reasoning => 
-            reasoning.participantId === this.participantInfo.participantId &&
+            reasoning.participantId == this.participantInfo.participantId &&
             reasoning.video === onomatopoeiaItem.video &&
             reasoning.onomatopoeia === onomatopoeiaItem.onomatopoeia &&
-            reasoning.startTime === onomatopoeiaItem.startTime &&
-            reasoning.endTime === onomatopoeiaItem.endTime
+            parseFloat(reasoning.startTime) === parseFloat(onomatopoeiaItem.startTime) &&
+            parseFloat(reasoning.endTime) === parseFloat(onomatopoeiaItem.endTime)
         );
 
         entryDiv.innerHTML = `
@@ -424,11 +502,11 @@ class ReasoningApp {
 
             // Update local reasoning data
             const existingIndex = this.reasoningData.findIndex(item => 
-                item.participantId === reasoningEntry.participantId &&
+                item.participantId == reasoningEntry.participantId &&
                 item.video === reasoningEntry.video &&
                 item.onomatopoeia === reasoningEntry.onomatopoeia &&
-                item.startTime === reasoningEntry.startTime &&
-                item.endTime === reasoningEntry.endTime
+                parseFloat(item.startTime) === parseFloat(reasoningEntry.startTime) &&
+                parseFloat(item.endTime) === parseFloat(reasoningEntry.endTime)
             );
 
             if (existingIndex >= 0) {
@@ -482,7 +560,7 @@ class ReasoningApp {
                 throw new Error("Matching onomatopoeia entry not found in sheet");
             }
 
-            // Update the reasoning column (assuming it's the 10th column, index 9)
+            // Update the reasoning column (column J, index 9)
             const range = `${this.config.OnomatopoeiaSheet}!J${matchingRowIndex + 1}`;
             const updateResult = await updateSheetData(this.config.spreadsheetId, range, [[reasoningEntry.reasoning]]);
 
@@ -516,8 +594,8 @@ class ReasoningApp {
                         this.reasoningData.some(reasoning => 
                             reasoning.video === item.video &&
                             reasoning.onomatopoeia === item.onomatopoeia &&
-                            reasoning.startTime === item.startTime &&
-                            reasoning.endTime === item.endTime
+                            parseFloat(reasoning.startTime) === parseFloat(item.startTime) &&
+                            parseFloat(reasoning.endTime) === parseFloat(item.endTime)
                         )
                     );
                     
