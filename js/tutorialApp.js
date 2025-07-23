@@ -5,7 +5,7 @@ class TutorialApp {
         this.participantInfo = null;
         this.tutorialData = []; // Local storage for tutorial data
         this.currentStep = 1;
-        this.totalSteps = 12; // Added step 12 for the No button
+        this.totalSteps = 13; // Added step 13 for final completion message
         this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
@@ -219,6 +219,11 @@ class TutorialApp {
         // Scroll handler to reposition bubbles when user scrolls
         window.addEventListener('scroll', () => {
             if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
+                // Skip repositioning for step 13 (centered bubble)
+                if (this.currentStep === 13) {
+                    return;
+                }
+                
                 // Only reposition, don't auto-scroll again
                 const step = this.currentStep;
                 const elementMap = {
@@ -356,7 +361,8 @@ class TutorialApp {
                 6: 'clicked_start_time',  // Step 6: Auto-advance when start time is captured
                 7: 'clicked_end_time',    // Step 7: Auto-advance when end time is captured
                 9: 'clicked_save',        // Step 9: Auto-advance when save is clicked
-                10: 'clicked_no'          // Step 10: Auto-advance when No is clicked
+                10: 'clicked_no',         // Step 10: Auto-advance when No is clicked
+                12: 'clicked_no'          // Step 12: Auto-advance when No is clicked
             };
             
             // Check if current step should auto-advance for this action
@@ -443,7 +449,8 @@ class TutorialApp {
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
             10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: true },
             11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', required: false },
-            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false }
+            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: false },
+            13: { title: 'tutorial.step13_title', text: 'tutorial.step13_text', required: false }
         };
         
         const stepData = stepKeys[step];
@@ -455,6 +462,12 @@ class TutorialApp {
     }
 
     positionBubbleForStep(step) {
+        // Step 13 is centered on screen, no specific element to target
+        if (step === 13) {
+            this.centerBubbleOnScreen();
+            return;
+        }
+        
         const elementMap = {
             1: this.elements.languageSelect?.parentElement, // Language selector
             2: this.elements.videoPlayer, // Video player
@@ -520,6 +533,31 @@ class TutorialApp {
                 resolve();
             }, 500); // Give enough time for smooth scroll to complete
         });
+    }
+
+    centerBubbleOnScreen() {
+        if (!this.elements.tutorialBubble) return;
+        
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Get bubble dimensions
+        this.elements.tutorialBubble.style.visibility = 'hidden';
+        this.elements.tutorialBubble.style.display = 'block';
+        const bubbleRect = this.elements.tutorialBubble.getBoundingClientRect();
+        this.elements.tutorialBubble.style.visibility = 'visible';
+        
+        // Center the bubble on screen
+        const left = (viewportWidth - bubbleRect.width) / 2;
+        const top = (viewportHeight - bubbleRect.height) / 2;
+        
+        // Apply position
+        this.elements.tutorialBubble.style.position = 'fixed';
+        this.elements.tutorialBubble.style.left = `${left}px`;
+        this.elements.tutorialBubble.style.top = `${top}px`;
+        
+        // Remove all arrow classes for centered bubble
+        this.elements.tutorialBubble.className = this.elements.tutorialBubble.className.replace(/arrow-\w+(-\w+)?/g, '');
     }
 
     positionBubbleNearElement(targetElement, bubble) {
@@ -625,6 +663,11 @@ class TutorialApp {
         document.querySelectorAll('.tutorial-highlight').forEach(el => {
             el.classList.remove('tutorial-highlight');
         });
+        
+        // Step 13 is centered with no specific element to highlight
+        if (step === 13) {
+            return;
+        }
         
         // Note: Removed tutorial-active class addition for better UX
         

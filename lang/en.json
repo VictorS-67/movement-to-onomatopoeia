@@ -147,6 +147,8 @@
         "step11_title": "Video Button Colors",
         "step11_text": "The video buttons change color to show your progress: Grey = not yet completed. Green = you've saved at least one onomatopoeia. Another possible color is Yellow. It appears when you don't think a video has any onomatopoeia. Let's try it with this second video, with no onomatopoeia saved.",        
         "step12_title": "Try the 'No' Button",
-        "step12_text": "Now try clicking the 'No' button to see how it works. This will mark the current video as having no onomatopoeia and automatically load the next video."
+        "step12_text": "Now try clicking the 'No' button to see how it works. This will mark the current video as having no onomatopoeia and automatically load the next video.",
+        "step13_title": "Tutorial Complete!",
+        "step13_text": "Well done! You've finished the tutorial and learned how to use the onomatopoeia collection system. You're now ready to start the actual survey. Click 'Complete Tutorial' to begin!"
     }
 }
