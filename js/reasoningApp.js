@@ -1,17 +1,14 @@
 // Main application logic for reasoning.html
-class ReasoningApp {
+class ReasoningApp extends BaseApp {
     constructor() {
-        this.elements = {};
-        this.config = null;
-        this.participantInfo = null;
+        // Initialize reasoning-specific properties before calling super()
         this.onomatopoeiaData = [];
         this.reasoningData = [];
         this.currentVideoName = null;
         this.currentVideoOnomatopoeia = [];
         this.currentOnomatopoeiaIndex = 0;
         
-        this.initializeElements();
-        this.initialize();
+        super();
     }
 
     initializeElements() {
@@ -37,7 +34,7 @@ class ReasoningApp {
         };
     }
 
-    async initialize() {
+    async initializeSubclass() {
         try {
             // Check if survey was completed
             const surveyCompleted = localStorage.getItem("surveyCompleted");
@@ -47,15 +44,13 @@ class ReasoningApp {
                 return;
             }
 
-            // Check participant info
-            this.participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
-            this.onomatopoeiaData = JSON.parse(localStorage.getItem("filteredData")) || [];
-
-            if (!this.participantInfo) {
-                alert("Warning, no participant information found");
-                window.location.href = "index.html";
-                return;
+            // Load and validate participant info using base class method
+            if (!this.loadAndValidateParticipantInfo()) {
+                return; // Base class handles the redirect
             }
+
+            // Load onomatopoeia data from localStorage
+            this.onomatopoeiaData = JSON.parse(localStorage.getItem("filteredData")) || [];
 
             // Filter out null onomatopoeia entries
             this.onomatopoeiaData = this.onomatopoeiaData.filter(item => item.onomatopoeia !== "null");
@@ -68,14 +63,6 @@ class ReasoningApp {
 
             // Load existing reasoning data if any
             this.reasoningData = JSON.parse(localStorage.getItem("reasoningData")) || [];
-
-            // Initialize language manager and configuration
-            const [langInitialized, config] = await Promise.all([
-                langManager.ensureInitialized(),
-                ConfigManager.getSheetConfig()
-            ]);
-            
-            this.config = config;
 
             // Load existing reasoning data from Google Sheets
             await this.loadExistingReasoningData();
@@ -97,10 +84,23 @@ class ReasoningApp {
 
         } catch (error) {
             console.error('Failed to initialize reasoning app:', error);
-            if (this.elements.messageDisplay) {
-                UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize reasoning page');
-            }
+            this.showError('Failed to initialize reasoning page');
         }
+    }
+
+    getParticipantDisplayKey() {
+        return 'reasoning.participant_name';
+    }
+
+    onLanguageChange() {
+        super.onLanguageChange(); // Call base class method
+        this.updateProgressDisplay();
+        this.displayReasoningForCurrentVideo();
+    }
+
+    performAdditionalLogoutCleanup() {
+        localStorage.removeItem("reasoningData");
+        localStorage.removeItem("surveyCompleted");
     }
 
     async loadExistingReasoningData() {
@@ -206,25 +206,12 @@ class ReasoningApp {
     }
 
     setupEventListeners() {
-        // Language switching
-        if (this.elements.languageSelect) {
-            this.elements.languageSelect.addEventListener("change", async (event) => {
-                const selectedLanguage = event.target.value;
-                await langManager.switchLanguage(selectedLanguage);
-                this.updateParticipantDisplay();
-                this.updateProgressDisplay();
-                this.displayReasoningForCurrentVideo();
-            });
-        }
+        // Set up common event listeners from base class
+        this.setupCommonEventListeners();
 
         // Video button interactions (read-only)
         if (this.elements.videoButtons) {
             this.elements.videoButtons.addEventListener('click', this.handleVideoButtonClick.bind(this));
-        }
-
-        // Logout button
-        if (this.elements.buttonLogout) {
-            this.elements.buttonLogout.addEventListener('click', this.handleLogout.bind(this));
         }
 
         // Carousel navigation
@@ -252,13 +239,6 @@ class ReasoningApp {
                 }
             }
         });
-    }
-
-    updateParticipantDisplay() {
-        if (this.elements.nameDisplay && this.participantInfo) {
-            const participantName = this.participantInfo.name || this.participantInfo.email;
-            this.elements.nameDisplay.textContent = langManager.getText('reasoning.participant_name') + participantName;
-        }
     }
 
     updateProgressDisplay() {
@@ -608,13 +588,6 @@ class ReasoningApp {
         });
     }
 
-    handleLogout() {
-        localStorage.removeItem("participantInfo");
-        localStorage.removeItem("filteredData");
-        localStorage.removeItem("reasoningData");
-        localStorage.removeItem("surveyCompleted");
-        window.location.href = "index.html";
-    }
 }
 
 // Initialize the app when DOM is loaded

@@ -1,9 +1,7 @@
 // Main application logic for survey.html
-class SurveyApp {
+class SurveyApp extends BaseApp {
     constructor() {
-        this.elements = {};
-        this.config = null;
-        this.participantInfo = null;
+        // Initialize survey-specific properties before calling super()
         this.filteredData = [];
         this.currentVideoName = null;
         this.audioRecording = {
@@ -14,8 +12,7 @@ class SurveyApp {
         };
         this.introExpanded = false; // Track introduction toggle state
         
-        this.initializeElements();
-        this.initialize();
+        super();
     }
 
     initializeElements() {
@@ -63,25 +60,15 @@ class SurveyApp {
         };
     }
 
-    async initialize() {
+    async initializeSubclass() {
         try {
-            // Check participant info
-            this.participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
-            this.filteredData = JSON.parse(localStorage.getItem("filteredData")) || [];
-
-            if (!this.participantInfo) {
-                alert("Warning, no participant information found");
-                window.location.href = "index.html";
-                return;
+            // Load and validate participant info using base class method
+            if (!this.loadAndValidateParticipantInfo()) {
+                return; // Base class handles the redirect
             }
-
-            // Initialize language manager and configuration
-            const [langInitialized, config] = await Promise.all([
-                langManager.ensureInitialized(),
-                ConfigManager.getSheetConfig()
-            ]);
             
-            this.config = config;
+            // Load filtered data from localStorage
+            this.filteredData = JSON.parse(localStorage.getItem("filteredData")) || [];
             
             // Set up event listeners
             this.setupEventListeners();
@@ -97,10 +84,22 @@ class SurveyApp {
 
         } catch (error) {
             console.error('Failed to initialize survey app:', error);
-            if (this.elements.messageDisplay) {
-                UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize survey');
-            }
+            this.showError('Failed to initialize survey');
         }
+    }
+
+    getParticipantDisplayKey() {
+        return 'survey.participant_name';
+    }
+
+    onLanguageChange() {
+        super.onLanguageChange(); // Call base class method
+        this.updateAudioStatusText();
+        this.updateIntroductionContent();
+    }
+
+    performAdditionalLogoutCleanup() {
+        // No additional cleanup needed for survey app
     }
 
     async loadVideos() {
@@ -137,16 +136,8 @@ class SurveyApp {
     }
 
     setupEventListeners() {
-        // Language switching
-        if (this.elements.languageSelect) {
-            this.elements.languageSelect.addEventListener("change", async (event) => {
-                const selectedLanguage = event.target.value;
-                await langManager.switchLanguage(selectedLanguage);
-                this.updateParticipantDisplay();
-                this.updateAudioStatusText();
-                this.updateIntroductionContent();
-            });
-        }
+        // Set up common event listeners from base class
+        this.setupCommonEventListeners();
 
         // Video button interactions
         if (this.elements.videoButtons) {
@@ -181,11 +172,6 @@ class SurveyApp {
             this.elements.saveOnomatopoeiaButton.addEventListener('click', this.handleSaveOnomatopoeia.bind(this));
         }
 
-        // Logout button
-        if (this.elements.buttonLogout) {
-            this.elements.buttonLogout.addEventListener('click', this.handleLogout.bind(this));
-        }
-
         // Continue to reasoning button
         if (this.elements.continueToReasoningButton) {
             this.elements.continueToReasoningButton.addEventListener('click', this.goToReasoningPage.bind(this));
@@ -211,10 +197,8 @@ class SurveyApp {
     }
 
     updateParticipantDisplay() {
-        if (this.elements.nameDisplay && this.participantInfo) {
-            const participantName = this.participantInfo.name || this.participantInfo.email;
-            this.elements.nameDisplay.textContent = langManager.getText('survey.participant_name') + participantName;
-        }
+        // Call base class method to handle the common display logic
+        super.updateParticipantDisplay();
 
         // Check if all videos are completed and show/hide reasoning button
         this.updateReasoningButtonVisibility();
@@ -459,12 +443,6 @@ class SurveyApp {
         } catch (error) {
             console.error('Error saving onomatopoeia:', error);
         }
-    }
-
-    handleLogout() {
-        localStorage.removeItem("participantInfo");
-        localStorage.removeItem("filteredData");
-        window.location.href = "index.html";
     }
 
     // Audio recording methods

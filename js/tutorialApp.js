@@ -1,8 +1,7 @@
 // Tutorial application logic
-class TutorialApp {
+class TutorialApp extends BaseApp {
     constructor() {
-        this.elements = {};
-        this.participantInfo = null;
+        // Initialize tutorial-specific properties before calling super()
         this.tutorialData = []; // Local storage for tutorial data
         this.currentStep = 1;
         this.totalSteps = 13; // Added step 13 for final completion message
@@ -10,8 +9,7 @@ class TutorialApp {
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
         
-        this.initializeElements();
-        this.initialize();
+        super();
     }
 
     initializeElements() {
@@ -66,19 +64,12 @@ class TutorialApp {
         };
     }
 
-    async initialize() {
+    async initializeSubclass() {
         try {
-            // Check participant info
-            this.participantInfo = JSON.parse(localStorage.getItem("participantInfo"));
-
-            if (!this.participantInfo) {
-                alert("Warning, no participant information found");
-                window.location.href = "index.html";
-                return;
+            // Load and validate participant info using base class method
+            if (!this.loadAndValidateParticipantInfo()) {
+                return; // Base class handles the redirect
             }
-
-            // Initialize language manager
-            await langManager.ensureInitialized();
             
             // Set up event listeners
             this.setupEventListeners();
@@ -94,22 +85,22 @@ class TutorialApp {
 
         } catch (error) {
             console.error('Failed to initialize tutorial app:', error);
-            if (this.elements.messageDisplay) {
-                UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize tutorial');
-            }
+            this.showError('Failed to initialize tutorial');
         }
     }
 
+    getParticipantDisplayKey() {
+        return 'tutorial.participant_name';
+    }
+
+    onLanguageChange() {
+        super.onLanguageChange(); // Call base class method
+        this.updateCurrentStepContent();
+    }
+
     setupEventListeners() {
-        // Language switching
-        if (this.elements.languageSelect) {
-            this.elements.languageSelect.addEventListener("change", async (event) => {
-                const selectedLanguage = event.target.value;
-                await langManager.switchLanguage(selectedLanguage);
-                this.updateParticipantDisplay();
-                this.updateCurrentStepContent();
-            });
-        }
+        // Set up common event listeners from base class
+        this.setupCommonEventListeners();
 
         // Video interactions for tracking
         if (this.elements.videoPlayer) {
@@ -190,14 +181,6 @@ class TutorialApp {
         if (this.elements.startSurveyButton) {
             this.elements.startSurveyButton.addEventListener('click', () => {
                 this.completeTutorialAndStartSurvey();
-            });
-        }
-
-        // Logout button
-        if (this.elements.buttonLogout) {
-            this.elements.buttonLogout.addEventListener('click', () => {
-                localStorage.removeItem("participantInfo");
-                window.location.href = "index.html";
             });
         }
 
@@ -849,13 +832,6 @@ class TutorialApp {
         // Clear messages
         if (this.elements.messageDisplay) {
             UIUtils.clearMessage(this.elements.messageDisplay);
-        }
-    }
-
-    updateParticipantDisplay() {
-        if (this.elements.nameDisplay && this.participantInfo) {
-            const participantName = this.participantInfo.name || this.participantInfo.email;
-            this.elements.nameDisplay.textContent = langManager.getText('tutorial.participant_name') + participantName;
         }
     }
 

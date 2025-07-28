@@ -1,11 +1,8 @@
 // Main application logic for index.html
-class IndexApp {
+class IndexApp extends BaseApp {
     constructor() {
-        this.elements = {};
-        this.config = null;
-        this.initializeElements();
+        super();
         this.setupEventListeners();
-        this.initialize();
     }
 
     initializeElements() {
@@ -24,33 +21,18 @@ class IndexApp {
         };
     }
 
-    async initialize() {
-        try {
-            // Initialize language manager and configuration
-            // Run these in parallel
-            const [langInitialized, config] = await Promise.all([
-                langManager.ensureInitialized(),
-                ConfigManager.getSheetConfig()
-            ]);
-            
-            this.config = config;
-            console.log('Configuration loaded');
-        } catch (error) {
-            console.error('Failed to initialize app:', error);
-            if (this.elements.messageDisplay) {
-                UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize application');
-            }
-        }
+    async initializeSubclass() {
+        // IndexApp doesn't need additional async initialization beyond the base class
+        console.log('IndexApp initialized');
+    }
+
+    getParticipantDisplayKey() {
+        return 'ui.participant_name';
     }
 
     setupEventListeners() {
-        // Language switching
-        if (this.elements.languageSelect) {
-            this.elements.languageSelect.addEventListener("change", async (event) => {
-                const selectedLanguage = event.target.value;
-                await langManager.switchLanguage(selectedLanguage);
-            });
-        }
+        // Set up common event listeners from base class
+        this.setupCommonEventListeners();
 
         // Email form submission
         if (this.elements.emailForm) {
