@@ -1,15 +1,16 @@
 // Tutorial application logic
 class TutorialApp extends BaseApp {
     constructor() {
-        // Initialize tutorial-specific properties before calling super()
+        // Must call super() first before accessing 'this'
+        super();
+        
+        // Initialize tutorial-specific properties after calling super()
         this.tutorialData = []; // Local storage for tutorial data
         this.currentStep = 1;
         this.totalSteps = 13; // Added step 13 for final completion message
         this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
-        
-        super();
     }
 
     initializeElements() {

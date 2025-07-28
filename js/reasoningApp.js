@@ -1,14 +1,15 @@
 // Main application logic for reasoning.html
 class ReasoningApp extends BaseApp {
     constructor() {
-        // Initialize reasoning-specific properties before calling super()
+        // Must call super() first before accessing 'this'
+        super();
+        
+        // Initialize reasoning-specific properties after calling super()
         this.onomatopoeiaData = [];
         this.reasoningData = [];
         this.currentVideoName = null;
         this.currentVideoOnomatopoeia = [];
         this.currentOnomatopoeiaIndex = 0;
-        
-        super();
     }
 
     initializeElements() {

@@ -1,5 +1,5 @@
 // Base Application Class
-// Extracts common functionality shared across all app classes
+// Common functionality shared across all app classes
 
 class BaseApp {
     constructor() {

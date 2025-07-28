@@ -1,7 +1,10 @@
 // Main application logic for survey.html
 class SurveyApp extends BaseApp {
     constructor() {
-        // Initialize survey-specific properties before calling super()
+        // Must call super() first before accessing 'this'
+        super();
+        
+        // Initialize survey-specific properties after calling super()
         this.filteredData = [];
         this.currentVideoName = null;
         this.audioRecording = {
@@ -11,8 +14,6 @@ class SurveyApp extends BaseApp {
             audioUrl: null
         };
         this.introExpanded = false; // Track introduction toggle state
-        
-        super();
     }
 
     initializeElements() {
