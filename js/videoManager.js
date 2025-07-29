@@ -184,6 +184,10 @@ class VideoManager {
         };
     }
 
+    getCurrentActiveButton() {
+        return this.videoButtons?.querySelector('.video-button.active');
+    }
+
     // Set up event listeners for video buttons
     setupEventListeners() {
         if (this.videoButtons) {

@@ -197,6 +197,8 @@ class TutorialApp extends BaseApp {
             });
         }
 
+        // Audio recording integration
+        this.setupAudioRecording();
 
         // Window resize handler to reposition bubbles
         window.addEventListener('resize', () => {
@@ -471,9 +473,7 @@ class TutorialApp extends BaseApp {
 
     highlightElementForStep(step) {
         // Remove previous highlights
-        document.querySelectorAll('.tutorial-highlight').forEach(el => {
-            el.classList.remove('tutorial-highlight');
-        });
+        this.clearTutorialHighlights();
         
         // Use BubblePositioner's element mapping for consistency
         const elementMap = BubblePositioner.getStepElementMapping(this.elements);
@@ -517,7 +517,8 @@ class TutorialApp extends BaseApp {
         
         // Update video button color to yellow (completed without onomatopoeia)
         // if not already completed
-        if (!this.elements.videoButtons.querySelector('.video-button.active').classList.contains('completed')) {
+        const activeButton = this.videoManager?.getCurrentActiveButton();
+        if (activeButton && !activeButton.classList.contains('completed')) {
             this.updateActiveVideoButtonState('no-onomatopoeia');
         }
         
@@ -586,7 +587,7 @@ class TutorialApp extends BaseApp {
     goToNextVideo() {
         if (!this.elements.videoButtons) return;
         
-        const currentButton = this.elements.videoButtons.querySelector('.video-button.active');
+        const currentButton = this.videoManager?.getCurrentActiveButton();
         if (!currentButton) return;
         
         const allButtons = Array.from(this.elements.videoButtons.querySelectorAll('.video-button'));
@@ -644,9 +645,7 @@ class TutorialApp extends BaseApp {
         }
         
         // Remove highlighting
-        document.querySelectorAll('.tutorial-highlight').forEach(el => {
-            el.classList.remove('tutorial-highlight');
-        });
+        this.clearTutorialHighlights();
         // Note: Removed tutorial-active class removal as it's no longer added
         
         // Show completion modal
@@ -675,6 +674,88 @@ class TutorialApp extends BaseApp {
         }
         
         // Remove tutorial highlights
+        this.clearTutorialHighlights();
+    }
+
+    setupAudioRecording() {
+        // Set up audio recording service callbacks
+        audioRecordingService.onStateChange = (state, audioState) => {
+            this.updateAudioUI(state, audioState);
+        };
+
+        audioRecordingService.onError = (type, message) => {
+            console.error(`Audio ${type} error:`, message);
+            if (this.elements.messageDisplay) {
+                uiManager.showError(this.elements.messageDisplay, message);
+            }
+        };
+
+        // Set up audio control event listeners
+        if (this.elements.audioRecord) {
+            this.elements.audioRecord.addEventListener('click', () => audioRecordingService.startRecording());
+        }
+
+        if (this.elements.audioStop) {
+            this.elements.audioStop.addEventListener('click', () => audioRecordingService.stopRecording());
+        }
+
+        if (this.elements.audioPlay) {
+            this.elements.audioPlay.addEventListener('click', () => audioRecordingService.playRecording());
+        }
+
+        if (this.elements.audioDelete) {
+            this.elements.audioDelete.addEventListener('click', () => audioRecordingService.deleteRecording());
+        }
+    }
+
+    updateAudioUI(state, audioState) {
+        // Update button visibility based on state
+        if (this.elements.audioRecord) {
+            this.elements.audioRecord.style.display = (state === 'idle') ? 'inline-block' : 'none';
+        }
+
+        if (this.elements.audioStop) {
+            this.elements.audioStop.style.display = (state === 'recording') ? 'inline-block' : 'none';
+        }
+
+        if (this.elements.audioPlay) {
+            this.elements.audioPlay.style.display = (audioState.hasRecording && state !== 'recording') ? 'inline-block' : 'none';
+        }
+
+        if (this.elements.audioDelete) {
+            this.elements.audioDelete.style.display = (audioState.hasRecording && state !== 'recording') ? 'inline-block' : 'none';
+        }
+
+        // Update status display
+        if (this.elements.audioStatus) {
+            let statusText = '';
+            switch (state) {
+                case 'recording':
+                    statusText = 'Recording...';
+                    break;
+                case 'playing':
+                    statusText = 'Playing...';
+                    break;
+                case 'idle':
+                    statusText = audioState.hasRecording ? 'Recording ready' : 'No recording';
+                    break;
+                default:
+                    statusText = state;
+            }
+            this.elements.audioStatus.textContent = statusText;
+        }
+
+        // Update waveform visualization if available
+        if (this.elements.audioWaveform) {
+            if (state === 'recording') {
+                this.elements.audioWaveform.classList.add('recording');
+            } else {
+                this.elements.audioWaveform.classList.remove('recording');
+            }
+        }
+    }
+
+    clearTutorialHighlights() {
         document.querySelectorAll('.tutorial-highlight').forEach(el => {
             el.classList.remove('tutorial-highlight');
         });

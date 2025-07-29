@@ -7,13 +7,10 @@ class SurveyApp extends BaseApp {
         // Initialize survey-specific properties after calling super()
         this.filteredData = [];
         this.currentVideoName = null;
-        this.audioRecording = {
-            mediaRecorder: null,
-            audioChunks: [],
-            recordedAudioBlob: null,
-            audioUrl: null
-        };
         this.introExpanded = false; // Track introduction toggle state
+        
+        // Initialize audio recording service
+        this.initializeAudioService();
     }
 
     initializeElements() {
@@ -175,18 +172,30 @@ class SurveyApp extends BaseApp {
         this.setupAudioEventListeners();
     }
 
+    // Initialize audio recording service with callbacks
+    initializeAudioService() {
+        // Set up callbacks for audio state changes
+        audioRecordingService.onStateChange = (state, audioState) => {
+            this.handleAudioStateChange(state, audioState);
+        };
+        
+        audioRecordingService.onError = (type, message) => {
+            this.handleAudioError(type, message);
+        };
+    }
+
     setupAudioEventListeners() {
         if (this.elements.audioRecord) {
-            this.elements.audioRecord.addEventListener('click', this.startAudioRecording.bind(this));
+            this.elements.audioRecord.addEventListener('click', () => audioRecordingService.startRecording());
         }
         if (this.elements.audioStop) {
-            this.elements.audioStop.addEventListener('click', this.stopAudioRecording.bind(this));
+            this.elements.audioStop.addEventListener('click', () => audioRecordingService.stopRecording());
         }
         if (this.elements.audioPlay) {
-            this.elements.audioPlay.addEventListener('click', this.playAudioRecording.bind(this));
+            this.elements.audioPlay.addEventListener('click', () => audioRecordingService.playRecording());
         }
         if (this.elements.audioDelete) {
-            this.elements.audioDelete.addEventListener('click', this.deleteAudioRecording.bind(this));
+            this.elements.audioDelete.addEventListener('click', () => audioRecordingService.deleteRecording());
         }
     }
 
@@ -219,8 +228,49 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioStatusText() {
-        if (this.elements.audioStatus && !this.audioRecording.recordedAudioBlob) {
+        const audioState = audioRecordingService.getState();
+        if (this.elements.audioStatus && !audioState.hasRecording) {
             this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_ready');
+        }
+    }
+
+    // Handle audio service state changes
+    handleAudioStateChange(state, audioState) {
+        switch (state) {
+            case 'READY':
+                this.updateAudioUIInitial();
+                break;
+            case 'RECORDING':
+                this.updateAudioUIDuringRecording();
+                break;
+            case 'RECORDED':
+                this.updateAudioUIAfterRecording();
+                break;
+            case 'PLAYING':
+                this.updateAudioUIWhilePlaying();
+                break;
+        }
+    }
+
+    // Handle audio service errors
+    handleAudioError(type, message) {
+        if (!this.elements.audioStatus) return;
+        
+        switch (type) {
+            case 'NOT_SUPPORTED':
+                this.elements.audioStatus.textContent = langManager.getText('survey.audio_not_supported');
+                break;
+            case 'PERMISSION_DENIED':
+                this.elements.audioStatus.textContent = langManager.getText('survey.audio_permission_denied');
+                break;
+            case 'FILE_TOO_LARGE':
+                uiManager.showError(this.elements.messageDisplay, langManager.getText('survey.audio_too_large'));
+                break;
+            case 'GENERIC_ERROR':
+            case 'PLAYBACK_ERROR':
+            default:
+                this.elements.audioStatus.textContent = langManager.getText('survey.audio_error_generic');
+                break;
         }
     }
 
@@ -311,7 +361,7 @@ class SurveyApp extends BaseApp {
         };
         
         this.resetDisplay(this.currentVideoName, this.filteredData, docElts);
-        this.resetAudioRecording();
+        audioRecordingService.reset();
     }
 
     showOnomatopoeiaInput() {
@@ -326,7 +376,7 @@ class SurveyApp extends BaseApp {
         if (this.elements.inputVisibility) {
             this.elements.inputVisibility.style.display = "block";
         }
-        this.resetAudioRecording();
+        audioRecordingService.reset();
     }
 
     async handleNoOnomatopoeia() {
@@ -335,7 +385,7 @@ class SurveyApp extends BaseApp {
             uiManager.clearMessage(this.elements.messageDisplay);
         }
         
-        const currentButton = this.elements.videoButtons?.querySelector('.video-button.active');
+        const currentButton = this.videoManager?.getCurrentActiveButton();
         if (currentButton) {
             try {
                 // Check if onomatopoeia has already been saved for this video
@@ -384,6 +434,7 @@ class SurveyApp extends BaseApp {
 
     async handleSaveOnomatopoeia() {
         try {
+            const audioState = audioRecordingService.getState();
             const infoDict = {
                 participantId: this.participantInfo.participantId,
                 participantName: this.participantInfo.name || this.participantInfo.email,
@@ -392,8 +443,8 @@ class SurveyApp extends BaseApp {
                 startTime: this.elements.startDisplay?.textContent || "-.--",
                 endTime: this.elements.endDisplay?.textContent || "-.--",
                 answeredTimestamp: obtainDate(),
-                hasAudio: this.audioRecording.recordedAudioBlob ? 1 : 0,
-                audioBlob: this.audioRecording.recordedAudioBlob
+                hasAudio: audioState.hasRecording ? 1 : 0,
+                audioBlob: audioRecordingService.getRecordingBlob()
             };
 
             await this.saveOnomatopoeia(
@@ -411,116 +462,7 @@ class SurveyApp extends BaseApp {
         }
     }
 
-    // Audio recording methods
-    async startAudioRecording() {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            this.audioRecording.mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-            this.audioRecording.audioChunks = [];
-
-            this.audioRecording.mediaRecorder.addEventListener('dataavailable', (event) => {
-                if (event.data.size > 0) {
-                    // Check file size - 10MB limit
-                    const currentSize = this.audioRecording.audioChunks.reduce((total, chunk) => total + chunk.size, 0);
-                    const newSize = currentSize + event.data.size;
-                    
-                    if (newSize > 10 * 1024 * 1024) { // 10MB in bytes
-                        this.stopAudioRecording();
-                        uiManager.showError(this.elements.messageDisplay, 
-                            langManager.getText('survey.audio_too_large'));
-                        return;
-                    }
-
-                    this.audioRecording.audioChunks.push(event.data);
-                }
-            });
-
-            this.audioRecording.mediaRecorder.addEventListener('stop', () => {
-                this.audioRecording.recordedAudioBlob = new Blob(this.audioRecording.audioChunks, { type: 'audio/webm' });
-                
-                // Clean up previous URL before creating new one
-                if (this.audioRecording.audioUrl) {
-                    URL.revokeObjectURL(this.audioRecording.audioUrl);
-                }
-                
-                this.audioRecording.audioUrl = URL.createObjectURL(this.audioRecording.recordedAudioBlob);
-                this.updateAudioUIAfterRecording();
-                
-                // Stop all tracks to free up microphone
-                stream.getTracks().forEach(track => track.stop());
-            });
-
-            this.audioRecording.mediaRecorder.start();
-            this.updateAudioUIDuringRecording();
-            
-        } catch (error) {
-            console.error('Error starting audio recording:', error);
-            if (this.elements.audioStatus) {
-                if (error.name === 'NotAllowedError') {
-                    this.elements.audioStatus.textContent = langManager.getText('survey.audio_permission_denied');
-                } else {
-                    this.elements.audioStatus.textContent = langManager.getText('survey.audio_not_supported');
-                }
-            }
-        }
-    }
-
-    stopAudioRecording() {
-        if (this.audioRecording.mediaRecorder && this.audioRecording.mediaRecorder.state === 'recording') {
-            this.audioRecording.mediaRecorder.stop();
-        }
-    }
-
-    playAudioRecording() {
-        if (this.audioRecording.audioUrl) {
-            const audio = new Audio(this.audioRecording.audioUrl);
-            if (this.elements.audioStatus) {
-                this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_playing');
-            }
-            if (this.elements.audioWaveform) {
-                this.elements.audioWaveform.style.display = 'flex';
-                this.elements.audioWaveform.classList.add('audio-playing');
-            }
-            
-            audio.addEventListener('ended', () => {
-                if (this.elements.audioStatus) {
-                    this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_recorded');
-                }
-                if (this.elements.audioWaveform) {
-                    this.elements.audioWaveform.style.display = 'none';
-                    this.elements.audioWaveform.classList.remove('audio-playing');
-                }
-            });
-            
-            audio.play();
-        }
-    }
-
-    deleteAudioRecording() {
-        this.resetAudioRecording();
-    }
-
-    resetAudioRecording() {
-        // Clean up existing recording with proper URL cleanup
-        if (this.audioRecording.audioUrl) {
-            URL.revokeObjectURL(this.audioRecording.audioUrl);
-        }
-
-        // Stop any active media recorder and tracks
-        if (this.audioRecording.mediaRecorder && this.audioRecording.mediaRecorder.state === 'recording') {
-            this.audioRecording.mediaRecorder.stop();
-        }
-
-        this.audioRecording = {
-            mediaRecorder: null,
-            audioChunks: [],
-            recordedAudioBlob: null,
-            audioUrl: null
-        };
-
-        this.updateAudioUIInitial();
-    }
-
+    // Audio UI update methods
     updateAudioUIDuringRecording() {
         uiManager.updateVisibility(this.elements, {
             audioRecord: false,
@@ -548,6 +490,16 @@ class SurveyApp extends BaseApp {
         if (this.elements.audioWaveform) {
             this.elements.audioWaveform.style.display = 'none';
             this.elements.audioWaveform.classList.remove('audio-recording');
+        }
+    }
+
+    updateAudioUIWhilePlaying() {
+        if (this.elements.audioStatus) {
+            this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_playing');
+        }
+        if (this.elements.audioWaveform) {
+            this.elements.audioWaveform.style.display = 'flex';
+            this.elements.audioWaveform.classList.add('audio-playing');
         }
     }
 
@@ -583,7 +535,7 @@ class SurveyApp extends BaseApp {
         }
 
         // Reset audio recording
-        this.resetAudioRecording();
+        audioRecordingService.reset();
 
         let recordMessage = "";
 
