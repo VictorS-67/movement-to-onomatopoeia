@@ -72,6 +72,12 @@ class TutorialApp extends BaseApp {
                 return; // Base class handles the redirect
             }
             
+            // Initialize video manager for tutorial videos
+            this.initializeVideoManager(
+                this.onVideoChange.bind(this), // Called when video changes
+                null // No special onVideoLoad callback needed for tutorial
+            );
+            
             // Set up event listeners
             this.setupEventListeners();
             
@@ -92,6 +98,12 @@ class TutorialApp extends BaseApp {
 
     getParticipantDisplayKey() {
         return 'tutorial.participant_name';
+    }
+
+    // Callback for when video changes (called by VideoManager)
+    onVideoChange(videoName, videoSrc) {
+        // Reset display when video changes
+        this.resetDisplay();
     }
 
     onLanguageChange() {
@@ -185,14 +197,6 @@ class TutorialApp extends BaseApp {
             });
         }
 
-        // Video button clicks
-        if (this.elements.videoButtons) {
-            this.elements.videoButtons.addEventListener('click', (event) => {
-                if (event.target.classList.contains('video-button')) {
-                    this.handleVideoButtonClick(event);
-                }
-            });
-        }
 
         // Window resize handler to reposition bubbles
         window.addEventListener('resize', () => {
@@ -745,40 +749,20 @@ class TutorialApp extends BaseApp {
         this.resetDisplay();
     }
 
+    // This method only handles tutorial-specific logic
     handleVideoButtonClick(event) {
-        // Remove active class from all buttons
-        const allButtons = this.elements.videoButtons.querySelectorAll('.video-button');
-        allButtons.forEach(btn => btn.classList.remove('active'));
-        
-        // Add active class to clicked button
-        event.target.classList.add('active');
-        
-        // Update video source
-        const videoSrc = DOMUtils.safeGetDataset(event.target, 'video');
-        if (videoSrc && this.elements.videoPlayer) {
-            this.elements.videoPlayer.src = videoSrc;
-            this.elements.videoPlayer.load();
-            if (this.elements.videoTitle) {
-                this.elements.videoTitle.textContent = `Video: ${videoSrc}`;
-            }
-        }
-        
+        // The VideoManager handles the basic video switching
+        // We just need to reset the display for tutorial state
         this.resetDisplay();
     }
 
     updateActiveVideoButtonState(state) {
-        // Find the currently active video button
-        const activeButton = this.elements.videoButtons?.querySelector('.video-button.active');
-        if (activeButton) {
-            // Remove any existing completion state classes
-            activeButton.classList.remove('completed', 'no-onomatopoeia');
-            
-            // Add the new state class
-            if (state === 'completed') {
-                activeButton.classList.add('completed');
-            } else if (state === 'no-onomatopoeia') {
-                activeButton.classList.add('no-onomatopoeia');
-            }
+        if (!this.videoManager) return;
+        
+        // Get current video name and set its state
+        const currentVideo = this.videoManager.getCurrentVideo();
+        if (currentVideo && currentVideo.name) {
+            this.videoManager.setButtonState(currentVideo.name, state);
         }
     }
 

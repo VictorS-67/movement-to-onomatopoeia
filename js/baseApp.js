@@ -6,6 +6,7 @@ class BaseApp {
         this.elements = {};
         this.config = null;
         this.participantInfo = null;
+        this.videoManager = null; // Will be initialized by subclasses that need it
         
         // Allow subclasses to initialize their specific elements first
         this.initializeElements();
@@ -98,6 +99,30 @@ class BaseApp {
     // Hook for subclasses to add additional logout cleanup
     performAdditionalLogoutCleanup() {
         // Default implementation - can be overridden
+    }
+
+    // Video Manager initialization helper
+    initializeVideoManager(onVideoChangeCallback = null, onVideoLoadCallback = null) {
+        if (this.elements.videoPlayer && this.elements.videoButtons) {
+            this.videoManager = new VideoManager(
+                this.elements.videoPlayer,
+                this.elements.videoButtons,
+                this.elements.videoTitle
+            );
+            
+            // Set up callbacks if provided
+            if (onVideoChangeCallback) {
+                this.videoManager.onVideoChange = onVideoChangeCallback;
+            }
+            if (onVideoLoadCallback) {
+                this.videoManager.onVideoLoad = onVideoLoadCallback;
+            }
+            
+            return this.videoManager;
+        } else {
+            console.warn('VideoManager requires videoPlayer and videoButtons elements');
+            return null;
+        }
     }
 
     // Common participant info validation and loading

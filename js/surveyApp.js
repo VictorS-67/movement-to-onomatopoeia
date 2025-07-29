@@ -71,11 +71,17 @@ class SurveyApp extends BaseApp {
             // Load filtered data from localStorage
             this.filteredData = JSON.parse(localStorage.getItem("filteredData")) || [];
             
+            // Initialize video manager with callbacks
+            this.initializeVideoManager(
+                this.onVideoChange.bind(this), // Called when video changes
+                this.onVideoLoad.bind(this)    // Called when videos are loaded
+            );
+            
+            // Load videos using video manager
+            await this.videoManager.loadVideos(this.config);
+            
             // Set up event listeners
             this.setupEventListeners();
-
-            // Load configuration and videos
-            await this.loadVideos();
 
             // Update participant name display
             this.updateParticipantDisplay();
@@ -99,51 +105,38 @@ class SurveyApp extends BaseApp {
         this.updateIntroductionContent();
     }
 
+    // Callback for when video changes (called by VideoManager)
+    onVideoChange(videoName, videoSrc) {
+        this.currentVideoName = videoName;
+        
+        // Clear any existing messages when changing videos
+        if (this.elements.messageDisplay) {
+            UIUtils.clearMessage(this.elements.messageDisplay);
+        }
+        
+        // Reset display for the new video
+        this.resetDisplayForCurrentVideo();
+    }
+    
+    // Callback for when videos are loaded (called by VideoManager)
+    onVideoLoad() {
+        // Set current video name from first video
+        if (this.videoManager) {
+            const currentVideo = this.videoManager.getCurrentVideo();
+            this.currentVideoName = currentVideo.name;
+        }
+        
+        // Reset display for initial video
+        this.resetDisplayForCurrentVideo();
+    }
+
     performAdditionalLogoutCleanup() {
         // No additional cleanup needed for survey app
-    }
-
-    async loadVideos() {
-        try {            
-            // Load selected videos
-            await loadSelectedVideos(this.config.spreadsheetId, this.config.videoSheet, this.elements.videoButtons);
-            
-            // Set up initial video
-            this.setupInitialVideo();
-            
-        } catch (error) {
-            console.error('Error loading configuration:', error);
-            throw error;
-        }
-    }
-
-    setupInitialVideo() {
-        const firstButton = this.elements.videoButtons?.querySelector('button');
-        if (firstButton && this.elements.videoPlayer) {
-            const initialVideo = DOMUtils.safeGetDataset(firstButton, 'video') || "videos/1.mp4";
-            this.elements.videoPlayer.src = initialVideo;
-            this.elements.videoPlayer.load();
-            if (this.elements.videoTitle) {
-                this.elements.videoTitle.textContent = `Video: ${initialVideo}`;
-            }
-            
-            // Ensure first button is marked as active
-            firstButton.classList.add('active');
-            this.currentVideoName = initialVideo.split("/").pop();
-            
-            // Reset display for the initial video
-            this.resetDisplayForCurrentVideo();
-        }
     }
 
     setupEventListeners() {
         // Set up common event listeners from base class
         this.setupCommonEventListeners();
-
-        // Video button interactions
-        if (this.elements.videoButtons) {
-            this.elements.videoButtons.addEventListener('click', this.handleVideoButtonClick.bind(this));
-        }
 
         // Onomatopoeia flow buttons
         if (this.elements.hasOnomatopoeiaButtonYes) {
@@ -303,34 +296,6 @@ class SurveyApp extends BaseApp {
             this.elements.introToggleButton.textContent = this.introExpanded ? 
                 langManager.getText('survey.hide_introduction') : 
                 langManager.getText('survey.show_introduction');
-        }
-    }
-
-    handleVideoButtonClick(event) {
-        if (event.target.classList.contains('video-button')) {
-            // Clear any existing messages when changing videos
-            if (this.elements.messageDisplay) {
-                UIUtils.clearMessage(this.elements.messageDisplay);
-            }
-            
-            // Remove active class from all buttons
-            const allButtons = this.elements.videoButtons.querySelectorAll('.video-button');
-            allButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            
-            // Update video source
-            const videoSrc = DOMUtils.safeGetDataset(event.target, 'video');
-            if (videoSrc && this.elements.videoPlayer) {
-                this.elements.videoPlayer.src = videoSrc;
-                this.elements.videoPlayer.load();
-                if (this.elements.videoTitle) {
-                    this.elements.videoTitle.textContent = `Video: ${videoSrc}`;
-                }
-                this.currentVideoName = videoSrc.split("/").pop();
-                this.resetDisplayForCurrentVideo();
-            }
         }
     }
 
@@ -613,28 +578,22 @@ class SurveyApp extends BaseApp {
 
         let recordMessage = "";
 
-        // Mark completed video buttons
-        if (this.elements.videoButtons) {
-            const videoButtons = this.elements.videoButtons.querySelectorAll('.video-button');
-            videoButtons.forEach(button => {
-                const buttonVideo = DOMUtils.safeGetDataset(button, 'video')?.split("/").pop();
-                if (buttonVideo) {
-                    const videoData = filteredData.filter(item => item["video"] === buttonVideo);
+        // Update video button completion states using VideoManager
+        if (this.videoManager) {
+            this.videoManager.updateButtonCompletionStates(filteredData, {
+                determineState: (videoName, data) => {
+                    const videoData = data.filter(item => item["video"] === videoName);
                     if (videoData.length > 0) {
                         // Check if there are any actual onomatopoeia (not "null")
                         const hasActualOnomatopoeia = videoData.some(item => item["onomatopoeia"] !== "null");
                         
-                        // Remove any existing completion classes
-                        button.classList.remove('completed', 'no-onomatopoeia');
-                        
                         if (hasActualOnomatopoeia) {
-                            // User has saved at least one onomatopoeia - green
-                            button.classList.add('completed');
+                            return 'completed'; // User has saved at least one onomatopoeia - green
                         } else {
-                            // User said no onomatopoeia in this video - yellow
-                            button.classList.add('no-onomatopoeia');
+                            return 'no-onomatopoeia'; // User said no onomatopoeia in this video - yellow
                         }
                     }
+                    return null;
                 }
             });
         }

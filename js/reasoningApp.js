@@ -3,7 +3,7 @@ class ReasoningApp extends BaseApp {
     constructor() {
         // Must call super() first before accessing 'this'
         super();
-        
+
         // Initialize reasoning-specific properties after calling super()
         this.onomatopoeiaData = [];
         this.reasoningData = [];
@@ -68,11 +68,17 @@ class ReasoningApp extends BaseApp {
             // Load existing reasoning data from Google Sheets
             await this.loadExistingReasoningData();
             
+            // Initialize video manager with callbacks
+            this.initializeVideoManager(
+                this.onVideoChange.bind(this), // Called when video changes
+                this.onVideoLoad.bind(this)    // Called when videos are loaded
+            );
+            
+            // Load videos using video manager
+            await this.videoManager.loadVideos(this.config);
+            
             // Set up event listeners
             this.setupEventListeners();
-
-            // Load configuration and videos
-            await this.loadVideos();
 
             // Update participant name display
             this.updateParticipantDisplay();
@@ -96,6 +102,31 @@ class ReasoningApp extends BaseApp {
     onLanguageChange() {
         super.onLanguageChange(); // Call base class method
         this.updateProgressDisplay();
+        this.displayReasoningForCurrentVideo();
+    }
+
+    // Callback for when video changes (called by VideoManager)
+    onVideoChange(videoName, videoSrc) {
+        this.currentVideoName = videoName;
+        
+        // Clear any existing messages when changing videos
+        if (this.elements.messageDisplay) {
+            UIUtils.clearMessage(this.elements.messageDisplay);
+        }
+        
+        // Display reasoning content for the new video
+        this.displayReasoningForCurrentVideo();
+    }
+    
+    // Callback for when videos are loaded (called by VideoManager)
+    onVideoLoad() {
+        // Set current video name from first video
+        if (this.videoManager) {
+            const currentVideo = this.videoManager.getCurrentVideo();
+            this.currentVideoName = currentVideo.name;
+        }
+        
+        // Display reasoning for initial video
         this.displayReasoningForCurrentVideo();
     }
 
@@ -158,39 +189,6 @@ class ReasoningApp extends BaseApp {
         }
     }
 
-    async loadVideos() {
-        try {            
-            // Load selected videos
-            await loadSelectedVideos(this.config.spreadsheetId, this.config.videoSheet, this.elements.videoButtons);
-            
-            // Set up initial video
-            this.setupInitialVideo();
-            
-        } catch (error) {
-            console.error('Error loading configuration:', error);
-            throw error;
-        }
-    }
-
-    setupInitialVideo() {
-        const firstButton = this.elements.videoButtons?.querySelector('button');
-        if (firstButton && this.elements.videoPlayer) {
-            const initialVideo = DOMUtils.safeGetDataset(firstButton, 'video') || "videos/1.mp4";
-            this.elements.videoPlayer.src = initialVideo;
-            this.elements.videoPlayer.load();
-            if (this.elements.videoTitle) {
-                this.elements.videoTitle.textContent = `Video: ${initialVideo}`;
-            }
-            
-            // Ensure first button is marked as active
-            firstButton.classList.add('active');
-            this.currentVideoName = initialVideo.split("/").pop();
-            
-            // Display reasoning content for the initial video
-            this.displayReasoningForCurrentVideo();
-        }
-    }
-
     setupEventListeners() {
         // Set up common event listeners from base class
         this.setupCommonEventListeners();
@@ -236,34 +234,6 @@ class ReasoningApp extends BaseApp {
                 .replace('{completed}', completedReasoning)
                 .replace('{total}', totalOnomatopoeia);
             this.elements.progressDisplay.textContent = progressText;
-        }
-    }
-
-    handleVideoButtonClick(event) {
-        if (event.target.classList.contains('video-button')) {
-            // Clear any existing messages when changing videos
-            if (this.elements.messageDisplay) {
-                UIUtils.clearMessage(this.elements.messageDisplay);
-            }
-            
-            // Remove active class from all buttons
-            const allButtons = this.elements.videoButtons.querySelectorAll('.video-button');
-            allButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            
-            // Update video source
-            const videoSrc = DOMUtils.safeGetDataset(event.target, 'video');
-            if (videoSrc && this.elements.videoPlayer) {
-                this.elements.videoPlayer.src = videoSrc;
-                this.elements.videoPlayer.load();
-                if (this.elements.videoTitle) {
-                    this.elements.videoTitle.textContent = `Video: ${videoSrc}`;
-                }
-                this.currentVideoName = videoSrc.split("/").pop();
-                this.displayReasoningForCurrentVideo();
-            }
         }
     }
 
@@ -514,21 +484,17 @@ class ReasoningApp extends BaseApp {
     }
 
     updateVideoButtonStates() {
-        if (!this.elements.videoButtons) return;
+        if (!this.videoManager) return;
 
-        const videoButtons = this.elements.videoButtons.querySelectorAll('.video-button');
-        videoButtons.forEach(button => {
-            const buttonVideo = DOMUtils.safeGetDataset(button, 'video')?.split("/").pop();
-            if (buttonVideo) {
+        // Use VideoManager for button state updates
+        this.videoManager.updateButtonCompletionStates(this.onomatopoeiaData, {
+            determineState: (videoName, onomatopoeiaData) => {
                 // Check if this video has onomatopoeia
-                const hasOnomatopoeia = this.onomatopoeiaData.some(item => item.video === buttonVideo);
-                
-                // Remove existing completion classes
-                button.classList.remove('completed', 'no-onomatopoeia');
+                const hasOnomatopoeia = onomatopoeiaData.some(item => item.video === videoName);
                 
                 if (hasOnomatopoeia) {
                     // Check if all onomatopoeia for this video have reasoning
-                    const videoOnomatopoeia = this.onomatopoeiaData.filter(item => item.video === buttonVideo);
+                    const videoOnomatopoeia = onomatopoeiaData.filter(item => item.video === videoName);
                     const completedReasoning = videoOnomatopoeia.filter(item => 
                         this.reasoningData.some(reasoning => 
                             reasoning.video === item.video &&
@@ -539,12 +505,11 @@ class ReasoningApp extends BaseApp {
                     );
                     
                     if (completedReasoning.length === videoOnomatopoeia.length) {
-                        // All reasoning completed for this video
-                        button.classList.add('completed');
+                        return 'completed'; // All reasoning completed for this video
                     }
+                    return null; // Has onomatopoeia but not all reasoning completed
                 } else {
-                    // No onomatopoeia for this video - mark as no-onomatopoeia
-                    button.classList.add('no-onomatopoeia');
+                    return 'no-onomatopoeia'; // No onomatopoeia for this video
                 }
             }
         });
