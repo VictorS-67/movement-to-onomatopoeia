@@ -6,11 +6,11 @@ class TutorialApp extends BaseApp {
         
         // Initialize tutorial-specific properties after calling super()
         this.tutorialData = []; // Local storage for tutorial data
-        this.currentStep = 1;
-        this.totalSteps = 13; // Added step 13 for final completion message
-        this.stepValidation = {}; // Track required actions
         this.lastVideoPlayTime = 0;
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
+        
+        // Initialize tutorial step manager
+        this.stepManager = new TutorialStepManager(13);
     }
 
     initializeElements() {
@@ -200,41 +200,37 @@ class TutorialApp extends BaseApp {
 
         // Window resize handler to reposition bubbles
         window.addEventListener('resize', () => {
-            if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
+            const currentStep = this.stepManager.getCurrentStep();
+            const totalSteps = this.stepManager.getTotalSteps();
+            
+            if (currentStep >= 1 && currentStep <= totalSteps) {
                 // Delay to allow layout to settle
                 setTimeout(() => {
-                    this.positionBubbleForStep(this.currentStep);
+                    BubblePositioner.positionForStep(this.elements.tutorialBubble, currentStep, this.elements);
                 }, 100);
             }
         });
 
-        // Scroll handler to reposition bubbles when user scrolls
+        // Scroll handler to reposition bubbles when user scrolls  
         window.addEventListener('scroll', () => {
-            if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
-                // Only reposition, don't auto-scroll again
-                const step = this.currentStep;
-                const elementMap = {
-                    1: this.elements.languageSelect?.parentElement,
-                    2: this.elements.videoPlayer,
-                    3: this.elements.videoPlayer,
-                    4: this.elements.hasOnomatopoeiaButtonYes,
-                    5: this.elements.onomatopoeiaInput,
-                    6: this.elements.getStart,
-                    7: this.elements.getEnd,
-                    8: this.elements.audioRecord,
-                    9: this.elements.saveOnomatopoeiaButton,
-                    10: this.elements.hasOnomatopoeiaButtonNo,
-                    11: this.elements.videoButtons,
-                    12: this.elements.hasOnomatopoeiaButtonNo,
-                    13: this.elements.videoButtons
-                };
+            const currentStep = this.stepManager.getCurrentStep();
+            const totalSteps = this.stepManager.getTotalSteps();
+            
+            if (currentStep >= 1 && currentStep <= totalSteps) {
+                // Use BubblePositioner for element mapping and positioning
+                const elementMap = BubblePositioner.getStepElementMapping(this.elements);
+                const targetElement = elementMap[currentStep];
                 
-                const targetElement = elementMap[step];
                 if (targetElement && this.elements.tutorialBubble) {
                     // Debounce the repositioning to avoid too many calls
                     clearTimeout(this.scrollTimeout);
                     this.scrollTimeout = setTimeout(() => {
-                        this.positionBubbleNearElement(targetElement, this.elements.tutorialBubble);
+                        BubblePositioner.positionNear(
+                            this.elements.tutorialBubble, 
+                            targetElement, 
+                            BubblePositioner.getStepPositioningPreferences(currentStep),
+                            { scrollIntoView: false } // Don't auto-scroll on user scroll
+                        );
                     }, 50);
                 }
             }
@@ -242,21 +238,13 @@ class TutorialApp extends BaseApp {
     }
 
     initializeTutorial() {
-        // Set total steps
+        // Set total steps using step manager
         if (this.elements.totalSteps) {
-            this.elements.totalSteps.textContent = this.totalSteps;
+            this.elements.totalSteps.textContent = this.stepManager.getTotalSteps();
         }
         
-        // Initialize step validation tracking
-        this.stepValidation = {
-            video_played: false,
-            clicked_yes: false,
-            entered_text: false,
-            clicked_start_time: false,
-            clicked_end_time: false,
-            clicked_save: false,
-            clicked_no: false
-        };
+        // Reset step manager (it initializes its own validation tracking)
+        this.stepManager.resetValidation();
         
         // Reset display
         this.resetDisplay();
@@ -285,32 +273,38 @@ class TutorialApp extends BaseApp {
     }
 
     startTutorial() {
-        this.currentStep = 1;
+        this.stepManager.goToStep(1);
         this.updateProgress();
         this.showTutorialStep();
     }
 
     nextStep() {
-        // Check if required action is completed for current step
-        if (!this.canProceedToNextStep()) {
-            return;
-        }
+        // Use step manager to advance with callbacks
+        const advanced = this.stepManager.advance(
+            (newStep) => {
+                // Called when step advances successfully
+                this.updateProgress();
+                this.showTutorialStep();
+            },
+            (message) => {
+                // Called when required action message should be shown
+                if (this.elements.messageDisplay) {
+                    uiManager.showError(this.elements.messageDisplay, message);
+                }
+            }
+        );
         
-        if (this.currentStep < this.totalSteps) {
-            this.currentStep++;
-            this.updateProgress();
-            this.showTutorialStep();
-        } else {
+        // If we reached the end, complete tutorial
+        if (!advanced && this.stepManager.isComplete()) {
             this.completeTutorial();
         }
     }
 
     previousStep() {
-        if (this.currentStep > 1) {
-            this.currentStep--;
+        this.stepManager.goBack((newStep) => {
             this.updateProgress();
-            this.showTutorialStep();
-        }
+            this.showTutorialStep();            
+        });
     }
 
     canProceedToNextStep() {
@@ -360,50 +354,45 @@ class TutorialApp extends BaseApp {
     }
 
     checkStepValidation(action) {
-        if (this.stepValidation.hasOwnProperty(action)) {
-            this.stepValidation[action] = true;
-            this.updateNextButtonState();
-            
-            // Auto-advance for specific steps when their action is completed
-            const autoAdvanceSteps = {
-                2: 'video_played',        // Step 2: Auto-advance when video is played
-                4: 'clicked_yes',         // Step 4: Auto-advance when Yes is clicked
-                6: 'clicked_start_time',  // Step 6: Auto-advance when start time is captured
-                7: 'clicked_end_time',    // Step 7: Auto-advance when end time is captured
-                9: 'clicked_save',        // Step 9: Auto-advance when save is clicked
-                10: 'clicked_no',         // Step 10: Auto-advance when No is clicked
-                12: 'clicked_no'          // Step 12: Auto-advance when No is clicked
-            };
-            
-            // Check if current step should auto-advance for this action
-            if (autoAdvanceSteps[this.currentStep] === action) {
-                // Auto-advance immediately when action is completed
+        // Use step manager to mark action as completed
+        this.stepManager.markActionCompleted(
+            action,
+            (actionName, completed) => {
+                // Called when validation changes
+                this.updateNextButtonState();
+            },
+            (stepNumber, actionName) => {
+                // Called for auto-advance steps
                 this.nextStep();
             }
-        }
+        );
     }
 
     updateNextButtonState() {
         if (this.elements.bubbleNext) {
-            const canProceed = this.canProceedToNextStep();
-            this.elements.bubbleNext.disabled = !canProceed;
+            const canProceed = this.stepManager.canAdvance();
+            uiManager.updateButtonState(this.elements.bubbleNext, canProceed);
         }
     }
 
     updateProgress() {
-        const progressPercent = (this.currentStep / this.totalSteps) * 100;
+        const currentStep = this.stepManager.getCurrentStep();
+        const totalSteps = this.stepManager.getTotalSteps();
         
+        // Update progress bar using UI manager
         if (this.elements.progressFill) {
-            this.elements.progressFill.style.width = `${progressPercent}%`;
+            uiManager.updateProgress(this.elements.progressFill, currentStep, totalSteps);
         }
         
         if (this.elements.currentStep) {
-            this.elements.currentStep.textContent = this.currentStep;
+            this.elements.currentStep.textContent = currentStep;
         }
     }
 
     showTutorialStep() {
-        const stepData = this.getTutorialStepData(this.currentStep);
+        const currentStep = this.stepManager.getCurrentStep();
+        const totalSteps = this.stepManager.getTotalSteps();
+        const stepData = this.getTutorialStepData(currentStep);
         
         // Update bubble content
         if (this.elements.bubbleTitle) {
@@ -416,26 +405,35 @@ class TutorialApp extends BaseApp {
         
         // Show/hide previous button
         if (this.elements.bubblePrevious) {
-            this.elements.bubblePrevious.style.display = this.currentStep > 1 ? 'inline-block' : 'none';
+            this.elements.bubblePrevious.style.display = currentStep > 1 ? 'inline-block' : 'none';
         }
         
         // Update next button text
         if (this.elements.bubbleNext) {
-            this.elements.bubbleNext.textContent = this.currentStep === this.totalSteps ? 
+            this.elements.bubbleNext.textContent = currentStep === totalSteps ? 
                 langManager.getText('tutorial.complete') : 
                 langManager.getText('tutorial.next');
         }
         
         // Mark step as required if needed
-        if (stepData.required) {
+        const stepConfig = this.stepManager.getStepConfig();
+        if (stepConfig.required) {
             this.elements.tutorialBubble.classList.add('tutorial-required-action');
         } else {
             this.elements.tutorialBubble.classList.remove('tutorial-required-action');
         }
         
-        // Position bubble and highlight element
-        this.positionBubbleForStep(this.currentStep);
-        this.highlightElementForStep(this.currentStep);
+        // Position bubble using BubblePositioner
+        BubblePositioner.positionForStep(this.elements.tutorialBubble, currentStep, this.elements)
+            .then(() => {
+                // Highlight element after positioning is complete
+                this.highlightElementForStep(currentStep);
+            })
+            .catch(error => {
+                console.warn('Failed to position tutorial bubble:', error);
+                // Still try to highlight the element
+                this.highlightElementForStep(currentStep);
+            });
         
         // Update next button state
         this.updateNextButtonState();
@@ -471,198 +469,16 @@ class TutorialApp extends BaseApp {
         };
     }
 
-    positionBubbleForStep(step) {
-        const elementMap = {
-            1: this.elements.languageSelect?.parentElement, // Language selector
-            2: this.elements.videoPlayer, // Video player
-            3: this.elements.videoPlayer, // Video timeline (same as player)
-            4: this.elements.hasOnomatopoeiaButtonYes, // Yes button
-            5: this.elements.onomatopoeiaInput, // Input field
-            6: this.elements.getStart, // Start time button
-            7: this.elements.getEnd, // End time button
-            8: this.elements.audioRecord, // Audio record button
-            9: this.elements.saveOnomatopoeiaButton, // Save button
-            10: this.elements.hasOnomatopoeiaButtonNo, // No button
-            11: this.elements.videoButtons, // Video buttons
-            12: this.elements.hasOnomatopoeiaButtonNo, // No button again for step 12
-            13: this.elements.videoButtons // Step 13: Point at video buttons to show color change
-        };
-        
-        const targetElement = elementMap[step];
-        if (!targetElement || !this.elements.tutorialBubble) {
-            return;
-        }
-        
-        // First, scroll the target element into view
-        this.scrollElementIntoView(targetElement).then(() => {
-            // After scrolling is complete, position the bubble
-            this.positionBubbleNearElement(targetElement, this.elements.tutorialBubble);
-        });
-    }
-
-    scrollElementIntoView(element) {
-        return new Promise((resolve) => {
-            // Check if element is already fully visible
-            const rect = element.getBoundingClientRect();
-            const viewportHeight = window.innerHeight;
-            const viewportWidth = window.innerWidth;
-            
-            const isFullyVisible = rect.top >= 0 && 
-                                  rect.left >= 0 && 
-                                  rect.bottom <= viewportHeight && 
-                                  rect.right <= viewportWidth;
-            
-            if (isFullyVisible) {
-                // Element is already visible, no need to scroll
-                resolve();
-                return;
-            }
-            
-            // Calculate the desired scroll position to center the element in viewport
-            const elementCenter = rect.top + rect.height / 2;
-            const viewportCenter = viewportHeight / 2;
-            const scrollOffset = elementCenter - viewportCenter;
-            
-            // Get current scroll position
-            const currentScroll = window.pageYOffset || document.documentElement.scrollTop;
-            const targetScroll = Math.max(0, currentScroll + scrollOffset);
-            
-            // Smooth scroll to the calculated position
-            window.scrollTo({
-                top: targetScroll,
-                behavior: 'smooth'
-            });
-            
-            // Wait for scroll animation to complete
-            setTimeout(() => {
-                resolve();
-            }, 500); // Give enough time for smooth scroll to complete
-        });
-    }
-
-    positionBubbleNearElement(targetElement, bubble) {
-        // Get target element position and dimensions
-        const targetRect = targetElement.getBoundingClientRect();
-        const viewportWidth = window.innerWidth;
-        const viewportHeight = window.innerHeight;
-        
-        // Get bubble dimensions by temporarily showing it
-        bubble.style.visibility = 'hidden';
-        bubble.style.display = 'block';
-        const bubbleRect = bubble.getBoundingClientRect();
-        bubble.style.visibility = 'visible';
-        
-        // Calculate target center
-        const targetCenterX = targetRect.left + targetRect.width / 2;
-        const targetCenterY = targetRect.top + targetRect.height / 2;
-        
-        // Try different positions in order of preference
-        const positions = [
-            // Right of target
-            {
-                left: targetRect.right + 20,
-                top: targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2),
-                arrow: 'arrow-left'
-            },
-            // Left of target
-            {
-                left: targetRect.left - bubbleRect.width - 20,
-                top: targetRect.top + (targetRect.height / 2) - (bubbleRect.height / 2),
-                arrow: 'arrow-right'
-            },
-            // Below target
-            {
-                left: targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2),
-                top: targetRect.bottom + 20,
-                arrow: 'arrow-top'
-            },
-            // Above target
-            {
-                left: targetRect.left + (targetRect.width / 2) - (bubbleRect.width / 2),
-                top: targetRect.top - bubbleRect.height - 20,
-                arrow: 'arrow-bottom'
-            }
-        ];
-        
-        // Find the first position that fits within the viewport
-        let bestPosition = positions[0]; // Default to right
-        
-        for (const position of positions) {
-            const fitsHorizontally = position.left >= 20 && position.left + bubbleRect.width <= viewportWidth - 20;
-            const fitsVertically = position.top >= 20 && position.top + bubbleRect.height <= viewportHeight - 20;
-            
-            if (fitsHorizontally && fitsVertically) {
-                bestPosition = position;
-                break;
-            }
-        }
-        
-        // If no position fits perfectly, adjust the best one
-        let { left, top, arrow } = bestPosition;
-        
-        // Constrain to viewport bounds
-        left = Math.max(20, Math.min(left, viewportWidth - bubbleRect.width - 20));
-        top = Math.max(20, Math.min(top, viewportHeight - bubbleRect.height - 20));
-        
-        // Adjust arrow based on actual final position relative to target
-        const bubbleCenterX = left + bubbleRect.width / 2;
-        const bubbleCenterY = top + bubbleRect.height / 2;
-        
-        // Determine arrow direction based on bubble position relative to target
-        const deltaX = bubbleCenterX - targetCenterX;
-        const deltaY = bubbleCenterY - targetCenterY;
-        
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            // Horizontal positioning is dominant
-            if (deltaX > 0) {
-                arrow = 'arrow-left'; // Bubble is to the right, arrow points left
-            } else {
-                arrow = 'arrow-right'; // Bubble is to the left, arrow points right
-            }
-        } else {
-            // Vertical positioning is dominant
-            if (deltaY > 0) {
-                arrow = 'arrow-top'; // Bubble is below, arrow points up
-            } else {
-                arrow = 'arrow-bottom'; // Bubble is above, arrow points down
-            }
-        }
-        
-        // Apply position
-        bubble.style.position = 'fixed';
-        bubble.style.left = `${left}px`;
-        bubble.style.top = `${top}px`;
-        
-        // Update arrow direction
-        bubble.className = bubble.className.replace(/arrow-\w+(-\w+)?/g, '');
-        bubble.classList.add(arrow);
-    }
-
     highlightElementForStep(step) {
         // Remove previous highlights
         document.querySelectorAll('.tutorial-highlight').forEach(el => {
             el.classList.remove('tutorial-highlight');
         });
         
-        // Note: Removed tutorial-active class addition for better UX
-        
-        const elementMap = {
-            1: this.elements.languageSelect?.parentElement,
-            2: this.elements.videoPlayer,
-            3: this.elements.videoPlayer,
-            4: this.elements.hasOnomatopoeiaButtonYes,
-            5: this.elements.onomatopoeiaInput,
-            6: this.elements.getStart,
-            7: this.elements.getEnd,
-            8: this.elements.audioRecord,
-            9: this.elements.saveOnomatopoeiaButton,
-            10: this.elements.hasOnomatopoeiaButtonNo,
-            11: this.elements.videoButtons,
-            12: this.elements.hasOnomatopoeiaButtonNo,
-            13: this.elements.videoButtons // Step 13: Highlight video buttons
-        };
-        
+        // Use BubblePositioner's element mapping for consistency
+        const elementMap = BubblePositioner.getStepElementMapping(this.elements);
         const targetElement = elementMap[step];
+        
         if (targetElement) {
             targetElement.classList.add('tutorial-highlight');
         }
@@ -670,7 +486,8 @@ class TutorialApp extends BaseApp {
 
     updateCurrentStepContent() {
         // Update current step content when language changes
-        if (this.currentStep >= 1 && this.currentStep <= this.totalSteps) {
+        const currentStep = this.stepManager.getCurrentStep();
+        if (currentStep >= 1 && currentStep <= this.stepManager.getTotalSteps()) {
             this.showTutorialStep();
         }
     }
@@ -844,6 +661,25 @@ class TutorialApp extends BaseApp {
         
         // Redirect to survey
         window.location.href = "survey.html";
+    }
+    
+    // Cleanup method for tutorial app
+    performAdditionalLogoutCleanup() {
+        // Clean up UI manager resources
+        if (typeof uiManager !== 'undefined') {
+            uiManager.cleanup();
+        }
+        
+        // Clear any scroll timeouts
+        if (this.scrollTimeout) {
+            clearTimeout(this.scrollTimeout);
+            this.scrollTimeout = null;
+        }
+        
+        // Remove tutorial highlights
+        document.querySelectorAll('.tutorial-highlight').forEach(el => {
+            el.classList.remove('tutorial-highlight');
+        });
     }
 }
 
