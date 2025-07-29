@@ -136,12 +136,6 @@ class SurveyApp extends BaseApp {
         // Reset display for the new video
         this.resetDisplayForCurrentVideo();
         
-        // Ensure audio UI is properly initialized after reset
-        // Use setTimeout to ensure it happens after the display reset is complete
-        setTimeout(() => {
-            this.updateAudioUIInitial();
-        }, 50);
-        
         // Hide loading overlay after a short delay to allow video to start loading
         setTimeout(() => {
             if (videoContainer) {
@@ -288,6 +282,7 @@ class SurveyApp extends BaseApp {
 
     // Handle audio service state changes
     handleAudioStateChange(state, audioState) {
+        console.log('Audio state changed to:', state);
         switch (state) {
             case 'READY':
                 this.updateAudioUIInitial();
@@ -417,6 +412,8 @@ class SurveyApp extends BaseApp {
     }
 
     showOnomatopoeiaInput() {
+        console.log('showOnomatopoeiaInput called');
+        
         // Clear any existing messages when starting to input onomatopoeia
         if (this.elements.messageDisplay) {
             uiManager.clearMessage(this.elements.messageDisplay);
@@ -427,8 +424,11 @@ class SurveyApp extends BaseApp {
         }
         if (this.elements.inputVisibility) {
             this.elements.inputVisibility.style.display = "block";
+            console.log('inputVisibility set to block');
         }
+        
         // Ensure audio UI is properly initialized when showing input
+        console.log('Calling deleteRecording to reset audio state');
         audioRecordingService.deleteRecording();
     }
 
@@ -565,6 +565,14 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIInitial() {
+        console.log('Updating audio UI to initial state');
+        console.log('Audio elements:', {
+            audioRecord: !!this.elements.audioRecord,
+            audioStop: !!this.elements.audioStop,
+            audioPlay: !!this.elements.audioPlay,
+            audioDelete: !!this.elements.audioDelete
+        });
+        
         uiManager.updateVisibility(this.elements, {
             audioRecord: true,
             audioStop: false,
@@ -577,6 +585,8 @@ class SurveyApp extends BaseApp {
             this.elements.audioWaveform.style.display = 'none';
             this.elements.audioWaveform.classList.remove('audio-recording', 'audio-playing');
         }
+        
+        console.log('Audio record button display after update:', this.elements.audioRecord?.style.display);
     }
 
     // Survey-specific helper methods
