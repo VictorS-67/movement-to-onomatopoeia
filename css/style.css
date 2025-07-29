@@ -140,17 +140,6 @@ body {
     border-color: #9ca3af;
 }
 
-.video-button.active {
-    background-color: var(--primary-color);
-    color: #ffffff;
-    border-color: var(--primary-color);
-}
-
-.video-button.active:hover {
-    background-color: var(--primary-hover);
-    border-color: var(--primary-hover);
-}
-
 .video-button.completed {
     background-color: var(--success-color);
     color: #ffffff;
@@ -171,6 +160,22 @@ body {
 .video-button.no-onomatopoeia:hover {
     background-color: #d97706;
     border-color: #d97706;
+}
+
+/* Active state should always override other states - higher specificity */
+.video-button.active,
+.video-button.completed.active,
+.video-button.no-onomatopoeia.active {
+    background-color: var(--primary-color) !important;
+    color: #ffffff !important;
+    border-color: var(--primary-color) !important;
+}
+
+.video-button.active:hover,
+.video-button.completed.active:hover,
+.video-button.no-onomatopoeia.active:hover {
+    background-color: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
 }
 
 #buttonVisibility {

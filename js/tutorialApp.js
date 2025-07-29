@@ -699,23 +699,37 @@ class TutorialApp extends BaseApp {
     setupAudioRecording() {
         // Set up audio recording service callbacks
         audioRecordingService.onStateChange = (state, audioState) => {
-            this.updateAudioUI(state, audioState);
+            this.handleAudioStateChange(state, audioState);
         };
 
         audioRecordingService.onError = (type, message) => {
-            console.error(`Audio ${type} error:`, message);
-            if (this.elements.messageDisplay) {
-                uiManager.showError(this.elements.messageDisplay, message);
-            }
+            this.handleAudioError(type, message);
         };
 
-        // Set up audio control event listeners
+        // Set up audio control event listeners with proper error handling
         if (this.elements.audioRecord) {
-            this.elements.audioRecord.addEventListener('click', () => audioRecordingService.startRecording());
+            this.elements.audioRecord.addEventListener('click', async () => {
+                try {
+                    this.startButtonLoading(this.elements.audioRecord);
+                    await audioRecordingService.startRecording();
+                } catch (error) {
+                    this.stopButtonLoading(this.elements.audioRecord);
+                    this.showError('Failed to start recording. Please try again.');
+                }
+            });
         }
 
         if (this.elements.audioStop) {
-            this.elements.audioStop.addEventListener('click', () => audioRecordingService.stopRecording());
+            this.elements.audioStop.addEventListener('click', async () => {
+                try {
+                    this.startButtonLoading(this.elements.audioStop);
+                    await audioRecordingService.stopRecording();
+                    this.stopButtonLoading(this.elements.audioStop);
+                } catch (error) {
+                    this.stopButtonLoading(this.elements.audioStop);
+                    this.showError('Failed to stop recording. Please try again.');
+                }
+            });
         }
 
         if (this.elements.audioPlay) {
@@ -727,50 +741,121 @@ class TutorialApp extends BaseApp {
         }
     }
 
-    updateAudioUI(state, audioState) {
-        // Update button visibility based on state
+    // Handle audio service state changes (similar to survey app)
+    handleAudioStateChange(state, audioState) {
+        switch (state) {
+            case 'READY':
+                this.updateAudioUIInitial();
+                break;
+            case 'RECORDING':
+                this.updateAudioUIDuringRecording();
+                break;
+            case 'RECORDED':
+                this.updateAudioUIAfterRecording();
+                break;
+            case 'PLAYING':
+                this.updateAudioUIWhilePlaying();
+                break;
+        }
+    }
+
+    // Handle audio service errors (similar to survey app)
+    handleAudioError(type, message) {
+        if (!this.elements.audioStatus) return;
+        
+        switch (type) {
+            case 'NOT_SUPPORTED':
+                this.elements.audioStatus.textContent = 'Audio recording is not supported in this browser.';
+                break;
+            case 'PERMISSION_DENIED':
+                this.elements.audioStatus.textContent = 'Microphone permission denied. Audio recording is optional.';
+                break;
+            case 'FILE_TOO_LARGE':
+                this.showError('Audio recording exceeds maximum size (10MB). Please record a shorter sample.');
+                break;
+            case 'GENERIC_ERROR':
+            case 'PLAYBACK_ERROR':
+            default:
+                this.elements.audioStatus.textContent = 'Error during audio recording. Please try again.';
+                break;
+        }
+    }
+
+    // Audio UI update methods (updated to match survey app pattern)
+    updateAudioUIInitial() {
+        // Clear any loading states on all audio buttons first
         if (this.elements.audioRecord) {
-            this.elements.audioRecord.style.display = (state === 'idle') ? 'inline-block' : 'none';
+            this.stopButtonLoading(this.elements.audioRecord);
         }
-
         if (this.elements.audioStop) {
-            this.elements.audioStop.style.display = (state === 'recording') ? 'inline-block' : 'none';
+            this.stopButtonLoading(this.elements.audioStop);
         }
-
         if (this.elements.audioPlay) {
-            this.elements.audioPlay.style.display = (audioState.hasRecording && state !== 'recording') ? 'inline-block' : 'none';
+            this.stopButtonLoading(this.elements.audioPlay);
         }
-
         if (this.elements.audioDelete) {
-            this.elements.audioDelete.style.display = (audioState.hasRecording && state !== 'recording') ? 'inline-block' : 'none';
+            this.stopButtonLoading(this.elements.audioDelete);
         }
 
-        // Update status display
-        if (this.elements.audioStatus) {
-            let statusText = '';
-            switch (state) {
-                case 'recording':
-                    statusText = 'Recording...';
-                    break;
-                case 'playing':
-                    statusText = 'Playing...';
-                    break;
-                case 'idle':
-                    statusText = audioState.hasRecording ? 'Recording ready' : 'No recording';
-                    break;
-                default:
-                    statusText = state;
-            }
-            this.elements.audioStatus.textContent = statusText;
-        }
-
-        // Update waveform visualization if available
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: true,
+            audioStop: false,
+            audioPlay: false,
+            audioDelete: false
+        });
+        
+        if (this.elements.audioStatus) this.elements.audioStatus.textContent = 'Ready to record';
         if (this.elements.audioWaveform) {
-            if (state === 'recording') {
-                this.elements.audioWaveform.classList.add('recording');
-            } else {
-                this.elements.audioWaveform.classList.remove('recording');
-            }
+            this.elements.audioWaveform.style.display = 'none';
+            this.elements.audioWaveform.classList.remove('audio-recording', 'audio-playing');
+        }
+    }
+
+    updateAudioUIDuringRecording() {
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: false,
+            audioStop: true,
+            audioPlay: false,
+            audioDelete: false
+        });
+        
+        if (this.elements.audioStatus) this.elements.audioStatus.textContent = 'Recording...';
+        if (this.elements.audioWaveform) {
+            this.elements.audioWaveform.style.display = 'flex';
+            this.elements.audioWaveform.classList.add('audio-recording');
+        }
+    }
+
+    updateAudioUIAfterRecording() {
+        // Clear loading states for buttons that will become visible
+        if (this.elements.audioPlay) {
+            this.stopButtonLoading(this.elements.audioPlay);
+        }
+        if (this.elements.audioDelete) {
+            this.stopButtonLoading(this.elements.audioDelete);
+        }
+        
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: false,
+            audioStop: false,
+            audioPlay: true,
+            audioDelete: true
+        });
+        
+        if (this.elements.audioStatus) this.elements.audioStatus.textContent = 'Audio recorded successfully';
+        if (this.elements.audioWaveform) {
+            this.elements.audioWaveform.style.display = 'none';
+            this.elements.audioWaveform.classList.remove('audio-recording');
+        }
+    }
+
+    updateAudioUIWhilePlaying() {
+        if (this.elements.audioStatus) {
+            this.elements.audioStatus.textContent = 'Playing...';
+        }
+        if (this.elements.audioWaveform) {
+            this.elements.audioWaveform.style.display = 'flex';
+            this.elements.audioWaveform.classList.add('audio-playing');
         }
     }
 
