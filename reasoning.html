@@ -8,6 +8,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./css/style.css">
     
+    <!-- External Libraries -->
+    <script src="./node_modules/date-fns/index.js"></script>
+    <link rel="stylesheet" href="./node_modules/swiper/swiper-bundle.min.css">
+    <script src="./node_modules/swiper/swiper-bundle.min.js"></script>
+    
 </head>
 
 <body class="bg-gray-100">
@@ -49,18 +54,17 @@
         <div class="reasoning-section">
             <h3 id="reasoningSectionTitle">Your Onomatopoeia for this video:</h3>
             <div class="onomatopoeia-carousel-container">
-                <button id="prevOnomatopoeia" class="carousel-arrow carousel-arrow-left" style="display: none;" aria-label="Previous onomatopoeia">
-                    <span>‹</span>
-                </button>
-                <div id="onomatopoeiaList" class="onomatopoeia-list">
-                    <!-- Dynamic content will be inserted here -->
+                <!-- Swiper -->
+                <div class="swiper onomatopoeia-swiper">
+                    <div class="swiper-wrapper" id="onomatopoeiaList">
+                        <!-- Dynamic content will be inserted here -->
+                    </div>
+                    <!-- Navigation buttons -->
+                    <div class="swiper-button-next" id="nextOnomatopoeia"></div>
+                    <div class="swiper-button-prev" id="prevOnomatopoeia"></div>
+                    <!-- Pagination -->
+                    <div class="swiper-pagination" id="onomatopoeiaCounter"></div>
                 </div>
-                <button id="nextOnomatopoeia" class="carousel-arrow carousel-arrow-right" style="display: none;" aria-label="Next onomatopoeia">
-                    <span>›</span>
-                </button>
-            </div>
-            <div class="onomatopoeia-counter" id="onomatopoeiaCounter" style="display: none;">
-                <span id="currentOnomatopoeiaIndex">1</span> / <span id="totalOnomatopoeia">1</span>
             </div>
             <div id="noOnomatopoeiaMessage" class="no-onomatopoeia-message" style="display: none;">
                 <p id="noOnomatopoeiaText">No onomatopoeia saved for this video.</p>
@@ -85,6 +89,7 @@
     <script src="./js/baseApp.js"></script>
     <script src="./js/uiManager.js"></script>
     <script src="./js/videoManager.js"></script>
+    <script src="./js/carouselManager.js"></script>
     <script src="./js/reasoningApp.js"></script>
     
 </body>

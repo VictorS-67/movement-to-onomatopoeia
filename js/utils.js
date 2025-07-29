@@ -1,8 +1,8 @@
 // General utility functions and classes
 
-// Utility function to get current timestamp
+// Utility function to get current timestamp using date-fns
 function obtainDate() {
-    return new Date().toISOString().split('.')[0] + 'Z';
+    return dateFns.formatISO(new Date());
 }
 
 // Configuration manager for common app settings (Singleton pattern)

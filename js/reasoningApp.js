@@ -10,6 +10,7 @@ class ReasoningApp extends BaseApp {
         this.currentVideoName = null;
         this.currentVideoOnomatopoeia = [];
         this.currentOnomatopoeiaIndex = 0;
+        this.carouselManager = new CarouselManager();
     }
 
     initializeElements() {
@@ -29,9 +30,7 @@ class ReasoningApp extends BaseApp {
             noOnomatopoeiaText: DOMUtils.getElement("noOnomatopoeiaText"),
             prevOnomatopoeia: DOMUtils.getElement("prevOnomatopoeia"),
             nextOnomatopoeia: DOMUtils.getElement("nextOnomatopoeia"),
-            onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter"),
-            currentOnomatopoeiaIndex: DOMUtils.getElement("currentOnomatopoeiaIndex"),
-            totalOnomatopoeia: DOMUtils.getElement("totalOnomatopoeia")
+            onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter")
         };
     }
 
@@ -243,154 +242,57 @@ class ReasoningApp extends BaseApp {
 
         if (this.currentVideoOnomatopoeia.length === 0) {
             // No onomatopoeia for this video
-            this.elements.onomatopoeiaList.style.display = 'none';
+            this.carouselManager.updateVisibility(false);
             this.elements.noOnomatopoeiaMessage.style.display = 'block';
-            this.hideCarouselControls();
         } else {
-            // Show onomatopoeia carousel
-            this.elements.onomatopoeiaList.style.display = 'block';
+            // Initialize carousel if not already done
+            if (!this.carouselManager.isInitialized()) {
+                this.initializeCarousel();
+            }
+            
+            // Create slides content
+            const slides = this.currentVideoOnomatopoeia.map((item, index) => 
+                this.createReasoningEntryHTML(item, index)
+            );
+            
+            // Update carousel with new slides
+            this.carouselManager.addSlides(slides);
+            this.carouselManager.updateVisibility(true);
             this.elements.noOnomatopoeiaMessage.style.display = 'none';
             
-            // Reset to first onomatopoeia
-            this.currentOnomatopoeiaIndex = 0;
-            this.displayCurrentOnomatopoeia();
-            this.updateCarouselControls();
+            // Set up event listeners for the new slides
+            this.setupSlideEventListeners();
+            
+            // Reset to first slide
+            this.carouselManager.slideTo(0);
         }
 
         // Mark video buttons with completion status
         this.updateVideoButtonStates();
     }
 
-    displayCurrentOnomatopoeia() {
-        // Clear existing content
-        this.elements.onomatopoeiaList.innerHTML = '';
-        
-        // Display only the current onomatopoeia
-        if (this.currentVideoOnomatopoeia.length > 0 && 
-            this.currentOnomatopoeiaIndex < this.currentVideoOnomatopoeia.length) {
-            const currentItem = this.currentVideoOnomatopoeia[this.currentOnomatopoeiaIndex];
-            this.createReasoningEntry(currentItem, this.currentOnomatopoeiaIndex);
-        }
-    }
-
-    updateCarouselControls() {
-        const totalCount = this.currentVideoOnomatopoeia.length;
-        
-        if (totalCount <= 1) {
-            // Hide carousel controls for single or no items
-            this.hideCarouselControls();
-        } else {
-            // Show carousel controls
-            this.elements.prevOnomatopoeia.style.display = 'flex';
-            this.elements.nextOnomatopoeia.style.display = 'flex';
-            this.elements.onomatopoeiaCounter.style.display = 'block';
-            
-            // Update aria-labels
-            this.elements.prevOnomatopoeia.setAttribute('aria-label', langManager.getText('reasoning.prev_onomatopoeia'));
-            this.elements.nextOnomatopoeia.setAttribute('aria-label', langManager.getText('reasoning.next_onomatopoeia'));
-            
-            // Update counter
-            this.elements.currentOnomatopoeiaIndex.textContent = this.currentOnomatopoeiaIndex + 1;
-            this.elements.totalOnomatopoeia.textContent = totalCount;
-            
-            // Update button states
-            uiManager.updateButtonState(this.elements.prevOnomatopoeia, this.currentOnomatopoeiaIndex > 0);
-            uiManager.updateButtonState(this.elements.nextOnomatopoeia, this.currentOnomatopoeiaIndex < totalCount - 1);
-        }
-    }
-
-    hideCarouselControls() {
-        uiManager.updateVisibility(this.elements, {
-            prevOnomatopoeia: false,
-            nextOnomatopoeia: false,
-            onomatopoeiaCounter: false
-        });
+    initializeCarousel() {
+        this.carouselManager.initialize(
+            '.onomatopoeia-swiper',
+            {
+                // Custom configuration can be added here
+                effect: 'slide',
+                speed: 300,
+            },
+            (slideIndex) => {
+                this.currentOnomatopoeiaIndex = slideIndex;
+                // Handle any additional slide change logic here
+            }
+        );
     }
 
     navigateOnomatopoeia(direction) {
-        const newIndex = this.currentOnomatopoeiaIndex + direction;
-        
-        if (newIndex >= 0 && newIndex < this.currentVideoOnomatopoeia.length) {
-            this.currentOnomatopoeiaIndex = newIndex;
-            this.displayCurrentOnomatopoeia();
-            this.updateCarouselControls();
+        // Use CarouselManager navigation
+        if (direction > 0) {
+            this.carouselManager.slideNext();
+        } else if (direction < 0) {
+            this.carouselManager.slidePrev();
         }
-    }
-
-    createReasoningEntry(onomatopoeiaItem, index) {
-        const entryDiv = document.createElement('div');
-        entryDiv.className = 'reasoning-entry';
-        
-        // Find existing reasoning for this onomatopoeia
-        const existingReasoning = this.reasoningData.find(reasoning => 
-            reasoning.participantId == this.participantInfo.participantId &&
-            reasoning.video === onomatopoeiaItem.video &&
-            reasoning.onomatopoeia === onomatopoeiaItem.onomatopoeia &&
-            parseFloat(reasoning.startTime) === parseFloat(onomatopoeiaItem.startTime) &&
-            parseFloat(reasoning.endTime) === parseFloat(onomatopoeiaItem.endTime)
-        );
-
-        entryDiv.innerHTML = `
-            <div class="onomatopoeia-header">
-                <div class="onomatopoeia-info">
-                    <span class="onomatopoeia-text">"${onomatopoeiaItem.onomatopoeia}"</span>
-                    <span class="time-range">${langManager.getText('reasoning.time_range')
-                        .replace('{start}', onomatopoeiaItem.startTime)
-                        .replace('{end}', onomatopoeiaItem.endTime)}</span>
-                    ${onomatopoeiaItem.hasAudio === 1 ? '<span class="audio-icon">🎵</span>' : ''}
-                </div>
-                <button class="show-button" data-start="${onomatopoeiaItem.startTime}" data-end="${onomatopoeiaItem.endTime}">
-                    ${langManager.getText('reasoning.show_button')}
-                </button>
-            </div>
-            <div class="reasoning-input-container">
-                <label class="reasoning-label">${langManager.getText('reasoning.reasoning_label')}</label>
-                <textarea 
-                    class="reasoning-textarea" 
-                    placeholder="${langManager.getText('reasoning.reasoning_placeholder')}"
-                    data-video="${onomatopoeiaItem.video}"
-                    data-onomatopoeia="${onomatopoeiaItem.onomatopoeia}"
-                    data-start="${onomatopoeiaItem.startTime}"
-                    data-end="${onomatopoeiaItem.endTime}"
-                >${existingReasoning ? existingReasoning.reasoning : ''}</textarea>
-                <div class="reasoning-actions">
-                    <button class="save-reasoning-button" data-index="${index}">
-                        ${langManager.getText('reasoning.save_button')}
-                    </button>
-                    <div class="character-count">
-                        <span class="char-count">${existingReasoning ? existingReasoning.reasoning.length : 0}</span>/5 min
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // Add event listeners
-        const showButton = entryDiv.querySelector('.show-button');
-        const textarea = entryDiv.querySelector('.reasoning-textarea');
-        const saveButton = entryDiv.querySelector('.save-reasoning-button');
-        const charCountSpan = entryDiv.querySelector('.char-count');
-
-        showButton.addEventListener('click', () => {
-            this.playOnomatopoeiaSegment(
-                parseFloat(showButton.dataset.start),
-                parseFloat(showButton.dataset.end)
-            );
-        });
-
-        textarea.addEventListener('input', () => {
-            charCountSpan.textContent = textarea.value.length;
-            // Enable/disable save button based on minimum character requirement
-            uiManager.updateButtonState(saveButton, textarea.value.trim().length >= 5);
-        });
-
-        saveButton.addEventListener('click', () => {
-            this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
-        });
-
-        // Initial save button state
-        uiManager.updateButtonState(saveButton, textarea.value.trim().length >= 5);
-
-        this.elements.onomatopoeiaList.appendChild(entryDiv);
     }
 
     playOnomatopoeiaSegment(startTime, endTime) {
@@ -511,6 +413,90 @@ class ReasoningApp extends BaseApp {
                 } else {
                     return 'no-onomatopoeia'; // No onomatopoeia for this video
                 }
+            }
+        });
+    }
+
+    createReasoningEntryHTML(onomatopoeiaItem, index) {
+        // Find existing reasoning for this onomatopoeia
+        const existingReasoning = this.reasoningData.find(reasoning => 
+            reasoning.participantId == this.participantInfo.participantId &&
+            reasoning.video === onomatopoeiaItem.video &&
+            reasoning.onomatopoeia === onomatopoeiaItem.onomatopoeia &&
+            parseFloat(reasoning.startTime) === parseFloat(onomatopoeiaItem.startTime) &&
+            parseFloat(reasoning.endTime) === parseFloat(onomatopoeiaItem.endTime)
+        );
+
+        const reasoningText = existingReasoning ? existingReasoning.reasoning : '';
+        const charCount = reasoningText.length;
+
+        return `
+            <div class="reasoning-entry">
+                <div class="onomatopoeia-header">
+                    <div class="onomatopoeia-info">
+                        <span class="onomatopoeia-text">"${onomatopoeiaItem.onomatopoeia}"</span>
+                        <span class="time-range">${langManager.getText('reasoning.time_range')
+                            .replace('{start}', onomatopoeiaItem.startTime)
+                            .replace('{end}', onomatopoeiaItem.endTime)}</span>
+                        ${onomatopoeiaItem.hasAudio === 1 ? '<span class="audio-icon">🎵</span>' : ''}
+                    </div>
+                    <button class="show-button" data-start="${onomatopoeiaItem.startTime}" data-end="${onomatopoeiaItem.endTime}">
+                        ${langManager.getText('reasoning.show_button')}
+                    </button>
+                </div>
+                <div class="reasoning-input-container">
+                    <label class="reasoning-label">${langManager.getText('reasoning.reasoning_label')}</label>
+                    <textarea 
+                        class="reasoning-textarea" 
+                        placeholder="${langManager.getText('reasoning.reasoning_placeholder')}"
+                        data-video="${onomatopoeiaItem.video}"
+                        data-onomatopoeia="${onomatopoeiaItem.onomatopoeia}"
+                        data-start="${onomatopoeiaItem.startTime}"
+                        data-end="${onomatopoeiaItem.endTime}"
+                    >${reasoningText}</textarea>
+                    <div class="reasoning-actions">
+                        <button class="save-reasoning-button" data-index="${index}" ${charCount < 5 ? 'disabled' : ''}>
+                            ${langManager.getText('reasoning.save_button')}
+                        </button>
+                        <div class="character-count">
+                            <span class="char-count">${charCount}</span>/5 min
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    setupSlideEventListeners() {
+        // Set up event listeners for all slides in the carousel
+        const slides = this.carouselManager.swiper.slides;
+        
+        slides.forEach((slide, slideIndex) => {
+            const showButton = slide.querySelector('.show-button');
+            const textarea = slide.querySelector('.reasoning-textarea');
+            const saveButton = slide.querySelector('.save-reasoning-button');
+            const charCountSpan = slide.querySelector('.char-count');
+            
+            if (showButton) {
+                showButton.addEventListener('click', () => {
+                    this.playOnomatopoeiaSegment(
+                        parseFloat(showButton.dataset.start),
+                        parseFloat(showButton.dataset.end)
+                    );
+                });
+            }
+
+            if (textarea && charCountSpan && saveButton) {
+                textarea.addEventListener('input', () => {
+                    charCountSpan.textContent = textarea.value.length;
+                    // Enable/disable save button based on minimum character requirement
+                    uiManager.updateButtonState(saveButton, textarea.value.trim().length >= 5);
+                });
+
+                saveButton.addEventListener('click', () => {
+                    const onomatopoeiaItem = this.currentVideoOnomatopoeia[slideIndex];
+                    this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
+                });
             }
         });
     }

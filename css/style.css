@@ -524,46 +524,64 @@ body {
 
 .onomatopoeia-carousel-container {
     position: relative;
-    display: flex;
-    align-items: center;
     margin-bottom: 1rem;
     min-height: 40px; /* Ensures consistent height even without arrows */
 }
 
-.carousel-arrow {
+/* SwiperJS Custom Styling */
+.onomatopoeia-swiper {
+    width: 100%;
+    padding: 2rem 0;
+}
+
+.onomatopoeia-swiper .swiper-slide {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* Custom navigation buttons */
+.onomatopoeia-swiper .swiper-button-next,
+.onomatopoeia-swiper .swiper-button-prev {
     background-color: var(--primary-color);
     color: #ffffff;
-    border: none;
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 1.5rem;
-    font-weight: bold;
+    margin-top: 0;
     transition: background-color 0.2s ease, transform 0.1s ease;
-    z-index: 10;
 }
 
-.carousel-arrow:hover {
+.onomatopoeia-swiper .swiper-button-next:after,
+.onomatopoeia-swiper .swiper-button-prev:after {
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.onomatopoeia-swiper .swiper-button-next:hover,
+.onomatopoeia-swiper .swiper-button-prev:hover {
     background-color: var(--primary-hover);
     transform: scale(1.05);
 }
 
-.carousel-arrow:disabled {
+.onomatopoeia-swiper .swiper-button-disabled {
     background-color: var(--border-color);
-    cursor: not-allowed;
-    transform: none;
+    color: #999;
 }
 
-.carousel-arrow-left {
-    margin-right: 1rem;
+/* Custom pagination */
+.onomatopoeia-swiper .swiper-pagination {
+    position: static;
+    margin-top: 1rem;
 }
 
-.carousel-arrow-right {
-    margin-left: 1rem;
+.onomatopoeia-swiper .swiper-pagination-bullet {
+    background-color: var(--primary-color);
+    opacity: 0.3;
+}
+
+.onomatopoeia-swiper .swiper-pagination-bullet-active {
+    opacity: 1;
 }
 
 .onomatopoeia-counter {
@@ -601,22 +619,8 @@ body {
     }
 }
 
-/* Responsive design for carousel */
+/* Responsive design */
 @media (max-width: 768px) {
-    .carousel-arrow {
-        width: 35px;
-        height: 35px;
-        font-size: 1.3rem;
-    }
-    
-    .carousel-arrow-left {
-        margin-right: 0.5rem;
-    }
-    
-    .carousel-arrow-right {
-        margin-left: 0.5rem;
-    }
-    
     .onomatopoeia-counter {
         font-size: 0.8rem;
     }
