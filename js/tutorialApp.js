@@ -49,6 +49,7 @@ class TutorialApp extends BaseApp {
             tutorialBubble: DOMUtils.getElement("tutorialBubble"),
             bubbleTitle: DOMUtils.getElement("bubbleTitle"),
             bubbleText: DOMUtils.getElement("bubbleText"),
+            bubbleInstruction: DOMUtils.getElement("bubbleInstruction"),
             bubbleNext: DOMUtils.getElement("bubbleNext"),
             bubblePrevious: DOMUtils.getElement("bubblePrevious"),
             progressFill: DOMUtils.getElement("progressFill"),
@@ -412,6 +413,16 @@ class TutorialApp extends BaseApp {
             this.elements.bubbleText.textContent = stepData.text;
         }
         
+        // Update bubble instruction
+        if (this.elements.bubbleInstruction) {
+            if (stepData.instruction && stepData.instruction.trim()) {
+                this.elements.bubbleInstruction.textContent = stepData.instruction;
+                this.elements.bubbleInstruction.style.display = 'block';
+            } else {
+                this.elements.bubbleInstruction.style.display = 'none';
+            }
+        }
+        
         // Show/hide previous button
         if (this.elements.bubblePrevious) {
             this.elements.bubblePrevious.style.display = currentStep > 1 ? 'inline-block' : 'none';
@@ -455,25 +466,26 @@ class TutorialApp extends BaseApp {
 
     getTutorialStepData(step) {
         const stepKeys = {
-            1: { title: 'tutorial.step1_title', text: 'tutorial.step1_text', required: false },
-            2: { title: 'tutorial.step2_title', text: 'tutorial.step2_text', required: true },
-            3: { title: 'tutorial.step3_title', text: 'tutorial.step3_text', required: false },
-            4: { title: 'tutorial.step4_title', text: 'tutorial.step4_text', required: true },
-            5: { title: 'tutorial.step5_title', text: 'tutorial.step5_text', required: true },
-            6: { title: 'tutorial.step6_title', text: 'tutorial.step6_text', required: true },
-            7: { title: 'tutorial.step7_title', text: 'tutorial.step7_text', required: true },
-            8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', required: false },
-            9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', required: true },
-            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', required: true },
-            11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', required: false },
-            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', required: true },
-            13: { title: 'tutorial.step13_title', text: 'tutorial.step13_text', required: false }
+            1: { title: 'tutorial.step1_title', text: 'tutorial.step1_text', instruction: 'tutorial.step1_instruction', required: false },
+            2: { title: 'tutorial.step2_title', text: 'tutorial.step2_text', instruction: 'tutorial.step2_instruction', required: true },
+            3: { title: 'tutorial.step3_title', text: 'tutorial.step3_text', instruction: 'tutorial.step3_instruction', required: false },
+            4: { title: 'tutorial.step4_title', text: 'tutorial.step4_text', instruction: 'tutorial.step4_instruction', required: true },
+            5: { title: 'tutorial.step5_title', text: 'tutorial.step5_text', instruction: 'tutorial.step5_instruction', required: true },
+            6: { title: 'tutorial.step6_title', text: 'tutorial.step6_text', instruction: 'tutorial.step6_instruction', required: true },
+            7: { title: 'tutorial.step7_title', text: 'tutorial.step7_text', instruction: 'tutorial.step7_instruction', required: true },
+            8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', instruction: 'tutorial.step8_instruction', required: false },
+            9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', instruction: 'tutorial.step9_instruction', required: true },
+            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', instruction: 'tutorial.step10_instruction', required: true },
+            11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', instruction: 'tutorial.step11_instruction', required: false },
+            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', instruction: 'tutorial.step12_instruction', required: true },
+            13: { title: 'tutorial.step13_title', text: 'tutorial.step13_text', instruction: 'tutorial.step13_instruction', required: false }
         };
         
         const stepData = stepKeys[step];
         return {
             title: langManager.getText(stepData.title),
             text: langManager.getText(stepData.text),
+            instruction: langManager.getText(stepData.instruction),
             required: stepData.required
         };
     }

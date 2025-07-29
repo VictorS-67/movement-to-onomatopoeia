@@ -101,7 +101,23 @@
     font-size: 15px;
     line-height: 1.5;
     color: #333;
+    margin-bottom: 12px;
+}
+
+.bubble-instruction {
+    font-size: 14px;
+    line-height: 1.4;
+    color: #007acc;
+    background-color: #f0f8ff;
+    padding: 10px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #007acc;
     margin-bottom: 20px;
+    font-weight: 500;
+}
+
+.bubble-instruction:empty {
+    display: none;
 }
 
 .bubble-actions {
