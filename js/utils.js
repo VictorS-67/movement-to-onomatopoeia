@@ -1,19 +1,8 @@
 // General utility functions and classes
 
-// Utility function to get current timestamp using date-fns
+// Utility function to get current timestamp in ISO format
 function obtainDate() {
-    try {
-        // Use date-fns if available (loaded from lib/date-fns.js)
-        if (typeof dateFns !== 'undefined' && dateFns.formatISO) {
-            return dateFns.formatISO(new Date());
-        }
-        // Fallback to native JavaScript if date-fns isn't loaded
-        console.warn('date-fns not available, falling back to native Date');
-        return new Date().toISOString();
-    } catch (error) {
-        console.error('Error using date-fns, falling back to native Date:', error);
-        return new Date().toISOString();
-    }
+    return new Date().toISOString();
 }
 
 // Configuration manager for common app settings (Singleton pattern)

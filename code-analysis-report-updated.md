@@ -16,10 +16,9 @@ This comprehensive report analyzes the movement-to-onomatopoeia web application 
 
 ### High-Impact External Library Opportunities (APPROVED)
 
-1. **CSV Processing** - Replace custom 30-line `parseCSV()` with PapaParse ✅ **APPROVED**
-2. **Date Handling** - Replace basic `obtainDate()` with date-fns for proper formatting ✅ **APPROVED**
-3. **Carousel Navigation** - Replace 100+ line custom carousel in reasoningApp.js ✅ **APPROVED**
-4. **Audio Recording** - Enhanced MediaRecorder with RecordRTC for better compatibility 🤔 **UNDER CONSIDERATION**
+1. **CSV Processing** - Replace custom 30-line `parseCSV()` with PapaParse ✅ **APPROVED** (REMOVED - Not needed)
+2. **Carousel Navigation** - Replace 100+ line custom carousel in reasoningApp.js ✅ **APPROVED**
+3. **Audio Recording** - Enhanced MediaRecorder with RecordRTC for better compatibility 🤔 **UNDER CONSIDERATION**
 
 ## Detailed Analysis by File
 
@@ -518,47 +517,7 @@ function parseCSV(data) {
 - Support for different delimiters and encoding
 - Memory efficient for large files
 
-### 2. date-fns Integration ✅ **APPROVED**
-
-**Installation**:
-```bash
-npm install date-fns
-```
-
-**Current Implementation** (app.js):
-```javascript
-function obtainDate() {
-    return new Date().toISOString();
-}
-```
-
-**New Implementation** (tree-shaken imports):
-```javascript
-import { format, parseISO, formatISO } from 'date-fns';
-import { enUS, ja } from 'date-fns/locale';
-
-// For display formatting
-function formatDateForDisplay(isoString, locale = 'en') {
-    const localeMap = { en: enUS, ja };
-    return format(parseISO(isoString), 'yyyy/MM/dd HH:mm:ss', { 
-        locale: localeMap[locale] 
-    });
-}
-
-// For ISO storage (replaces obtainDate)
-function obtainDate() {
-    return formatISO(new Date());
-}
-```
-
-**Benefits**:
-- Proper timezone handling
-- Internationalization support for Japanese users
-- Consistent date formatting across the application
-- Tree-shaking support (only import needed functions)
-- Better parsing of various date formats
-
-### 3. SwiperJS Carousel Integration ✅ **APPROVED**
+### 2. SwiperJS Carousel Integration ✅ **APPROVED**
 
 **Installation**:
 ```bash
@@ -719,16 +678,12 @@ class AudioRecorder {
 ```json
 {
   "dependencies": {
-    "papaparse": "^5.4.1",
-    "date-fns": "^2.30.0", 
     "swiper": "^11.0.5"
   }
 }
 ```
 
-**Total Bundle Size Impact**: ~75KB (gzipped)
-- PapaParse: ~25KB
-- date-fns (tree-shaken): ~10KB  
+**Total Bundle Size Impact**: ~40KB (gzipped)
 - SwiperJS (with modules): ~40KB
 
 ## External Library Integration Analysis
@@ -738,18 +693,11 @@ class AudioRecorder {
 **1. CSV Processing** ✅ **APPROVED - PapaParse**
 - **Current**: Custom `parseCSV()` function (30 lines)
 - **Issues**: Basic string splitting, no error handling for malformed CSV, encoding issues
-- **Implementation**: PapaParse library (~25KB)
+- **Implementation**: PapaParse library (~25KB) (REMOVED - Not needed)
 - **Benefits**: Streaming support, error reporting, encoding detection, 10x less code
-- **Impact**: Replace 30 lines with 5 lines, much more robust
+- **Impact**: Replace 30 lines with 5 lines, much more robust (REMOVED - Not needed)
 
-**2. Date Handling** ✅ **APPROVED - date-fns**
-- **Current**: Basic `obtainDate()` with `new Date().toISOString()`
-- **Issues**: Timezone issues, no localization, basic formatting
-- **Implementation**: date-fns (tree-shaken, ~10KB)
-- **Benefits**: Proper timezone handling, internationalization, better formatting
-- **Impact**: More reliable date operations, better user experience
-
-**3. Carousel Navigation** ✅ **APPROVED - SwiperJS**
+**2. Carousel Navigation** ✅ **APPROVED - SwiperJS**
 - **Current**: Custom carousel implementation in reasoningApp.js (100+ lines)
 - **Issues**: No touch support, limited accessibility, complex state management
 - **Implementation**: SwiperJS (~40KB with modules)
@@ -820,17 +768,12 @@ class AudioRecorder {
    - **Implementation**: `npm install papaparse` (~25KB)
    - **Impact**: -25 lines, much more robust CSV handling
 
-2. **Date Handling**: Integrate date-fns ✅ **APPROVED**
-   - Replace basic date operations  
-   - **Implementation**: `npm install date-fns` (tree-shaken, ~10KB)
-   - **Impact**: Better timezone and localization support
-
-3. **Carousel**: Integrate SwiperJS ✅ **APPROVED**
+2. **Carousel**: Integrate SwiperJS ✅ **APPROVED**
    - Replace custom carousel implementation in reasoning page
    - **Implementation**: `npm install swiper` (~40KB with required modules)
    - **Impact**: -80 lines, better UX and accessibility
 
-4. **Audio Recording**: Consider RecordRTC 🤔 **UNDER CONSIDERATION**
+3. **Audio Recording**: Consider RecordRTC 🤔 **UNDER CONSIDERATION**
    - Better browser compatibility and error handling
    - **Potential Implementation**: `npm install recordrtc` (~80KB)
    - **Impact**: More reliable audio functionality
@@ -845,10 +788,8 @@ class AudioRecorder {
 - **Video management consolidation**: -100 lines (4%)
 - **Tutorial simplification**: -200 lines (7%)
 - **UI state management**: -120 lines (4%)
-- **External library integration (approved)**: -105 lines (4%)
-  - PapaParse CSV processing: -25 lines
+- **External library integration (approved)**: -80 lines (3%)
   - SwiperJS carousel: -80 lines
-  - (Date-fns improvements: better reliability, not line reduction)
 
 ### Performance Improvements
 - **60% reduction in Google Sheets API calls** through batch operations
@@ -905,7 +846,6 @@ The movement-to-onomatopoeia application demonstrates good modular architecture 
 3. **Refinement**: Tutorial simplification (Phase 3) will reduce complexity and improve maintainability
 4. **Enhancement**: External library integration (Phase 4) with approved libraries:
    - **PapaParse** for robust CSV processing
-   - **date-fns** for reliable date handling  
    - **SwiperJS** for professional carousel functionality
    - **RecordRTC** evaluation pending for audio recording improvements
 
