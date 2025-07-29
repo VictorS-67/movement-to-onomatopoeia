@@ -725,6 +725,9 @@ class SurveyApp extends BaseApp {
         };
         delete updatedInfoDict.audioBlob;
         filteredData.push(updatedInfoDict);
+        
+        // Save updated data to localStorage
+        localStorage.setItem("filteredData", JSON.stringify(filteredData));
 
         // Show success message
         if (verbose) {
@@ -805,7 +808,8 @@ class SurveyApp extends BaseApp {
                 }
             }
         }
-    }
+   }
+
 }
 
 // Initialize the app when DOM is loaded
