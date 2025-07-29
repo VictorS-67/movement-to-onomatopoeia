@@ -698,20 +698,20 @@ class SurveyApp extends BaseApp {
             }
         }
 
-        // Prepare data for sheet
-        const newData = [
-            parseInt(infoDict.participantId),
-            infoDict.participantName,
-            infoDict.video,
-            infoDict.onomatopoeia,
-            parseFloat(infoDict.startTime),
-            parseFloat(infoDict.endTime),
-            infoDict.answeredTimestamp,
-            infoDict.hasAudio || 0,
-            audioFileName || ""
-        ];
+        // Prepare onomatopoeia data using the service
+        const onomatopoeiaData = {
+            participantId: parseInt(infoDict.participantId),
+            participantName: infoDict.participantName,
+            video: infoDict.video,
+            onomatopoeia: infoDict.onomatopoeia,
+            startTime: parseFloat(infoDict.startTime),
+            endTime: parseFloat(infoDict.endTime),
+            answeredTimestamp: infoDict.answeredTimestamp,
+            hasAudio: infoDict.hasAudio || 0,
+            audioFileName: audioFileName || ""
+        };
 
-        const appendResult = await appendSheetData(spreadsheetId, OnomatopoeiaSheet, newData);
+        const appendResult = await googleSheetsService.saveOnomatopoeia(spreadsheetId, OnomatopoeiaSheet, onomatopoeiaData);
 
         if (!appendResult) {
             if (verbose) {

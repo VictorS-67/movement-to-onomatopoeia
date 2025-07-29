@@ -106,40 +106,26 @@ class ReasoningApp extends BaseApp {
 
     async loadExistingReasoningData() {
         try {
-            // Get the existing onomatopoeia data from Google Sheets
-            const existingData = await getSheetData(this.config.spreadsheetId, this.config.OnomatopoeiaSheet);
+            // Use the service to load onomatopoeia data with reasoning
+            const onomatopoeiaData = await googleSheetsService.loadOnomatopoeiaData(
+                this.config.spreadsheetId, 
+                this.config.OnomatopoeiaSheet, 
+                this.participantInfo.participantId
+            );
             
-            if (!existingData || existingData.length <= 1) {
-                console.log('No existing reasoning data found in Google Sheets');
-                return;
-            }
-
-            // Process the sheet data to extract reasoning information
-            const sheetReasoningData = [];
-            
-            // Skip header row (index 0)
-            for (let i = 1; i < existingData.length; i++) {
-                const row = existingData[i];
-                
-                // Check if this row belongs to the current participant and has reasoning data
-                if (row[0] == this.participantInfo.participantId && // participantId (column A)
-                    row[9] && // reasoning column (column J, index 9)
-                    row[9].trim() !== '') { // has non-empty reasoning
-                    
-                    const reasoningEntry = {
-                        participantId: row[0], // participantId column (column A)
-                        participantName: row[1], // participantName column (column B)
-                        video: row[2], // video column (column C)
-                        onomatopoeia: row[3], // onomatopoeia column (column D)
-                        startTime: parseFloat(row[4]), // startTime column (column E)
-                        endTime: parseFloat(row[5]), // endTime column (column F)
-                        answeredTimestamp: row[6], // answeredTimestamp column (column G)
-                        reasoning: row[9], // reasoning column (column J)
-                    };
-                    
-                    sheetReasoningData.push(reasoningEntry);
-                }
-            }
+            // Extract reasoning data from onomatopoeia data
+            const sheetReasoningData = onomatopoeiaData
+                .filter(item => item.reasoning && item.reasoning.trim() !== '')
+                .map(item => ({
+                    participantId: item.participantId,
+                    participantName: item.participantName,
+                    video: item.video,
+                    onomatopoeia: item.onomatopoeia,
+                    startTime: parseFloat(item.startTime),
+                    endTime: parseFloat(item.endTime),
+                    answeredTimestamp: item.answeredTimestamp,
+                    reasoning: item.reasoning
+                }));
 
             // Merge with local data, prioritizing sheet data for conflicts
             const mergedData = [...sheetReasoningData];
@@ -165,7 +151,6 @@ class ReasoningApp extends BaseApp {
             localStorage.setItem("reasoningData", JSON.stringify(this.reasoningData));
             
             console.log(`Loaded ${sheetReasoningData.length} reasoning entries from Google Sheets`);
-
             
         } catch (error) {
             console.error('Error loading existing reasoning data from Google Sheets:', error);
@@ -510,41 +495,17 @@ class ReasoningApp extends BaseApp {
 
     async saveReasoningToSheet(reasoningEntry) {
         try {
-            // For now, we'll extend the existing Onomatopoeia sheet with reasoning column
-            // This means we need to find the matching row and update it with reasoning
-            
-            // First, get the existing sheet data to find the matching row
-            const existingData = await getSheetData(this.config.spreadsheetId, this.config.OnomatopoeiaSheet);
-            
-            if (!existingData || existingData.length === 0) {
-                throw new Error("No existing onomatopoeia data found in sheet");
-            }
-
-            // Find the matching row (skip header row)
-            let matchingRowIndex = -1;
-            for (let i = 1; i < existingData.length; i++) {
-                const row = existingData[i];
-                if (row[0] == reasoningEntry.participantId && // participantId
-                    row[2] === reasoningEntry.video && // video
-                    row[3] === reasoningEntry.onomatopoeia && // onomatopoeia
-                    parseFloat(row[4]) === parseFloat(reasoningEntry.startTime) && // startTime
-                    parseFloat(row[5]) === parseFloat(reasoningEntry.endTime)) { // endTime
-                    matchingRowIndex = i;
-                    break;
-                }
-            }
-
-            if (matchingRowIndex === -1) {
-                throw new Error("Matching onomatopoeia entry not found in sheet");
-            }
-
-            // Update the reasoning column (column J, index 9)
-            const range = `${this.config.OnomatopoeiaSheet}!J${matchingRowIndex + 1}`;
-            const updateResult = await updateSheetData(this.config.spreadsheetId, range, [[reasoningEntry.reasoning]]);
-
-            if (!updateResult) {
-                throw new Error("Failed to update reasoning in sheet");
-            }
+            // Use the GoogleSheetsService to update reasoning
+            await googleSheetsService.updateReasoning(
+                this.config.spreadsheetId,
+                this.config.OnomatopoeiaSheet,
+                reasoningEntry.participantId,
+                reasoningEntry.video,
+                reasoningEntry.onomatopoeia,
+                reasoningEntry.startTime,
+                reasoningEntry.endTime,
+                reasoningEntry.reasoning
+            );
         } catch (error) {
             console.error('Error saving reasoning to sheet:', error);
             // Don't throw the error - allow local storage to work even if sheet update fails

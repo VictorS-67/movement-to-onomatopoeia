@@ -23,7 +23,6 @@ class IndexApp extends BaseApp {
 
     async initializeSubclass() {
         // IndexApp doesn't need additional async initialization beyond the base class
-        console.log('IndexApp initialized');
     }
 
     getParticipantDisplayKey() {
@@ -62,7 +61,7 @@ class IndexApp extends BaseApp {
             this.elements.messageDisplay.style.color = "blue";
 
             // Check if participant exists
-            const existingParticipantInfo = await checkParticipantExists(
+            const existingParticipantInfo = await googleSheetsService.findParticipantByEmail(
                 this.config.spreadsheetId, 
                 this.config.ParticipantSheet, 
                 email
@@ -73,9 +72,10 @@ class IndexApp extends BaseApp {
                 localStorage.setItem("participantInfo", JSON.stringify(existingParticipantInfo));
 
                 // Get their existing data
-                const sheetData = await getSheetData(this.config.spreadsheetId, this.config.OnomatopoeiaSheet);
-                const filteredData = parseCSV(sheetData).filter(item => 
-                    item["participantId"] === existingParticipantInfo.participantId
+                const filteredData = await googleSheetsService.loadOnomatopoeiaData(
+                    this.config.spreadsheetId, 
+                    this.config.OnomatopoeiaSheet, 
+                    existingParticipantInfo.participantId
                 );
                 localStorage.setItem("filteredData", JSON.stringify(filteredData));
                 
@@ -104,7 +104,7 @@ class IndexApp extends BaseApp {
             this.elements.messageDisplay.style.color = "blue";
 
             // Save new participant
-            const participantInfo = await saveNewParticipant(
+            const participantInfo = await googleSheetsService.saveNewParticipant(
                 this.config.spreadsheetId, 
                 this.config.ParticipantSheet, 
                 formData
