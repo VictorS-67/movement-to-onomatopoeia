@@ -136,6 +136,12 @@ class SurveyApp extends BaseApp {
         // Reset display for the new video
         this.resetDisplayForCurrentVideo();
         
+        // Ensure audio UI is properly initialized after reset
+        // Use setTimeout to ensure it happens after the display reset is complete
+        setTimeout(() => {
+            this.updateAudioUIInitial();
+        }, 50);
+        
         // Hide loading overlay after a short delay to allow video to start loading
         setTimeout(() => {
             if (videoContainer) {
@@ -422,7 +428,8 @@ class SurveyApp extends BaseApp {
         if (this.elements.inputVisibility) {
             this.elements.inputVisibility.style.display = "block";
         }
-        audioRecordingService.reset();
+        // Ensure audio UI is properly initialized when showing input
+        audioRecordingService.deleteRecording();
     }
 
     async handleNoOnomatopoeia() {
@@ -588,8 +595,7 @@ class SurveyApp extends BaseApp {
             uiManager.clearMessage(this.elements.messageDisplay);
         }
 
-        // Reset audio recording
-        audioRecordingService.reset();
+        // Note: Audio recording reset is now handled in onVideoChange to prevent timing issues
 
         let recordMessage = "";
 
