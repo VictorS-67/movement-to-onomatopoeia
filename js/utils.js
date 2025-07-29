@@ -5,30 +5,6 @@ function obtainDate() {
     return new Date().toISOString().split('.')[0] + 'Z';
 }
 
-// Utility classes for consistent UI operations
-class UIUtils {
-    static showError(messageElement, message) {
-        if (messageElement) {
-            messageElement.textContent = message;
-            messageElement.className = 'mt-4 text-red-600 font-medium';
-        }
-    }
-
-    static showSuccess(messageElement, message) {
-        if (messageElement) {
-            messageElement.textContent = message;
-            messageElement.className = 'mt-4 text-green-600 font-medium';
-        }
-    }
-
-    static clearMessage(messageElement) {
-        if (messageElement) {
-            messageElement.textContent = '';
-            messageElement.className = 'mt-4 text-gray-700';
-        }
-    }
-}
-
 // Configuration manager for common app settings (Singleton pattern)
 class ConfigManager {
     static instance = null;

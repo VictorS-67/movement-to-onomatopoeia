@@ -148,7 +148,7 @@ class VideoManager {
     // Utility method to clear messages (commonly done on video change)
     clearMessages(messageElement) {
         if (messageElement) {
-            UIUtils.clearMessage(messageElement);
+            uiManager.clearMessage(messageElement);
         }
     }
 

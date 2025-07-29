@@ -111,7 +111,7 @@ class ReasoningApp extends BaseApp {
         
         // Clear any existing messages when changing videos
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
         
         // Display reasoning content for the new video
@@ -294,15 +294,17 @@ class ReasoningApp extends BaseApp {
             this.elements.totalOnomatopoeia.textContent = totalCount;
             
             // Update button states
-            this.elements.prevOnomatopoeia.disabled = this.currentOnomatopoeiaIndex === 0;
-            this.elements.nextOnomatopoeia.disabled = this.currentOnomatopoeiaIndex === totalCount - 1;
+            uiManager.updateButtonState(this.elements.prevOnomatopoeia, this.currentOnomatopoeiaIndex > 0);
+            uiManager.updateButtonState(this.elements.nextOnomatopoeia, this.currentOnomatopoeiaIndex < totalCount - 1);
         }
     }
 
     hideCarouselControls() {
-        this.elements.prevOnomatopoeia.style.display = 'none';
-        this.elements.nextOnomatopoeia.style.display = 'none';
-        this.elements.onomatopoeiaCounter.style.display = 'none';
+        uiManager.updateVisibility(this.elements, {
+            prevOnomatopoeia: false,
+            nextOnomatopoeia: false,
+            onomatopoeiaCounter: false
+        });
     }
 
     navigateOnomatopoeia(direction) {
@@ -378,7 +380,7 @@ class ReasoningApp extends BaseApp {
         textarea.addEventListener('input', () => {
             charCountSpan.textContent = textarea.value.length;
             // Enable/disable save button based on minimum character requirement
-            saveButton.disabled = textarea.value.trim().length < 5;
+            uiManager.updateButtonState(saveButton, textarea.value.trim().length >= 5);
         });
 
         saveButton.addEventListener('click', () => {
@@ -386,7 +388,7 @@ class ReasoningApp extends BaseApp {
         });
 
         // Initial save button state
-        saveButton.disabled = textarea.value.trim().length < 5;
+        uiManager.updateButtonState(saveButton, textarea.value.trim().length >= 5);
 
         this.elements.onomatopoeiaList.appendChild(entryDiv);
     }
@@ -413,7 +415,7 @@ class ReasoningApp extends BaseApp {
         try {
             // Validate minimum character requirement
             if (reasoningText.length < 5) {
-                UIUtils.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_min_characters'));
+                uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_min_characters'));
                 return;
             }
 
@@ -453,11 +455,11 @@ class ReasoningApp extends BaseApp {
             this.updateProgressDisplay();
 
             // Show success message
-            UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('reasoning.success_saved'));
+            uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('reasoning.success_saved'));
 
         } catch (error) {
             console.error('Error saving reasoning:', error);
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_saving'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_saving'));
         }
     }
 

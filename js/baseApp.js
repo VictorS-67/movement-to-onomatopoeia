@@ -47,7 +47,7 @@ class BaseApp {
 
     handleInitializationError(error) {
         if (this.elements.messageDisplay) {
-            UIUtils.showError(this.elements.messageDisplay, 'Failed to initialize application');
+            uiManager.showError(this.elements.messageDisplay, 'Failed to initialize application');
         }
     }
 
@@ -141,21 +141,21 @@ class BaseApp {
     // Common message clearing utility
     clearMessage() {
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
     }
 
     // Common success message display
     showSuccess(message) {
         if (this.elements.messageDisplay) {
-            UIUtils.showSuccess(this.elements.messageDisplay, message);
+            uiManager.showSuccess(this.elements.messageDisplay, message);
         }
     }
 
     // Common error message display
     showError(message) {
         if (this.elements.messageDisplay) {
-            UIUtils.showError(this.elements.messageDisplay, message);
+            uiManager.showError(this.elements.messageDisplay, message);
         }
     }
 }

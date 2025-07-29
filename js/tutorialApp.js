@@ -346,9 +346,9 @@ class TutorialApp extends BaseApp {
         };
         
         if (this.elements.messageDisplay && messages[step]) {
-            UIUtils.showError(this.elements.messageDisplay, messages[step]);
+            uiManager.showError(this.elements.messageDisplay, messages[step]);
             setTimeout(() => {
-                UIUtils.clearMessage(this.elements.messageDisplay);
+                uiManager.clearMessage(this.elements.messageDisplay);
             }, 3000);
         }
     }
@@ -525,7 +525,7 @@ class TutorialApp extends BaseApp {
         this.goToNextVideo();
                 
         if (this.elements.messageDisplay) {
-            UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
+            uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
         }
         
         this.resetDisplay();
@@ -560,7 +560,7 @@ class TutorialApp extends BaseApp {
         this.updateActiveVideoButtonState('completed');
         
         if (this.elements.messageDisplay) {
-            UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
+            uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.saved_locally'));
         }
         
         this.resetDisplay();
@@ -598,20 +598,20 @@ class TutorialApp extends BaseApp {
         } else {
             // Reached the end - just show message but don't auto-advance
             if (this.elements.messageDisplay) {
-                UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.all_videos_complete'));
+                uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('tutorial.all_videos_complete'));
             }
         }
     }
 
     resetDisplay() {
-        // Reset form inputs
-        if (this.elements.onomatopoeiaInput) this.elements.onomatopoeiaInput.value = "";
-        if (this.elements.startDisplay) this.elements.startDisplay.textContent = "-.--";
-        if (this.elements.endDisplay) this.elements.endDisplay.textContent = "-.--";
+        // Reset form inputs using uiManager
+        uiManager.resetForm(this.elements, ['onomatopoeiaInput', 'startDisplay', 'endDisplay']);
 
-        // Reset visibility
-        if (this.elements.buttonVisibility) this.elements.buttonVisibility.style.display = "block";
-        if (this.elements.inputVisibility) this.elements.inputVisibility.style.display = "none";
+        // Reset visibility using uiManager
+        uiManager.updateVisibility(this.elements, {
+            buttonVisibility: true,
+            inputVisibility: false
+        });
 
         // Show tutorial data
         if (this.elements.recordOnomatopoeia) {
@@ -633,7 +633,7 @@ class TutorialApp extends BaseApp {
 
         // Clear messages
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
     }
 

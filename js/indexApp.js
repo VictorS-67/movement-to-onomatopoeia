@@ -51,12 +51,12 @@ class IndexApp extends BaseApp {
 
         // Validate email
         if (!ValidationUtils.isValidEmail(email)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_email'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_email'));
             return;
         }
 
         try {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
             this.elements.messageDisplay.textContent = langManager.getText('ui.checking_participant');
             this.elements.messageDisplay.style.color = "blue";
 
@@ -85,10 +85,10 @@ class IndexApp extends BaseApp {
                 // New participant - show intro section and registration form
                 this.elements.introSection.style.display = "block";
                 this.elements.participantForm.style.display = "block";
-                UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('ui.welcome_message'));
+                uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('ui.welcome_message'));
             }
         } catch (error) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_checking'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_checking'));
             console.error("Error:", error);
         }
     }
@@ -117,7 +117,7 @@ class IndexApp extends BaseApp {
             window.location.href = "tutorial.html";
 
         } catch (error) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_creating'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_creating'));
             console.error("Error:", error);
         }
     }
@@ -132,27 +132,27 @@ class IndexApp extends BaseApp {
 
         // Validate required fields
         if (!ValidationUtils.isValidEmail(email)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_email'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_email'));
             return null;
         }
 
         if (!ValidationUtils.isRequired(name)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_name_required'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_name_required'));
             return null;
         }
 
         if (!ValidationUtils.isValidAge(age)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_age'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_invalid_age'));
             return null;
         }
 
         if (!ValidationUtils.isRequired(gender)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_gender_required'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_gender_required'));
             return null;
         }
 
         if (!ValidationUtils.isRequired(nativeLanguage)) {
-            UIUtils.showError(this.elements.messageDisplay, langManager.getText('ui.error_language_required'));
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_language_required'));
             return null;
         }
 

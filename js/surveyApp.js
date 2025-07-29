@@ -111,7 +111,7 @@ class SurveyApp extends BaseApp {
         
         // Clear any existing messages when changing videos
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
         
         // Reset display for the new video
@@ -317,7 +317,7 @@ class SurveyApp extends BaseApp {
     showOnomatopoeiaInput() {
         // Clear any existing messages when starting to input onomatopoeia
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
         
         if (this.elements.buttonVisibility) {
@@ -332,7 +332,7 @@ class SurveyApp extends BaseApp {
     async handleNoOnomatopoeia() {
         // Clear any existing messages when clicking "No"
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
         
         const currentButton = this.elements.videoButtons?.querySelector('.video-button.active');
@@ -426,7 +426,7 @@ class SurveyApp extends BaseApp {
                     
                     if (newSize > 10 * 1024 * 1024) { // 10MB in bytes
                         this.stopAudioRecording();
-                        UIUtils.showError(this.elements.messageDisplay, 
+                        uiManager.showError(this.elements.messageDisplay, 
                             langManager.getText('survey.audio_too_large'));
                         return;
                     }
@@ -522,10 +522,13 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIDuringRecording() {
-        if (this.elements.audioRecord) this.elements.audioRecord.style.display = 'none';
-        if (this.elements.audioStop) this.elements.audioStop.style.display = 'inline-block';
-        if (this.elements.audioPlay) this.elements.audioPlay.style.display = 'none';
-        if (this.elements.audioDelete) this.elements.audioDelete.style.display = 'none';
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: false,
+            audioStop: true,
+            audioPlay: false,
+            audioDelete: false
+        });
+        
         if (this.elements.audioStatus) this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_recording');
         if (this.elements.audioWaveform) {
             this.elements.audioWaveform.style.display = 'flex';
@@ -534,10 +537,13 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIAfterRecording() {
-        if (this.elements.audioRecord) this.elements.audioRecord.style.display = 'none';
-        if (this.elements.audioStop) this.elements.audioStop.style.display = 'none';
-        if (this.elements.audioPlay) this.elements.audioPlay.style.display = 'inline-block';
-        if (this.elements.audioDelete) this.elements.audioDelete.style.display = 'inline-block';
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: false,
+            audioStop: false,
+            audioPlay: true,
+            audioDelete: true
+        });
+        
         if (this.elements.audioStatus) this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_recorded');
         if (this.elements.audioWaveform) {
             this.elements.audioWaveform.style.display = 'none';
@@ -546,10 +552,13 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIInitial() {
-        if (this.elements.audioRecord) this.elements.audioRecord.style.display = 'inline-block';
-        if (this.elements.audioStop) this.elements.audioStop.style.display = 'none';
-        if (this.elements.audioPlay) this.elements.audioPlay.style.display = 'none';
-        if (this.elements.audioDelete) this.elements.audioDelete.style.display = 'none';
+        uiManager.updateVisibility(this.elements, {
+            audioRecord: true,
+            audioStop: false,
+            audioPlay: false,
+            audioDelete: false
+        });
+        
         if (this.elements.audioStatus) this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_ready');
         if (this.elements.audioWaveform) {
             this.elements.audioWaveform.style.display = 'none';
@@ -559,18 +568,18 @@ class SurveyApp extends BaseApp {
 
     // Survey-specific helper methods
     resetDisplay(currentVideoName, filteredData, docElts) {
-        // Reset form inputs
-        if (docElts.onomatopoeiaInput) docElts.onomatopoeiaInput.value = "";
-        if (docElts.startDisplay) docElts.startDisplay.textContent = "-.--";
-        if (docElts.endDisplay) docElts.endDisplay.textContent = "-.--";
+        // Reset form inputs using uiManager
+        uiManager.resetForm(docElts, ['onomatopoeiaInput', 'startDisplay', 'endDisplay']);
 
-        // Reset visibility
-        if (docElts.buttonVisibility) docElts.buttonVisibility.style.display = "block";
-        if (docElts.inputVisibility) docElts.inputVisibility.style.display = "none";
+        // Reset visibility using uiManager
+        uiManager.updateVisibility(docElts, {
+            buttonVisibility: true,
+            inputVisibility: false
+        });
 
         // Clear messages
         if (this.elements.messageDisplay) {
-            UIUtils.clearMessage(this.elements.messageDisplay);
+            uiManager.clearMessage(this.elements.messageDisplay);
         }
 
         // Reset audio recording
@@ -632,7 +641,7 @@ class SurveyApp extends BaseApp {
         const validation = ValidationUtils.validateOnomatopoeiaData(infoDict);
         if (!validation.isValid) {
             if (verbose) {
-                UIUtils.showError(messageDisplay, validation.errorMessage);
+                uiManager.showError(messageDisplay, validation.errorMessage);
             }
             throw new Error(validation.errorMessage);
         }
@@ -652,7 +661,7 @@ class SurveyApp extends BaseApp {
             } catch (audioError) {
                 console.error("Audio upload failed:", audioError);
                 if (verbose) {
-                    UIUtils.showError(messageDisplay, langManager.getText('survey.audio_upload_error'));
+                    uiManager.showError(messageDisplay, langManager.getText('survey.audio_upload_error'));
                 }
             }
         }
@@ -674,7 +683,7 @@ class SurveyApp extends BaseApp {
 
         if (!appendResult) {
             if (verbose) {
-                UIUtils.showError(messageDisplay, langManager.getText('survey.error_saving_sheet'));
+                uiManager.showError(messageDisplay, langManager.getText('survey.error_saving_sheet'));
             }
             throw new Error("Failed to save to sheet");
         }
@@ -693,7 +702,7 @@ class SurveyApp extends BaseApp {
             const successMessage = (infoDict.hasAudio === 1 && audioFileName) ? 
                 langManager.getText('survey.success_saved_with_audio') :
                 langManager.getText('survey.success_saved');
-            UIUtils.showSuccess(messageDisplay, successMessage);
+            uiManager.showSuccess(messageDisplay, successMessage);
         }
     }
 
@@ -763,7 +772,7 @@ class SurveyApp extends BaseApp {
             } else {
                 // Not all videos completed yet - show regular message
                 if (this.elements.messageDisplay) {
-                    UIUtils.showSuccess(this.elements.messageDisplay, langManager.getText('survey.all_videos_complete'));
+                    uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('survey.all_videos_complete'));
                 }
             }
         }
