@@ -68,14 +68,27 @@ class SurveyApp extends BaseApp {
             // Load filtered data from localStorage
             this.filteredData = JSON.parse(localStorage.getItem("filteredData")) || [];
             
+            // Show video skeleton while loading
+            const videoContainer = this.elements.videoPlayer?.parentElement;
+            const videoSkeletonId = this.showSkeleton(videoContainer, 'video-player');
+            
             // Initialize video manager with callbacks
             this.initializeVideoManager(
                 this.onVideoChange.bind(this), // Called when video changes
                 this.onVideoLoad.bind(this)    // Called when videos are loaded
             );
             
-            // Load videos using video manager
-            await this.videoManager.loadVideos(this.config);
+            // Load videos using video manager with loading state
+            await this.withLoading('video-loading', async () => {
+                await this.videoManager.loadVideos(this.config);
+            }, {
+                type: 'skeleton',
+                container: this.elements.videoButtons,
+                skeletonType: 'video-list'
+            });
+            
+            // Hide video skeleton
+            this.hideSkeleton(videoSkeletonId);
             
             // Set up event listeners
             this.setupEventListeners();
@@ -104,6 +117,12 @@ class SurveyApp extends BaseApp {
 
     // Callback for when video changes (called by VideoManager)
     onVideoChange(videoName, videoSrc) {
+        // Show loading overlay on video container during video change
+        const videoContainer = this.elements.videoPlayer?.parentElement;
+        if (videoContainer) {
+            this.showOverlay(videoContainer, langManager.getText('survey.loading_video') || 'Loading video...');
+        }
+        
         this.currentVideoName = videoName;
         
         // Clear any existing messages when changing videos
@@ -113,6 +132,13 @@ class SurveyApp extends BaseApp {
         
         // Reset display for the new video
         this.resetDisplayForCurrentVideo();
+        
+        // Hide loading overlay after a short delay to allow video to start loading
+        setTimeout(() => {
+            if (videoContainer) {
+                this.hideOverlay(videoContainer);
+            }
+        }, 500);
     }
     
     // Callback for when videos are loaded (called by VideoManager)
@@ -186,10 +212,27 @@ class SurveyApp extends BaseApp {
 
     setupAudioEventListeners() {
         if (this.elements.audioRecord) {
-            this.elements.audioRecord.addEventListener('click', () => audioRecordingService.startRecording());
+            this.elements.audioRecord.addEventListener('click', async () => {
+                try {
+                    this.startButtonLoading(this.elements.audioRecord);
+                    await audioRecordingService.startRecording();
+                } catch (error) {
+                    this.stopButtonLoading(this.elements.audioRecord);
+                    this.showError(langManager.getText('survey.audio_start_error') || 'Failed to start recording');
+                }
+            });
         }
         if (this.elements.audioStop) {
-            this.elements.audioStop.addEventListener('click', () => audioRecordingService.stopRecording());
+            this.elements.audioStop.addEventListener('click', async () => {
+                try {
+                    this.startButtonLoading(this.elements.audioStop);
+                    await audioRecordingService.stopRecording();
+                    this.stopButtonLoading(this.elements.audioStop);
+                } catch (error) {
+                    this.stopButtonLoading(this.elements.audioStop);
+                    this.showError(langManager.getText('survey.audio_stop_error') || 'Failed to stop recording');
+                }
+            });
         }
         if (this.elements.audioPlay) {
             this.elements.audioPlay.addEventListener('click', () => audioRecordingService.playRecording());
@@ -447,18 +490,26 @@ class SurveyApp extends BaseApp {
                 audioBlob: audioRecordingService.getRecordingBlob()
             };
 
-            await this.saveOnomatopoeia(
-                this.filteredData,
-                infoDict,
-                this.config.spreadsheetId,
-                this.config.OnomatopoeiaSheet,
-                this.elements.messageDisplay
+            // Use submitWithLoading for form submission with loading state
+            await this.submitWithLoading(
+                this.elements.saveOnomatopoeiaButton,
+                async () => {
+                    await this.saveOnomatopoeia(
+                        this.filteredData,
+                        infoDict,
+                        this.config.spreadsheetId,
+                        this.config.OnomatopoeiaSheet,
+                        this.elements.messageDisplay
+                    );
+                },
+                langManager.getText('survey.saving') || 'Saving...'
             );
 
             this.resetDisplayForCurrentVideo();
             
         } catch (error) {
             console.error('Error saving onomatopoeia:', error);
+            this.showError(langManager.getText('survey.save_error') || 'Failed to save response');
         }
     }
 

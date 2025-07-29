@@ -56,37 +56,45 @@ class IndexApp extends BaseApp {
         }
 
         try {
-            uiManager.clearMessage(this.elements.messageDisplay);
-            this.elements.messageDisplay.textContent = langManager.getText('ui.checking_participant');
-            this.elements.messageDisplay.style.color = "blue";
+            // Show loading state on submit button
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            
+            await this.submitWithLoading(
+                submitButton,
+                async () => {
+                    uiManager.clearMessage(this.elements.messageDisplay);
 
-            // Check if participant exists
-            const existingParticipantInfo = await googleSheetsService.findParticipantByEmail(
-                this.config.spreadsheetId, 
-                this.config.ParticipantSheet, 
-                email
+                    // Check if participant exists
+                    const existingParticipantInfo = await googleSheetsService.findParticipantByEmail(
+                        this.config.spreadsheetId, 
+                        this.config.ParticipantSheet, 
+                        email
+                    );
+
+                    if (existingParticipantInfo) {
+                        // Returning participant - go directly to survey
+                        localStorage.setItem("participantInfo", JSON.stringify(existingParticipantInfo));
+
+                        // Get their existing data
+                        const filteredData = await googleSheetsService.loadOnomatopoeiaData(
+                            this.config.spreadsheetId, 
+                            this.config.OnomatopoeiaSheet, 
+                            existingParticipantInfo.participantId
+                        );
+                        localStorage.setItem("filteredData", JSON.stringify(filteredData));
+                        
+                        // Redirect to survey
+                        window.location.href = "survey.html";
+                    } else {
+                        // New participant - show intro section and registration form
+                        this.elements.introSection.style.display = "block";
+                        this.elements.participantForm.style.display = "block";
+                        uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('ui.welcome_message'));
+                    }
+                },
+                langManager.getText('ui.checking_participant') || 'Checking participant...'
             );
 
-            if (existingParticipantInfo) {
-                // Returning participant - go directly to survey
-                localStorage.setItem("participantInfo", JSON.stringify(existingParticipantInfo));
-
-                // Get their existing data
-                const filteredData = await googleSheetsService.loadOnomatopoeiaData(
-                    this.config.spreadsheetId, 
-                    this.config.OnomatopoeiaSheet, 
-                    existingParticipantInfo.participantId
-                );
-                localStorage.setItem("filteredData", JSON.stringify(filteredData));
-                
-                // Redirect to survey
-                window.location.href = "survey.html";
-            } else {
-                // New participant - show intro section and registration form
-                this.elements.introSection.style.display = "block";
-                this.elements.participantForm.style.display = "block";
-                uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('ui.welcome_message'));
-            }
         } catch (error) {
             uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_checking'));
             console.error("Error:", error);
@@ -100,21 +108,27 @@ class IndexApp extends BaseApp {
         if (!formData) return;
 
         try {
-            this.elements.messageDisplay.textContent = langManager.getText('ui.creating_profile');
-            this.elements.messageDisplay.style.color = "blue";
+            // Show loading state on submit button
+            const submitButton = event.target.querySelector('button[type="submit"]');
+            
+            await this.submitWithLoading(
+                submitButton,
+                async () => {
+                    // Save new participant
+                    const participantInfo = await googleSheetsService.saveNewParticipant(
+                        this.config.spreadsheetId, 
+                        this.config.ParticipantSheet, 
+                        formData
+                    );
 
-            // Save new participant
-            const participantInfo = await googleSheetsService.saveNewParticipant(
-                this.config.spreadsheetId, 
-                this.config.ParticipantSheet, 
-                formData
+                    localStorage.setItem("participantInfo", JSON.stringify(participantInfo));
+                    localStorage.setItem("filteredData", JSON.stringify([]));
+
+                    // New participants should go to tutorial first
+                    window.location.href = "tutorial.html";
+                },
+                langManager.getText('ui.creating_profile') || 'Creating profile...'
             );
-
-            localStorage.setItem("participantInfo", JSON.stringify(participantInfo));
-            localStorage.setItem("filteredData", JSON.stringify([]));
-
-            // New participants should go to tutorial first
-            window.location.href = "tutorial.html";
 
         } catch (error) {
             uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_creating'));

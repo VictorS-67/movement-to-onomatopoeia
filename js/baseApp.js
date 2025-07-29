@@ -8,6 +8,13 @@ class BaseApp {
         this.participantInfo = null;
         this.videoManager = null; // Will be initialized by subclasses that need it
         
+        // Initialize UI and Loading managers
+        this.uiManager = uiManager; // Global instance
+        this.loadingManager = new LoadingManager(this.uiManager);
+        
+        // Track loading states for this app instance
+        this.activeLoadingStates = new Set();
+        
         // Allow subclasses to initialize their specific elements first
         this.initializeElements();
         
@@ -22,6 +29,12 @@ class BaseApp {
 
     async initialize() {
         try {
+            // Show page loading during initialization
+            this.startLoading('app-init', {
+                type: 'page',
+                message: 'Initializing application...'
+            });
+            
             // Initialize language manager and configuration in parallel
             const [langInitialized, config] = await Promise.all([
                 langManager.ensureInitialized(),
@@ -34,8 +47,12 @@ class BaseApp {
             // Call subclass-specific initialization
             await this.initializeSubclass();
             
+            // Hide page loading
+            this.stopLoading('app-init');
+            
         } catch (error) {
             console.error('Failed to initialize app:', error);
+            this.stopLoading('app-init');
             this.handleInitializationError(error);
         }
     }
@@ -157,5 +174,159 @@ class BaseApp {
         if (this.elements.messageDisplay) {
             uiManager.showError(this.elements.messageDisplay, message);
         }
+    }
+    
+    /**
+     * Loading State Management Hooks
+     */
+    
+    /**
+     * Start loading state for a component
+     * @param {string} componentId - Unique identifier for loading state
+     * @param {Object} config - Loading configuration
+     */
+    startLoading(componentId, config = {}) {
+        this.loadingManager.startLoading(componentId, config);
+        this.activeLoadingStates.add(componentId);
+    }
+    
+    /**
+     * Stop loading state for a component
+     * @param {string} componentId - Component identifier
+     * @param {Function} callback - Optional callback when loading stops
+     */
+    stopLoading(componentId, callback = null) {
+        this.loadingManager.stopLoading(componentId, callback);
+        this.activeLoadingStates.delete(componentId);
+    }
+    
+    /**
+     * Check if component is loading
+     * @param {string} componentId - Component identifier
+     * @returns {boolean} - Whether component is loading
+     */
+    isLoading(componentId) {
+        return this.loadingManager.isLoading(componentId);
+    }
+    
+    /**
+     * Start button loading state
+     * @param {HTMLElement} button - Button element
+     * @param {string} loadingText - Optional loading text
+     */
+    startButtonLoading(button, loadingText = null) {
+        this.uiManager.setButtonLoading(button, loadingText);
+    }
+    
+    /**
+     * Stop button loading state
+     * @param {HTMLElement} button - Button element
+     */
+    stopButtonLoading(button) {
+        this.uiManager.clearButtonLoading(button);
+    }
+    
+    /**
+     * Show overlay on container
+     * @param {HTMLElement} container - Container element
+     * @param {string} message - Loading message
+     * @param {boolean} isDark - Use dark theme
+     */
+    showOverlay(container, message = 'Loading...', isDark = false) {
+        return this.uiManager.showOverlay(container, message, isDark);
+    }
+    
+    /**
+     * Hide overlay from container
+     * @param {HTMLElement} container - Container element
+     */
+    hideOverlay(container) {
+        this.uiManager.hideOverlay(container);
+    }
+    
+    /**
+     * Show skeleton screen
+     * @param {HTMLElement} container - Container element
+     * @param {string} skeletonType - Type of skeleton (form, video-list, video-player, survey)
+     */
+    showSkeleton(container, skeletonType = 'form') {
+        const componentId = `skeleton-${Date.now()}`;
+        this.startLoading(componentId, {
+            type: 'skeleton',
+            container,
+            skeletonType
+        });
+        return componentId;
+    }
+    
+    /**
+     * Hide skeleton screen
+     * @param {string} componentId - Component ID returned from showSkeleton
+     */
+    hideSkeleton(componentId) {
+        this.stopLoading(componentId);
+    }
+    
+    /**
+     * Execute async operation with loading state
+     * @param {string} componentId - Component identifier
+     * @param {Function} operation - Async operation to execute
+     * @param {Object} loadingConfig - Loading configuration
+     * @returns {Promise} - Operation result
+     */
+    async withLoading(componentId, operation, loadingConfig = {}) {
+        try {
+            this.startLoading(componentId, loadingConfig);
+            const result = await operation();
+            this.stopLoading(componentId);
+            return result;
+        } catch (error) {
+            this.stopLoading(componentId);
+            throw error;
+        }
+    }
+    
+    /**
+     * Execute form submission with loading state
+     * @param {HTMLElement} button - Submit button
+     * @param {Function} submitOperation - Async submit operation
+     * @param {string} loadingText - Loading button text
+     * @returns {Promise} - Submit result
+     */
+    async submitWithLoading(button, submitOperation, loadingText = 'Submitting...') {
+        try {
+            this.startButtonLoading(button, loadingText);
+            const result = await submitOperation();
+            this.stopButtonLoading(button);
+            return result;
+        } catch (error) {
+            this.stopButtonLoading(button);
+            throw error;
+        }
+    }
+    
+    /**
+     * Cleanup method - stop all loading states
+     */
+    cleanup() {
+        // Stop all active loading states
+        this.activeLoadingStates.forEach(componentId => {
+            this.stopLoading(componentId);
+        });
+        
+        // Clean up loading manager
+        this.loadingManager.cleanup();
+        
+        // Call subclass cleanup if it exists
+        if (typeof this.performAdditionalCleanup === 'function') {
+            this.performAdditionalCleanup();
+        }
+    }
+    
+    /**
+     * Abstract method for subclass-specific cleanup
+     */
+    performAdditionalCleanup() {
+        // Default implementation - can be overridden
     }
 }

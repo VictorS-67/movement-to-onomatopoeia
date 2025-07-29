@@ -311,6 +311,343 @@ class UIManager {
     }
 
     /**
+     * Button Loading States
+     */
+    
+    /**
+     * Set button to loading state
+     * @param {HTMLElement} button - Button element
+     * @param {string} loadingText - Optional loading text
+     */
+    setButtonLoading(button, loadingText = null) {
+        if (!button) return;
+        
+        // Store original state
+        if (!button.dataset.originalText) {
+            button.dataset.originalText = button.textContent;
+            button.dataset.originalDisabled = button.disabled;
+        }
+        
+        // Apply loading state
+        button.classList.add('btn-loading');
+        button.disabled = true;
+        
+        if (loadingText) {
+            button.textContent = loadingText;
+        }
+    }
+    
+    /**
+     * Remove button loading state
+     * @param {HTMLElement} button - Button element
+     */
+    clearButtonLoading(button) {
+        if (!button) return;
+        
+        button.classList.remove('btn-loading');
+        
+        // Restore original state
+        if (button.dataset.originalText) {
+            button.textContent = button.dataset.originalText;
+            button.disabled = button.dataset.originalDisabled === 'true';
+            
+            // Clean up stored data
+            delete button.dataset.originalText;
+            delete button.dataset.originalDisabled;
+        }
+    }
+    
+    /**
+     * Loading Overlays
+     */
+    
+    /**
+     * Show loading overlay on an element
+     * @param {HTMLElement} container - Container element
+     * @param {string} message - Loading message
+     * @param {boolean} isDark - Use dark overlay theme
+     * @returns {HTMLElement} - Created overlay element
+     */
+    showOverlay(container, message = 'Loading...', isDark = false) {
+        if (!container) return null;
+        
+        // Remove existing overlay
+        this.hideOverlay(container);
+        
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = `loading-overlay ${isDark ? 'loading-overlay-dark' : ''}`;
+        overlay.dataset.uiManagerOverlay = 'true';
+        
+        // Create content
+        const content = document.createElement('div');
+        content.className = 'loading-overlay-content';
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner';
+        
+        const text = document.createElement('div');
+        text.className = 'loading-overlay-text';
+        text.textContent = message;
+        
+        content.appendChild(spinner);
+        content.appendChild(text);
+        overlay.appendChild(content);
+        
+        // Position container relatively if needed
+        const containerStyle = getComputedStyle(container);
+        if (containerStyle.position === 'static') {
+            container.style.position = 'relative';
+            overlay.dataset.positionAdded = 'true';
+        }
+        
+        container.appendChild(overlay);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+        
+        return overlay;
+    }
+    
+    /**
+     * Hide loading overlay
+     * @param {HTMLElement} container - Container element
+     */
+    hideOverlay(container) {
+        if (!container) return;
+        
+        const overlay = container.querySelector('[data-ui-manager-overlay="true"]');
+        if (!overlay) return;
+        
+        overlay.classList.remove('active');
+        
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+                
+                // Reset position if we added it
+                if (overlay.dataset.positionAdded) {
+                    container.style.position = '';
+                }
+            }
+        }, 200); // Match CSS transition duration
+    }
+    
+    /**
+     * Show page-level loading overlay
+     * @param {string} message - Loading message
+     */
+    showPageOverlay(message = 'Loading...') {
+        this.hidePageOverlay(); // Remove existing
+        
+        const overlay = document.createElement('div');
+        overlay.className = 'loading-overlay page-loading-overlay';
+        overlay.id = 'page-loading-overlay';
+        
+        const content = document.createElement('div');
+        content.className = 'loading-overlay-content';
+        
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-lg';
+        
+        const text = document.createElement('div');
+        text.className = 'loading-overlay-text';
+        text.textContent = message;
+        
+        content.appendChild(spinner);
+        content.appendChild(text);
+        overlay.appendChild(content);
+        
+        document.body.appendChild(overlay);
+        
+        // Trigger animation
+        requestAnimationFrame(() => {
+            overlay.classList.add('active');
+        });
+        
+        return overlay;
+    }
+    
+    /**
+     * Hide page-level loading overlay
+     */
+    hidePageOverlay() {
+        const overlay = document.getElementById('page-loading-overlay');
+        if (!overlay) return;
+        
+        overlay.classList.remove('active');
+        
+        setTimeout(() => {
+            if (overlay.parentNode) {
+                overlay.parentNode.removeChild(overlay);
+            }
+        }, 200);
+    }
+    
+    /**
+     * Progress Indicators
+     */
+    
+    /**
+     * Set progress bar value
+     * @param {HTMLElement} progressBar - Progress bar element
+     * @param {number} percentage - Progress percentage (0-100)
+     */
+    setProgress(progressBar, percentage) {
+        if (!progressBar) return;
+        
+        const fill = progressBar.querySelector('.progress-bar-fill');
+        if (fill) {
+            fill.style.width = `${Math.max(0, Math.min(100, percentage))}%`;
+        }
+    }
+    
+    /**
+     * Create progress bar element
+     * @param {boolean} indeterminate - Whether progress is indeterminate
+     * @returns {HTMLElement} - Progress bar element
+     */
+    createProgressBar(indeterminate = false) {
+        const progressBar = document.createElement('div');
+        progressBar.className = `progress-bar ${indeterminate ? 'progress-bar-indeterminate' : ''}`;
+        
+        const fill = document.createElement('div');
+        fill.className = 'progress-bar-fill';
+        progressBar.appendChild(fill);
+        
+        return progressBar;
+    }
+    
+    /**
+     * Element State Management
+     */
+    
+    /**
+     * Set element to skeleton loading state
+     * @param {HTMLElement} element - Element to convert to skeleton
+     * @param {string} skeletonType - Type of skeleton (text, button, card, etc.)
+     */
+    setElementSkeleton(element, skeletonType = 'text') {
+        if (!element) return;
+        
+        // Store original state
+        if (!element.dataset.originalContent) {
+            element.dataset.originalContent = element.innerHTML;
+            element.dataset.originalClass = element.className;
+        }
+        
+        // Apply skeleton
+        element.className = `${element.dataset.originalClass} skeleton skeleton-${skeletonType}`;
+        element.innerHTML = '';
+    }
+    
+    /**
+     * Remove skeleton loading state
+     * @param {HTMLElement} element - Element to restore
+     */
+    clearElementSkeleton(element) {
+        if (!element) return;
+        
+        // Restore original state
+        if (element.dataset.originalContent) {
+            element.innerHTML = element.dataset.originalContent;
+            element.className = element.dataset.originalClass;
+            
+            // Clean up stored data
+            delete element.dataset.originalContent;
+            delete element.dataset.originalClass;
+        }
+    }
+    
+    /**
+     * Show/hide elements with fade transition
+     * @param {HTMLElement} element - Element to animate
+     * @param {boolean} show - Whether to show or hide
+     * @param {Function} callback - Optional callback when animation completes
+     */
+    fadeElement(element, show, callback = null) {
+        if (!element) return;
+        
+        const animationId = `fade-${Date.now()}`;
+        
+        // Cancel existing animation
+        if (this.animationFrames.has(element)) {
+            cancelAnimationFrame(this.animationFrames.get(element));
+        }
+        
+        if (show) {
+            element.classList.remove('hidden');
+            element.classList.add('fade-enter');
+            
+            const frame = requestAnimationFrame(() => {
+                element.classList.remove('fade-enter');
+                element.classList.add('fade-enter-active');
+                
+                setTimeout(() => {
+                    element.classList.remove('fade-enter-active');
+                    this.animationFrames.delete(element);
+                    if (callback) callback();
+                }, 200);
+            });
+            
+            this.animationFrames.set(element, frame);
+        } else {
+            element.classList.add('fade-exit');
+            
+            const frame = requestAnimationFrame(() => {
+                element.classList.remove('fade-exit');
+                element.classList.add('fade-exit-active');
+                
+                setTimeout(() => {
+                    element.classList.remove('fade-exit-active');
+                    element.classList.add('hidden');
+                    this.animationFrames.delete(element);
+                    if (callback) callback();
+                }, 200);
+            });
+            
+            this.animationFrames.set(element, frame);
+        }
+    }
+    
+    /**
+     * Utility Methods for Loading States
+     */
+    
+    /**
+     * Create spinner element
+     * @param {string} size - Spinner size (sm, md, lg, xl)
+     * @returns {HTMLElement} - Spinner element
+     */
+    createSpinner(size = 'md') {
+        const spinner = document.createElement('div');
+        spinner.className = size === 'md' ? 'spinner' : `spinner spinner-${size}`;
+        return spinner;
+    }
+    
+    /**
+     * Add loading dots animation to text
+     * @param {HTMLElement} element - Text element
+     */
+    addLoadingDots(element) {
+        if (element) {
+            element.classList.add('loading-dots');
+        }
+    }
+    
+    /**
+     * Remove loading dots animation
+     * @param {HTMLElement} element - Text element
+     */
+    removeLoadingDots(element) {
+        if (element) {
+            element.classList.remove('loading-dots');
+        }
+    }
+
+    /**
      * Clean up all timers and animations (call on app destruction)
      */
     cleanup() {
@@ -326,3 +663,4 @@ class UIManager {
 
 // Create and export singleton instance
 const uiManager = new UIManager();
+export default uiManager;
