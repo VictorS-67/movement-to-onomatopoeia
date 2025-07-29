@@ -661,6 +661,5 @@ class UIManager {
     }
 }
 
-// Create and export singleton instance
+// Create singleton instance for global use
 const uiManager = new UIManager();
-export default uiManager;
