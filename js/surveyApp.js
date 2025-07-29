@@ -757,26 +757,26 @@ class SurveyApp extends BaseApp {
     }
 
     showCompletionModal() {
-        // Add completion modal elements to the elements object if not already added
-        if (!this.elements.surveyCompletion) {
-            this.elements.surveyCompletion = DOMUtils.getElement("surveyCompletion");
-            this.elements.startReasoningButton = DOMUtils.getElement("startReasoningButton");
-            
-            // Set up event listener for the reasoning button
-            if (this.elements.startReasoningButton) {
-                this.elements.startReasoningButton.addEventListener('click', () => {
-                    this.startReasoningPhase();
-                });
+        // Use the new modal manager for consistent behavior and animations
+        modalManager.showModal('surveyCompletion', {
+            onOpen: () => {
+                // Update button text when modal opens
+                const continueButton = document.getElementById('startReasoningButton');
+                if (continueButton && !continueButton.dataset.listenerAttached) {
+                    continueButton.textContent = langManager.getText('survey.continue_to_reasoning');
+                    continueButton.addEventListener('click', () => {
+                        this.startReasoningPhase();
+                    });
+                    continueButton.dataset.listenerAttached = 'true';
+                }
             }
-        }
-        
-        // Show the completion modal
-        if (this.elements.surveyCompletion) {
-            this.elements.surveyCompletion.style.display = 'flex';
-        }
+        });
     }
 
     startReasoningPhase() {
+        // Hide the completion modal first
+        modalManager.hideModal('surveyCompletion');
+        
         // Store current completion state
         localStorage.setItem("surveyCompleted", "true");
         

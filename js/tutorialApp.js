@@ -258,20 +258,27 @@ class TutorialApp extends BaseApp {
             this.elements.tutorialOverlay.classList.add('hidden');
         }
         
-        // Show welcome modal
-        if (this.elements.tutorialWelcome) {
-            this.elements.tutorialWelcome.style.display = 'flex';
-        }
+        // Use the new modal manager for consistent behavior and animations
+        modalManager.showModal('tutorialWelcome', {
+            onOpen: () => {
+                // Set up the begin tutorial button when modal opens
+                const beginButton = document.getElementById('beginTutorialButton');
+                if (beginButton && !beginButton.dataset.listenerAttached) {
+                    beginButton.addEventListener('click', () => {
+                        this.startTutorialFromWelcome();
+                    });
+                    beginButton.dataset.listenerAttached = 'true';
+                }
+            }
+        });
     }
 
     startTutorialFromWelcome() {
-        // Hide welcome modal
-        if (this.elements.tutorialWelcome) {
-            this.elements.tutorialWelcome.style.display = 'none';
-        }
-        
-        // Start the actual tutorial
-        this.startTutorial();
+        // Hide welcome modal using modal manager
+        modalManager.hideModal('tutorialWelcome').then(() => {
+            // Start the actual tutorial after modal is hidden
+            this.startTutorial();
+        });
     }
 
     startTutorial() {
@@ -648,18 +655,30 @@ class TutorialApp extends BaseApp {
         this.clearTutorialHighlights();
         // Note: Removed tutorial-active class removal as it's no longer added
         
-        // Show completion modal
-        if (this.elements.tutorialCompletion) {
-            this.elements.tutorialCompletion.style.display = 'flex';
-        }
+        // Use the new modal manager for consistent behavior and animations
+        modalManager.showModal('tutorialCompletion', {
+            onOpen: () => {
+                // Set up the start survey button when modal opens
+                const startSurveyButton = document.getElementById('startSurveyButton');
+                if (startSurveyButton && !startSurveyButton.dataset.listenerAttached) {
+                    startSurveyButton.addEventListener('click', () => {
+                        this.completeTutorialAndStartSurvey();
+                    });
+                    startSurveyButton.dataset.listenerAttached = 'true';
+                }
+            }
+        });
     }
 
     completeTutorialAndStartSurvey() {
-        // Clear tutorial data
-        this.tutorialData = [];
-        
-        // Redirect to survey
-        window.location.href = "survey.html";
+        // Hide completion modal first
+        modalManager.hideModal('tutorialCompletion').then(() => {
+            // Clear tutorial data
+            this.tutorialData = [];
+            
+            // Redirect to survey
+            window.location.href = "survey.html";
+        });
     }
     
     // Cleanup method for tutorial app

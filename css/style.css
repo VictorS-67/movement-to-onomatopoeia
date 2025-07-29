@@ -470,6 +470,33 @@ body {
     justify-content: center;
     align-items: center;
     z-index: 1000;
+    opacity: 0;
+    transform: scale(0.7);
+    transition: opacity var(--transition-duration) ease, transform var(--transition-duration) ease;
+}
+
+.modal-overlay.modal-animating {
+    pointer-events: none;
+}
+
+/* Modal Sizes */
+.modal-small .modal-content {
+    max-width: 400px;
+}
+
+.modal-medium .modal-content {
+    max-width: 600px;
+}
+
+.modal-large .modal-content {
+    max-width: 800px;
+}
+
+.modal-fullscreen .modal-content {
+    max-width: 95vw;
+    max-height: 95vh;
+    width: 95vw;
+    height: 95vh;
 }
 
 .modal-content {
@@ -478,25 +505,111 @@ body {
     padding: 2rem;
     max-width: 500px;
     width: 90%;
+    max-height: 90vh;
     text-align: center;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative;
+    overflow-y: auto;
+    outline: none;
 }
 
-.modal-content h2 {
+.modal-title {
     color: var(--text-primary);
     font-size: 1.5rem;
     font-weight: 600;
     margin-bottom: 1rem;
+    margin-top: 0;
 }
 
-.modal-content p {
+.modal-body {
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 1.5rem;
 }
 
-.modal-content .button {
-    min-width: 150px;
+.modal-body p {
+    margin-bottom: 1rem;
+}
+
+.modal-body p:last-child {
+    margin-bottom: 0;
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.modal-buttons .button {
+    min-width: 120px;
+    margin: 0;
+}
+
+/* Close button for modals */
+.modal-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: var(--text-secondary);
+    padding: 0.25rem;
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color var(--transition-duration) ease, color var(--transition-duration) ease;
+}
+
+.modal-close:hover {
+    background-color: var(--bg-light);
+    color: var(--text-primary);
+}
+
+/* Modal animations */
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes modalFadeOut {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+}
+
+/* Responsive modal adjustments */
+@media (max-width: 768px) {
+    .modal-content {
+        padding: 1.5rem;
+        width: 95%;
+        max-height: 95vh;
+    }
+    
+    .modal-buttons {
+        flex-direction: column;
+    }
+    
+    .modal-buttons .button {
+        width: 100%;
+    }
 }
 
 /* Reasoning Page Styles */
