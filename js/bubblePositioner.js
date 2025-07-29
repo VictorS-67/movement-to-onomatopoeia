@@ -302,7 +302,7 @@ class BubblePositioner {
     static getStepPositioningPreferences(stepNumber) {
         const stepPreferences = {
             1: ['below', 'right', 'left', 'above'], // Language selector - below preferred
-            2: ['above', 'below', 'right', 'left'], // Video player - above preferred
+            2: ['right', 'left', 'above', 'below'], // Video player - side preferred
             3: ['above', 'below', 'right', 'left'], // Video timeline
             4: ['right', 'left', 'below', 'above'], // Yes button - right preferred
             5: ['above', 'below', 'right', 'left'], // Input field - above preferred
