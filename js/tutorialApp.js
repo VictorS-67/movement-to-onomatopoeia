@@ -10,7 +10,7 @@ class TutorialApp extends BaseApp {
         this.scrollTimeout = null; // For debouncing scroll-triggered repositioning
         
         // Initialize tutorial step manager
-        this.stepManager = new TutorialStepManager(13);
+        this.stepManager = new TutorialStepManager(10);
     }
 
     initializeElements() {
@@ -475,10 +475,7 @@ class TutorialApp extends BaseApp {
             7: { title: 'tutorial.step7_title', text: 'tutorial.step7_text', instruction: 'tutorial.step7_instruction', required: true },
             8: { title: 'tutorial.step8_title', text: 'tutorial.step8_text', instruction: 'tutorial.step8_instruction', required: false },
             9: { title: 'tutorial.step9_title', text: 'tutorial.step9_text', instruction: 'tutorial.step9_instruction', required: true },
-            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', instruction: 'tutorial.step10_instruction', required: true },
-            11: { title: 'tutorial.step11_title', text: 'tutorial.step11_text', instruction: 'tutorial.step11_instruction', required: false },
-            12: { title: 'tutorial.step12_title', text: 'tutorial.step12_text', instruction: 'tutorial.step12_instruction', required: true },
-            13: { title: 'tutorial.step13_title', text: 'tutorial.step13_text', instruction: 'tutorial.step13_instruction', required: false }
+            10: { title: 'tutorial.step10_title', text: 'tutorial.step10_text', instruction: 'tutorial.step10_instruction', required: false }
         };
         
         const stepData = stepKeys[step];

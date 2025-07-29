@@ -269,10 +269,7 @@ class BubblePositioner {
             7: elements.getEnd, // End time button
             8: elements.audioRecord, // Audio record button
             9: elements.saveOnomatopoeiaButton, // Save button
-            10: elements.hasOnomatopoeiaButtonNo, // No button
-            11: elements.videoButtons, // Video buttons
-            12: elements.hasOnomatopoeiaButtonNo, // No button again for step 12
-            13: elements.videoButtons // Step 13: Point at video buttons to show color change
+            10: elements.videoButtons // Video buttons colors explanation
         };
     }
 
@@ -310,10 +307,7 @@ class BubblePositioner {
             7: ['right', 'left', 'below', 'above'], // End time button
             8: ['above', 'right', 'left', 'below'], // Audio record button
             9: ['above', 'right', 'left', 'below'], // Save button - above preferred
-            10: ['right', 'left', 'below', 'above'], // No button
-            11: ['above', 'below', 'right', 'left'], // Video buttons
-            12: ['right', 'left', 'below', 'above'], // No button again
-            13: ['above', 'below', 'right', 'left']  // Video buttons final
+            10: ['above', 'below', 'right', 'left'] // Video buttons colors explanation
         };
 
         return stepPreferences[stepNumber] || ['right', 'left', 'below', 'above'];
