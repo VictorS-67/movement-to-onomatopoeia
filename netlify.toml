@@ -1,5 +1,7 @@
 [build]
   functions = "netlify/functions"
+  command = "npm run build"
+  publish = "."
 
 [functions]
   node_bundler = "esbuild"
@@ -11,6 +13,11 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/lib/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
 
 [[headers]]
   for = "/videos/*"

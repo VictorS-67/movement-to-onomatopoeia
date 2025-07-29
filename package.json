@@ -10,7 +10,8 @@
   "devDependencies": {},
   "scripts": {
     "dev": "python3 -m http.server 8080",
-    "build": "echo 'No build step required'"
+    "build": "mkdir -p lib && cp node_modules/date-fns/index.js lib/date-fns.js && cp node_modules/swiper/swiper-bundle.min.js lib/swiper.js && cp node_modules/swiper/swiper-bundle.min.css lib/swiper.css",
+    "postinstall": "npm run build"
   },
   "keywords": [
     "onomatopoeia",
@@ -19,6 +20,6 @@
     "google-sheets",
     "audio-recording"
   ],
-  "author": "",
+  "author": "VictorS67",
   "license": "MIT"
 }
