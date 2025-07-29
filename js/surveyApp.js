@@ -282,7 +282,6 @@ class SurveyApp extends BaseApp {
 
     // Handle audio service state changes
     handleAudioStateChange(state, audioState) {
-        console.log('Audio state changed to:', state);
         switch (state) {
             case 'READY':
                 this.updateAudioUIInitial();
@@ -412,8 +411,6 @@ class SurveyApp extends BaseApp {
     }
 
     showOnomatopoeiaInput() {
-        console.log('showOnomatopoeiaInput called');
-        
         // Clear any existing messages when starting to input onomatopoeia
         if (this.elements.messageDisplay) {
             uiManager.clearMessage(this.elements.messageDisplay);
@@ -424,11 +421,9 @@ class SurveyApp extends BaseApp {
         }
         if (this.elements.inputVisibility) {
             this.elements.inputVisibility.style.display = "block";
-            console.log('inputVisibility set to block');
         }
         
-        // Ensure audio UI is properly initialized when showing input
-        console.log('Calling deleteRecording to reset audio state');
+        // Ensure audio UI is properly reset when showing input
         audioRecordingService.deleteRecording();
     }
 
@@ -540,6 +535,14 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIAfterRecording() {
+        // Clear loading states for buttons that will become visible
+        if (this.elements.audioPlay) {
+            this.stopButtonLoading(this.elements.audioPlay);
+        }
+        if (this.elements.audioDelete) {
+            this.stopButtonLoading(this.elements.audioDelete);
+        }
+        
         uiManager.updateVisibility(this.elements, {
             audioRecord: false,
             audioStop: false,
@@ -565,49 +568,33 @@ class SurveyApp extends BaseApp {
     }
 
     updateAudioUIInitial() {
-        console.log('Updating audio UI to initial state');
-        console.log('Audio elements:', {
-            audioRecord: !!this.elements.audioRecord,
-            audioStop: !!this.elements.audioStop,
-            audioPlay: !!this.elements.audioPlay,
-            audioDelete: !!this.elements.audioDelete
-        });
-        
-        uiManager.updateVisibility(this.elements, {
-            audioRecord: true,
-            audioStop: false,
-            audioPlay: false,
-            audioDelete: false
-        });
+        // Clear any loading states on all audio buttons first
+        if (this.elements.audioRecord) {
+            this.stopButtonLoading(this.elements.audioRecord);
+            this.elements.audioRecord.style.setProperty('display', 'block', 'important');
+            this.elements.audioRecord.style.setProperty('visibility', 'visible', 'important');
+            this.elements.audioRecord.style.setProperty('opacity', '1', 'important');
+        }
+        if (this.elements.audioStop) {
+            this.stopButtonLoading(this.elements.audioStop);
+            this.elements.audioStop.style.setProperty('display', 'none', 'important');
+        }
+        if (this.elements.audioPlay) {
+            this.stopButtonLoading(this.elements.audioPlay);
+            this.elements.audioPlay.style.setProperty('display', 'none', 'important');
+        }
+        if (this.elements.audioDelete) {
+            this.stopButtonLoading(this.elements.audioDelete);
+            this.elements.audioDelete.style.setProperty('display', 'none', 'important');
+        }
         
         if (this.elements.audioStatus) this.elements.audioStatus.textContent = langManager.getText('survey.audio_status_ready');
         if (this.elements.audioWaveform) {
             this.elements.audioWaveform.style.display = 'none';
             this.elements.audioWaveform.classList.remove('audio-recording', 'audio-playing');
         }
-        
-        // Detailed debugging
-        if (this.elements.audioRecord) {
-            const recordBtn = this.elements.audioRecord;
-            console.log('Audio record button display after update:', recordBtn.style.display);
-            console.log('Audio record button computed style:', window.getComputedStyle(recordBtn).display);
-            console.log('Audio record button visibility:', window.getComputedStyle(recordBtn).visibility);
-            console.log('Audio record button opacity:', window.getComputedStyle(recordBtn).opacity);
-            
-            // Check parent containers
-            let parent = recordBtn.parentElement;
-            let level = 0;
-            while (parent && level < 5) {
-                console.log(`Parent ${level} (${parent.tagName}${parent.id ? '#' + parent.id : ''}):`, {
-                    display: window.getComputedStyle(parent).display,
-                    visibility: window.getComputedStyle(parent).visibility,
-                    opacity: window.getComputedStyle(parent).opacity
-                });
-                parent = parent.parentElement;
-                level++;
-            }
-        }
     }
+
 
     // Survey-specific helper methods
     resetDisplay(currentVideoName, filteredData, docElts) {
