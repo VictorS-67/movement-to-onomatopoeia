@@ -19,8 +19,8 @@ class VideoManager {
     // Unified video loading logic
     async loadVideos(config) {
         try {
-            // Load selected videos using existing utility
-            await loadSelectedVideos(config.spreadsheetId, config.videoSheet, this.videoButtons);
+            // Load selected videos from Google Sheets
+            await this.loadSelectedVideos(config.spreadsheetId, config.videoSheet, this.videoButtons);
             
             // Set up initial video
             this.setupInitialVideo();
@@ -34,6 +34,62 @@ class VideoManager {
             console.error('Error loading videos:', error);
             throw error;
         }
+    }
+
+    // Load selected videos from the Google Sheet
+    async loadSelectedVideos(spreadsheetId, sheetName, videoButtonsContainer) {
+        try {
+            // Use GoogleSheetsService to get video data
+            const sheetsService = new GoogleSheetsService();
+            const selectedVideosData = await sheetsService.getSheetData(spreadsheetId, sheetName);
+            
+            if (!selectedVideosData || selectedVideosData.length === 0) {
+                throw new Error(`No data found in ${sheetName} sheet`);
+            }
+            
+            // Extract video names (skip header row if present)
+            const videoNames = selectedVideosData.slice(1).map(row => row[0]).filter(name => name);
+            
+            // Sort videos alphabetically and add .mp4 extension
+            const videoNamesWithExtension = videoNames
+                .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+                .map(name => `${name}.mp4`);
+
+            this.createVideoButtons(videoNamesWithExtension, videoButtonsContainer);
+        } catch (error) {
+            console.error("Error loading selected videos:", error);
+            // Fallback to default videos if sheet reading fails
+            console.log("Falling back to default videos");
+            this.createVideoButtons(['1.mp4', '2.mp4', '3.mp4'], videoButtonsContainer);
+        }
+    }
+
+    // Reusable function to create video buttons
+    createVideoButtons(videoNames, container) {
+        if (!container) {
+            console.error('Video button container not found');
+            return;
+        }
+        
+        // Clear existing buttons
+        container.innerHTML = '';
+        
+        videoNames.forEach((videoName, index) => {
+            const button = document.createElement('button');
+            button.className = 'video-button';
+            button.dataset.video = `videos/${videoName}`;
+            
+            // Extract just the video number/name for display
+            const displayName = videoName.replace('.mp4', '');
+            button.textContent = displayName;
+            
+            // Mark first button as active by default
+            if (index === 0) {
+                button.classList.add('active');
+            }
+            
+            container.appendChild(button);
+        });
     }
 
     // Unified initial video setup

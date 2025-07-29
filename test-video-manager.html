@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VideoManager Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>VideoManager Test</h1>
+        
+        <!-- Video section -->
+        <div class="video-container">
+            <video id="myVideo" controls>
+                <span>Your browser does not support the video tag.</span>
+            </video>
+        </div>
+        
+        <!-- Video Selection Buttons -->
+        <div class="video-buttons-container">
+            <h3>Select a video:</h3>
+            <div id="videoButtons" class="video-buttons">
+                <!-- Buttons will be populated here -->
+            </div>
+        </div>
+        
+        <div id="message"></div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/googleApi.js"></script>
+    <script src="js/googleSheetsService.js"></script>
+    <script src="js/videoManager.js"></script>
+    <script>
+        // Test VideoManager functionality
+        async function testVideoManager() {
+            try {
+                const videoPlayer = document.getElementById('myVideo');
+                const videoButtons = document.getElementById('videoButtons');
+                const messageElement = document.getElementById('message');
+                
+                const videoManager = new VideoManager(videoPlayer, videoButtons);
+                
+                // Test with mock config (will fall back to default videos)
+                const mockConfig = {
+                    spreadsheetId: 'test-id',
+                    videoSheet: 'SelectedVideos'
+                };
+                
+                messageElement.textContent = 'Loading videos...';
+                await videoManager.loadVideos(mockConfig);
+                messageElement.textContent = 'Videos loaded successfully!';
+                
+            } catch (error) {
+                console.error('Test failed:', error);
+                document.getElementById('message').textContent = `Error: ${error.message}`;
+            }
+        }
+        
+        // Run test when page loads
+        document.addEventListener('DOMContentLoaded', testVideoManager);
+    </script>
+</body>
+</html>
