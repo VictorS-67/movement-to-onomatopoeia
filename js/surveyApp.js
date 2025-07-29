@@ -586,7 +586,27 @@ class SurveyApp extends BaseApp {
             this.elements.audioWaveform.classList.remove('audio-recording', 'audio-playing');
         }
         
-        console.log('Audio record button display after update:', this.elements.audioRecord?.style.display);
+        // Detailed debugging
+        if (this.elements.audioRecord) {
+            const recordBtn = this.elements.audioRecord;
+            console.log('Audio record button display after update:', recordBtn.style.display);
+            console.log('Audio record button computed style:', window.getComputedStyle(recordBtn).display);
+            console.log('Audio record button visibility:', window.getComputedStyle(recordBtn).visibility);
+            console.log('Audio record button opacity:', window.getComputedStyle(recordBtn).opacity);
+            
+            // Check parent containers
+            let parent = recordBtn.parentElement;
+            let level = 0;
+            while (parent && level < 5) {
+                console.log(`Parent ${level} (${parent.tagName}${parent.id ? '#' + parent.id : ''}):`, {
+                    display: window.getComputedStyle(parent).display,
+                    visibility: window.getComputedStyle(parent).visibility,
+                    opacity: window.getComputedStyle(parent).opacity
+                });
+                parent = parent.parentElement;
+                level++;
+            }
+        }
     }
 
     // Survey-specific helper methods
