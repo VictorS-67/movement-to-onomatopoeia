@@ -193,10 +193,8 @@ class ReasoningApp extends BaseApp {
         // Set up common event listeners from base class
         this.setupCommonEventListeners();
 
-        // Video button interactions (read-only)
-        if (this.elements.videoButtons) {
-            this.elements.videoButtons.addEventListener('click', this.handleVideoButtonClick.bind(this));
-        }
+        // Video button interactions are handled by VideoManager
+        // No need to set up manual event listeners
 
         // Carousel navigation
         if (this.elements.prevOnomatopoeia) {
