@@ -666,9 +666,7 @@ class TutorialApp extends BaseApp {
     // Cleanup method for tutorial app
     performAdditionalLogoutCleanup() {
         // Clean up UI manager resources
-        if (typeof uiManager !== 'undefined') {
-            uiManager.cleanup();
-        }
+        uiManager.cleanup();
         
         // Clear any scroll timeouts
         if (this.scrollTimeout) {
