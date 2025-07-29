@@ -130,6 +130,9 @@ class SurveyApp extends BaseApp {
             uiManager.clearMessage(this.elements.messageDisplay);
         }
         
+        // Reset audio recording state when changing videos
+        audioRecordingService.deleteRecording();
+        
         // Reset display for the new video
         this.resetDisplayForCurrentVideo();
         
@@ -404,7 +407,7 @@ class SurveyApp extends BaseApp {
         };
         
         this.resetDisplay(this.currentVideoName, this.filteredData, docElts);
-        audioRecordingService.reset();
+        // Note: audio recording is now reset in onVideoChange to avoid stale state issues
     }
 
     showOnomatopoeiaInput() {
