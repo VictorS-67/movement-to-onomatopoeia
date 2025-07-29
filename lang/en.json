@@ -118,6 +118,7 @@
         "show_introduction": "Show Introduction",
         "hide_introduction": "Hide Introduction",
         "completion_title": "Congratulations!",
+        "continue_to_reasoning": "Continue to Reasoning",
         "save_error": "Failed to save response. Please try again.",
         "audio_start_error": "Failed to start recording. Please check your microphone.",
         "audio_stop_error": "Failed to stop recording. Please try again."

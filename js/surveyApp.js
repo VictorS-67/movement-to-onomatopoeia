@@ -315,7 +315,7 @@ class SurveyApp extends BaseApp {
             case 'GENERIC_ERROR':
             case 'PLAYBACK_ERROR':
             default:
-                this.elements.audioStatus.textContent = langManager.getText('survey.audio_error_generic');
+                this.elements.audioStatus.textContent = langManager.getText('survey.audio_recording_error');
                 break;
         }
     }

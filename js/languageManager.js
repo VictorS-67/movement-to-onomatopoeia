@@ -113,6 +113,14 @@ class LanguageManager {
             this.updateElement('endTimeLabel', t.survey.end_time_label);
             this.updateElement('saveOnomatopoeia', t.survey.save_button);
             
+            // Update audio elements
+            this.updateElement('audioSectionTitle', t.survey.audio_section_title);
+            this.updateElement('audioRecord', t.survey.audio_record_button);
+            this.updateElement('audioStop', t.survey.audio_stop_button);
+            this.updateElement('audioPlay', t.survey.audio_play_button);
+            this.updateElement('audioDelete', t.survey.audio_delete_button);
+            this.updateElement('audioStatus', t.survey.audio_status_ready);
+            
             // Update completion modal elements (if they exist)
             this.updateElement('surveyCompletionTitle', t.survey.completion_title);
             this.updateElement('surveyCompletionText', t.survey.completion_text);
