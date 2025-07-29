@@ -224,18 +224,13 @@ After the initial refactoring, we identified and removed additional redundant wr
 
 ## Next Steps (Future Phases)
 
-### Phase 5: Event Handler Unification
-- Create consistent event handling patterns across apps
-- Standardize form submission and user interaction handling
-- Improve keyboard navigation and accessibility
-
-### Phase 6: External Library Integration
-- **PapaParse**: For robust CSV processing (replace remaining manual parsing)
+### Phase 5: External Library Integration
 - **date-fns**: For better date/time handling and localization
-- **SwiperJS**: For professional carousel functionality in reasoning page
+- **SwiperJS**: For professional carousel functionality in reasoning page  
 - **RecordRTC**: Evaluate for enhanced audio recording capabilities
+- ~~**PapaParse**: Not needed - CSV parsing was removed in previous phases~~
 
-### Phase 7: Audio Recording Consolidation  
+### Phase 6: Audio Recording Consolidation  
 - Create unified AudioRecordingService
 - Standardize audio upload and playback functionality
 - Improve browser compatibility and error handling
