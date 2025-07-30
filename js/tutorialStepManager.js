@@ -3,7 +3,7 @@
  * Extracted from tutorialApp.js to provide cleaner step management
  */
 class TutorialStepManager {
-    constructor(totalSteps = 13) {
+    constructor(totalSteps = 10) {
         this.totalSteps = totalSteps;
         this.currentStep = 1;
         this.stepValidation = {};
@@ -19,10 +19,7 @@ class TutorialStepManager {
             7: { type: 'action', required: true, autoAdvance: true, validation: 'clicked_end_time' },
             8: { type: 'info', required: false, autoAdvance: false },
             9: { type: 'action', required: true, autoAdvance: true, validation: 'clicked_save' },
-            10: { type: 'action', required: true, autoAdvance: true, validation: 'clicked_no' },
-            11: { type: 'info', required: false, autoAdvance: false },
-            12: { type: 'action', required: true, autoAdvance: true, validation: 'clicked_no' },
-            13: { type: 'completion', required: false, autoAdvance: false }
+            10: { type: 'completion', required: false, autoAdvance: false }
         };
 
         // Define required action messages for user feedback
@@ -33,7 +30,6 @@ class TutorialStepManager {
             6: "Please click the 'Get Start Time' button to continue.",
             7: "Please click the 'Get End Time' button to continue.",
             9: "Please click the 'Save Onomatopoeia' button to continue.",
-            10: "Please click the 'No' button to continue.",
             12: "Please click the 'No' button to continue."
         };
 
@@ -51,8 +47,7 @@ class TutorialStepManager {
             entered_text: false,
             clicked_start_time: false,
             clicked_end_time: false,
-            clicked_save: false,
-            clicked_no: false
+            clicked_save: false
         };
     }
 

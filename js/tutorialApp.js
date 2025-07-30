@@ -134,7 +134,6 @@ class TutorialApp extends BaseApp {
 
         if (this.elements.hasOnomatopoeiaButtonNo) {
             this.elements.hasOnomatopoeiaButtonNo.addEventListener('click', () => {
-                this.checkStepValidation('clicked_no');
                 this.handleNoOnomatopoeia();
             });
         }
@@ -328,8 +327,7 @@ class TutorialApp extends BaseApp {
             6: () => this.stepValidation.clicked_start_time, // Must click start time
             7: () => this.stepValidation.clicked_end_time, // Must click end time
             9: () => this.stepValidation.clicked_save, // Must click save
-            10: () => this.stepValidation.clicked_no, // Must click No
-            // Steps 1, 3, 8, 11 have no requirements
+            // Steps 1, 3, 8, 10 have no requirements
         };
         
         if (requirements[step]) {

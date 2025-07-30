@@ -2,7 +2,7 @@
 
 // Utility function to get current timestamp in ISO format
 function obtainDate() {
-    return new Date().toISOString();
+    return new Date().toISOString().split('.')[0] + 'Z';
 }
 
 // Configuration manager for common app settings (Singleton pattern)
