@@ -98,7 +98,7 @@
         "error_saving_sheet": "シートへのデータ保存に失敗しました。",
         "success_saved": "オノマトペと開始・終了時間が保存されました！",
         "success_saved_with_audio": "オノマトペ、タイミング、音声が保存されました！",
-        "all_videos_complete": "すべての動画が終了しました。ご参加いただきありがとうございました！",
+        "all_videos_complete": "すべての動画が終了しました。",
         "audio_section_title": "4) オプション：オノマトペを発音した音声を録音",
         "audio_record_button": "録音開始",
         "audio_stop_button": "録音停止",
