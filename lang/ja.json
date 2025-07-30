@@ -42,6 +42,8 @@
         "movement_practice_label": "ムーブメントの実践（任意）：",
         "movement_practice_placeholder": "例：ダンス、ソマティクス、マニュアルセラピー、動作分析...",
         "native_language_label": "母語：",
+        "other_language_label": "言語を指定してください：",
+        "other_language_placeholder": "母語を入力してください",
         "native_language_options": {
             "placeholder": "選択してください...",
             "japanese": "日本語",
@@ -63,7 +65,8 @@
         "error_name_required": "お名前を入力してください。",
         "error_invalid_age": "有効な年齢（1-149歳）を入力してください。",
         "error_gender_required": "性別を選択してください。",
-        "error_language_required": "母語を選択してください。"
+        "error_language_required": "母語を選択してください。",
+        "error_other_language_required": "母語を指定してください。"
     },
     "survey": {
         "page_title": "オノマトペを使った動作の描写",

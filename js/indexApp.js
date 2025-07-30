@@ -17,6 +17,8 @@ class IndexApp extends BaseApp {
             genderInput: DOMUtils.getElement("genderInput"),
             movementPracticeInput: DOMUtils.getElement("movementPracticeInput"),
             nativeLanguageInput: DOMUtils.getElement("nativeLanguageInput"),
+            otherLanguageContainer: DOMUtils.getElement("otherLanguageContainer"),
+            otherLanguageInput: DOMUtils.getElement("otherLanguageInput"),
             messageDisplay: DOMUtils.getElement("message")
         };
     }
@@ -41,6 +43,11 @@ class IndexApp extends BaseApp {
         // Participant form submission
         if (this.elements.participantForm) {
             this.elements.participantForm.addEventListener("submit", this.handleParticipantSubmit.bind(this));
+        }
+
+        // Native language dropdown change
+        if (this.elements.nativeLanguageInput) {
+            this.elements.nativeLanguageInput.addEventListener("change", this.handleLanguageChange.bind(this));
         }
     }
 
@@ -143,6 +150,10 @@ class IndexApp extends BaseApp {
         const gender = this.elements.genderInput.value;
         const movementPractice = ValidationUtils.sanitizeInput(this.elements.movementPracticeInput.value);
         const nativeLanguage = this.elements.nativeLanguageInput.value;
+        const otherLanguage = ValidationUtils.sanitizeInput(this.elements.otherLanguageInput.value);
+
+        // Determine the final native language value
+        const finalNativeLanguage = nativeLanguage === 'Other' ? otherLanguage : nativeLanguage;
 
         // Validate required fields
         if (!ValidationUtils.isValidEmail(email)) {
@@ -170,14 +181,35 @@ class IndexApp extends BaseApp {
             return null;
         }
 
+        // If "Other" is selected, validate the custom language input
+        if (nativeLanguage === 'Other' && !ValidationUtils.isRequired(otherLanguage)) {
+            uiManager.showError(this.elements.messageDisplay, langManager.getText('ui.error_other_language_required') || 'Please specify your native language.');
+            return null;
+        }
+
         return {
             email,
             name,
             age: parseInt(age),
             gender,
             movementPractice,
-            nativeLanguage
+            nativeLanguage: finalNativeLanguage
         };
+    }
+
+    handleLanguageChange() {
+        const selectedLanguage = this.elements.nativeLanguageInput.value;
+        const otherContainer = this.elements.otherLanguageContainer;
+        const otherInput = this.elements.otherLanguageInput;
+        
+        if (selectedLanguage === 'Other') {
+            otherContainer.style.display = 'block';
+            otherInput.required = true;
+        } else {
+            otherContainer.style.display = 'none';
+            otherInput.required = false;
+            otherInput.value = ''; // Clear the input when hidden
+        }
     }
 }
 

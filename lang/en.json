@@ -38,6 +38,8 @@
         "movement_practice_label": "Your movement practice (optional):",
         "movement_practice_placeholder": "e.g., dance, somatics, manual therapy, movement analysis...",
         "native_language_label": "Your native language:",
+        "other_language_label": "Please specify your language:",
+        "other_language_placeholder": "Enter your native language",
         "native_language_options": {
             "placeholder": "Please select...",
             "japanese": "Japanese",
@@ -68,7 +70,8 @@
         "error_name_required": "Please enter your name.",
         "error_invalid_age": "Please enter a valid age (1-149).",
         "error_gender_required": "Please select your gender.",
-        "error_language_required": "Please select your native language."
+        "error_language_required": "Please select your native language.",
+        "error_other_language_required": "Please specify your native language."
     },
     "survey": {
         "page_title": "Movement description using onomatopoeia",
