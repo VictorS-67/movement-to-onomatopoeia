@@ -16,10 +16,7 @@ class CarouselManager {
             slidesPerView: 1,
             spaceBetween: 0, // Set to 0 to prevent spacing issues
             centeredSlides: true, // Ensure slides are properly centered
-            navigation: {
-                nextEl: '.swiper-button-next',
-                prevEl: '.swiper-button-prev',
-            },
+            navigation: false, // Disable automatic navigation to prevent conflicts
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -65,6 +62,9 @@ class CarouselManager {
         try {
             this.swiper = new Swiper(containerSelector, finalOptions);
             this.currentSlideCallback = onSlideChange;
+            
+            // Manually set up navigation buttons to prevent double-clicking issues
+            this.setupNavigationButtons(containerSelector);
             
             console.log('Carousel initialized successfully');
             console.log('Swiper slides count:', this.swiper.slides ? this.swiper.slides.length : 'undefined');
@@ -217,6 +217,35 @@ class CarouselManager {
         if (this.swiper) {
             this.swiper.update();
             this.updateVisibility(this.getTotalSlides() > 0);
+        }
+    }
+
+    /**
+     * Manually set up navigation buttons to avoid conflicts
+     */
+    setupNavigationButtons(containerSelector) {
+        const container = document.querySelector(containerSelector);
+        if (!container) return;
+
+        const nextButton = container.querySelector('.swiper-button-next');
+        const prevButton = container.querySelector('.swiper-button-prev');
+
+        if (nextButton) {
+            nextButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Manual next button clicked');
+                this.slideNext();
+            });
+        }
+
+        if (prevButton) {
+            prevButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Manual prev button clicked');
+                this.slidePrev();
+            });
         }
     }
 }
