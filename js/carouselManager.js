@@ -36,8 +36,11 @@ class CarouselManager {
                 lastSlideMessage: 'This is the last onomatopoeia',
             },
             on: {
-                slideChange: (swiper) => {
+                slideChangeTransitionEnd: (swiper) => {
+                    // Use slideChangeTransitionEnd instead of slideChange to avoid double triggering
+                    console.log('CarouselManager slideChangeTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
                     if (onSlideChange) {
+                        console.log('Calling onSlideChange callback with index:', swiper.activeIndex);
                         onSlideChange(swiper.activeIndex);
                     }
                 }
