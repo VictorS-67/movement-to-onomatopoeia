@@ -111,7 +111,7 @@ class ReasoningApp extends BaseApp {
         
         // Re-render onomatopoeia entries to update translations
         if (this.allOnomatopoeiaEntries.length > 0) {
-            this.renderOnomatopoeiaEntries();
+            this.displayAllOnomatopoeiaInCarousel();
         }
     }
 
