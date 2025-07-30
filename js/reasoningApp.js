@@ -141,12 +141,16 @@ class ReasoningApp extends BaseApp {
                 uiManager.clearMessage(this.elements.messageDisplay);
             }
             
-            console.log(`Switched to video: ${this.currentVideoName} for onomatopoeia: ${currentEntry.onomatopoeia}`);
         }
     }
 
     displayAllOnomatopoeiaInCarousel() {
         if (!this.elements.onomatopoeiaList) return;
+
+        console.log('Creating carousel with', this.allOnomatopoeiaEntries.length, 'onomatopoeia entries:');
+        this.allOnomatopoeiaEntries.forEach((item, index) => {
+            console.log(`Entry ${index}: video=${item.video}, onomatopoeia="${item.onomatopoeia}", start=${item.startTime}, end=${item.endTime}`);
+        });
 
         // Clear existing content
         this.elements.onomatopoeiaList.innerHTML = '';
@@ -157,10 +161,16 @@ class ReasoningApp extends BaseApp {
             slide.className = 'swiper-slide';
             slide.innerHTML = this.createReasoningEntryHTML(item, index);
             this.elements.onomatopoeiaList.appendChild(slide);
+            console.log(`Created slide ${index} for onomatopoeia: "${item.onomatopoeia}"`);
         });
 
-        // Initialize the carousel
-        this.initializeCarousel();
+        console.log('Total slides created:', this.elements.onomatopoeiaList.children.length);
+
+        // Use requestAnimationFrame to ensure DOM is updated
+        requestAnimationFrame(() => {
+            // Initialize the carousel
+            this.initializeCarousel();
+        });
         
         // Hide the no onomatopoeia message
         if (this.elements.noOnomatopoeiaMessage) {
@@ -219,7 +229,6 @@ class ReasoningApp extends BaseApp {
             // Update local storage with merged data
             localStorage.setItem("reasoningData", JSON.stringify(this.reasoningData));
             
-            console.log(`Loaded ${sheetReasoningData.length} reasoning entries from Google Sheets`);
             
         } catch (error) {
             console.error('Error loading existing reasoning data from Google Sheets:', error);
@@ -274,7 +283,9 @@ class ReasoningApp extends BaseApp {
     }
 
     initializeCarousel() {
-        console.log('Initializing carousel with', this.allOnomatopoeiaEntries.length, 'entries');
+        console.log('Initializing carousel...');
+        const slidesInDOM = this.elements.onomatopoeiaList.querySelectorAll('.swiper-slide');
+        console.log('Slides found in DOM:', slidesInDOM.length);
         
         const carousel = this.carouselManager.initialize(
             '.onomatopoeia-swiper',
@@ -293,8 +304,11 @@ class ReasoningApp extends BaseApp {
         
         if (carousel) {
             console.log('Carousel initialized successfully');
+            console.log('Carousel slides count:', carousel.slides ? carousel.slides.length : 'undefined');
             // Set up event listeners for all slides after carousel is initialized
-            setTimeout(() => this.setupSlideEventListeners(), 100);
+            requestAnimationFrame(() => {
+                setTimeout(() => this.setupSlideEventListeners(), 50);
+            });
         } else {
             console.error('Failed to initialize carousel');
         }
@@ -399,13 +413,6 @@ class ReasoningApp extends BaseApp {
         }
     }
 
-    // This method is no longer needed since we removed video buttons
-    // and now use a single carousel for all onomatopoeia
-    updateVideoButtonStates() {
-        // Method kept for compatibility but no longer used
-        console.log('updateVideoButtonStates called but not needed in carousel mode');
-    }
-
     createReasoningEntryHTML(onomatopoeiaItem, index) {
         // Find existing reasoning for this onomatopoeia
         const existingReasoning = this.reasoningData.find(reasoning => 
@@ -423,7 +430,7 @@ class ReasoningApp extends BaseApp {
             <div class="reasoning-entry">
                 <div class="onomatopoeia-header">
                     <div class="onomatopoeia-info">
-                        <span class="onomatopoeia-text">"${onomatopoeiaItem.onomatopoeia}"</span>
+                        <span class="onomatopoeia-text">Your onomatopoeia for video ${onomatopoeiaItem.video}: "${onomatopoeiaItem.onomatopoeia}"</span>
                         <span class="time-range">${langManager.getText('reasoning.time_range')
                             .replace('{start}', onomatopoeiaItem.startTime)
                             .replace('{end}', onomatopoeiaItem.endTime)}</span>
@@ -456,14 +463,15 @@ class ReasoningApp extends BaseApp {
         `;
     }
 
-    setupSlideEventListeners() {
+    setupSlideEventListeners() {        
         console.log('Setting up slide event listeners');
         
         // Set up event listeners for all slides in the carousel
         const slides = this.elements.onomatopoeiaList.querySelectorAll('.swiper-slide');
-        console.log('Found', slides.length, 'slides');
+        console.log('Found slides for event listeners:', slides.length);
         
         slides.forEach((slide, slideIndex) => {
+            console.log(`Setting up listeners for slide ${slideIndex}`);
             const showButton = slide.querySelector('.show-button');
             const textarea = slide.querySelector('.reasoning-textarea');
             const saveButton = slide.querySelector('.save-reasoning-button');
@@ -497,6 +505,8 @@ class ReasoningApp extends BaseApp {
                 });
             }
         });
+        
+        console.log('Event listeners setup complete');
     }
 
 }
