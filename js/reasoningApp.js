@@ -81,6 +81,9 @@ class ReasoningApp extends BaseApp {
             // Set up event listeners
             this.setupEventListeners();
 
+            // Initialize translated elements
+            this.initializeTranslatedElements();
+
             // Update participant name display
             this.updateParticipantDisplay();
 
@@ -100,6 +103,9 @@ class ReasoningApp extends BaseApp {
     onLanguageChange() {
         super.onLanguageChange(); // Call base class method
         this.updateProgressDisplay();
+        
+        // Update all translated elements
+        this.initializeTranslatedElements();
         
         // Update introduction toggle button text based on current state
         if (this.elements.toggleIntroduction && this.elements.introductionText) {
@@ -149,11 +155,6 @@ class ReasoningApp extends BaseApp {
                 this.elements.videoPlayer.src = `videos/${this.currentVideoName}`;
                 this.elements.videoPlayer.title = this.currentVideoName;
                 this.elements.videoPlayer.load(); // Reload the video
-            }
-            
-            // Update video title
-            if (this.elements.videoTitle) {
-                this.elements.videoTitle.textContent = `Video: ${this.currentVideoName}`;
             }
             
             // Clear any existing messages when changing videos
@@ -387,7 +388,7 @@ class ReasoningApp extends BaseApp {
             if (saveButton) {
                 saveButton.disabled = true;
                 const originalText = saveButton.textContent;
-                saveButton.textContent = 'Saving...';
+                saveButton.textContent = langManager.getText('reasoning.saving_button');
                 
                 // Re-enable after 2 seconds
                 setTimeout(() => {
@@ -681,6 +682,18 @@ class ReasoningApp extends BaseApp {
             // Re-setup event listeners for the updated slides
             this.setupSlideEventListeners();
         }
+    }
+
+    initializeTranslatedElements() {
+        // Initialize all elements with data-lang attributes
+        const elementsToTranslate = document.querySelectorAll('[data-lang]');
+        elementsToTranslate.forEach(element => {
+            const langKey = element.getAttribute('data-lang');
+            if (langKey) {
+                const translatedText = langManager.getText(langKey);
+                element.textContent = translatedText;
+            }
+        });
     }
 
 }
