@@ -512,9 +512,6 @@ class SurveyApp extends BaseApp {
 
             this.resetDisplayForCurrentVideo();
             
-            // Check if all videos are completed after saving
-            this.checkAndShowCompletionModal();
-            
         } catch (error) {
             console.error('Error saving onomatopoeia:', error);
             this.showError(langManager.getText('survey.save_error') || 'Failed to save response');
@@ -666,6 +663,9 @@ class SurveyApp extends BaseApp {
 
         // Update reasoning button visibility
         this.updateReasoningButtonVisibility();
+        
+        // Check if all videos are completed after updating button states
+        this.checkAndShowCompletionModal();
     }
 
     async saveOnomatopoeia(filteredData, infoDict, spreadsheetId, OnomatopoeiaSheet, messageDisplay, verbose = true) {
