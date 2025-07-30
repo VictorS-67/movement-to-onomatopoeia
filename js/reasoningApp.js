@@ -156,6 +156,21 @@ class ReasoningApp extends BaseApp {
         this.allOnomatopoeiaEntries.forEach((item, index) => {
             const slide = document.createElement('div');
             slide.className = 'swiper-slide';
+            
+            // Check if this entry has existing reasoning
+            const existingReasoning = this.reasoningData.find(reasoning => 
+                reasoning.participantId == this.participantInfo.participantId &&
+                reasoning.video === item.video &&
+                reasoning.onomatopoeia === item.onomatopoeia &&
+                parseFloat(reasoning.startTime) === parseFloat(item.startTime) &&
+                parseFloat(reasoning.endTime) === parseFloat(item.endTime)
+            );
+            
+            // Add visual cue class if reasoning exists
+            if (existingReasoning && existingReasoning.reasoning && existingReasoning.reasoning.trim() !== '') {
+                slide.classList.add('has-reasoning');
+            }
+            
             slide.innerHTML = this.createReasoningEntryHTML(item, index);
             this.elements.onomatopoeiaList.appendChild(slide);
         });
@@ -385,6 +400,16 @@ class ReasoningApp extends BaseApp {
             // Show success message
             if (slideMessage) {
                 this.showSlideMessage(slideMessage, langManager.getText('reasoning.success_saved'), 'success');
+                // After success message disappears, show the saved reasoning
+                setTimeout(() => {
+                    this.showSavedReasoning(slideMessage, reasoningText);
+                }, 3000);
+                
+                // Add visual cue to the current slide
+                const currentSlide = slideMessage.closest('.swiper-slide');
+                if (currentSlide) {
+                    currentSlide.classList.add('has-reasoning');
+                }
             } else {
                 uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('reasoning.success_saved'));
             }
@@ -438,6 +463,16 @@ class ReasoningApp extends BaseApp {
 
         const reasoningText = existingReasoning ? existingReasoning.reasoning : '';
         const charCount = reasoningText.length;
+        
+        // Prepare the saved reasoning message if it exists
+        let savedReasoningMessage = '';
+        if (reasoningText.trim() !== '') {
+            const truncatedReasoning = reasoningText.length > 50 
+                ? reasoningText.substring(0, 50) + '...'
+                : reasoningText;
+            savedReasoningMessage = langManager.getText('reasoning.saved_reasoning')
+                .replace('{reasoning}', truncatedReasoning);
+        }
 
         return `
             <div class="reasoning-entry">
@@ -463,7 +498,7 @@ class ReasoningApp extends BaseApp {
                         data-start="${onomatopoeiaItem.startTime}"
                         data-end="${onomatopoeiaItem.endTime}"
                     >${reasoningText}</textarea>
-                    <div class="slide-message" style="display: none;"></div>
+                    <div class="slide-message ${reasoningText.trim() !== '' ? 'saved-reasoning' : ''}" style="display: ${reasoningText.trim() !== '' ? 'block' : 'none'};">${savedReasoningMessage}</div>
                     <div class="reasoning-actions">
                         <button class="save-reasoning-button" data-index="${index}" ${charCount < 5 ? 'disabled' : ''}>
                             ${langManager.getText('reasoning.save_button')}
@@ -540,6 +575,22 @@ class ReasoningApp extends BaseApp {
         setTimeout(() => {
             messageElement.style.display = 'none';
         }, 3000);
+    }
+
+    showSavedReasoning(messageElement, reasoningText) {
+        if (!messageElement) return;
+        
+        const truncatedReasoning = reasoningText.length > 50 
+            ? reasoningText.substring(0, 50) + '...'
+            : reasoningText;
+            
+        const savedMessage = langManager.getText('reasoning.saved_reasoning')
+            .replace('{reasoning}', truncatedReasoning);
+        
+        messageElement.textContent = savedMessage;
+        messageElement.className = 'slide-message saved-reasoning';
+        messageElement.style.display = 'block';
+        // This message stays visible (no auto-hide)
     }
 
 }
