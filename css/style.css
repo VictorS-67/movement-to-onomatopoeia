@@ -1282,3 +1282,14 @@ body {
         font-size: 2rem;
     }
 }
+
+/* Slide indicator for debugging */
+.slide-indicator {
+    background-color: #f0f0f0;
+    padding: 0.5rem;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #666;
+}

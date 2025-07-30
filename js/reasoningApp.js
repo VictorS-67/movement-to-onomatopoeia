@@ -297,6 +297,13 @@ class ReasoningApp extends BaseApp {
             (slideIndex) => {
                 console.log('Slide changed to index:', slideIndex);
                 this.currentOnomatopoeiaIndex = slideIndex;
+                
+                // Debug: Show which onomatopoeia we're now viewing
+                if (this.allOnomatopoeiaEntries[slideIndex]) {
+                    const currentEntry = this.allOnomatopoeiaEntries[slideIndex];
+                    console.log(`Now viewing: "${currentEntry.onomatopoeia}" from video ${currentEntry.video}`);
+                }
+                
                 // Update video when user swipes to different onomatopoeia
                 this.updateVideoForCurrentOnomatopoeia();
             }
@@ -428,6 +435,7 @@ class ReasoningApp extends BaseApp {
 
         return `
             <div class="reasoning-entry">
+                <div class="slide-indicator">Slide ${index + 1} of ${this.allOnomatopoeiaEntries.length}</div>
                 <div class="onomatopoeia-header">
                     <div class="onomatopoeia-info">
                         <span class="onomatopoeia-text">Your onomatopoeia for video ${onomatopoeiaItem.video}: "${onomatopoeiaItem.onomatopoeia}"</span>

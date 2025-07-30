@@ -40,9 +40,6 @@ class CarouselManager {
                     if (onSlideChange) {
                         onSlideChange(swiper.activeIndex);
                     }
-                    if (this.currentSlideCallback) {
-                        this.currentSlideCallback(swiper.activeIndex);
-                    }
                 }
             }
         };
