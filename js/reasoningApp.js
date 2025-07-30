@@ -33,7 +33,9 @@ class ReasoningApp extends BaseApp {
             nextOnomatopoeia: DOMUtils.getElement("nextOnomatopoeia"),
             onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter"),
             toggleIntroduction: DOMUtils.getElement("toggleIntroduction"),
-            introductionText: DOMUtils.getElement("introductionText")
+            introductionText: DOMUtils.getElement("introductionText"),
+            reasoningCompletionModal: DOMUtils.getElement("reasoningCompletionModal"),
+            stayOnPageButton: DOMUtils.getElement("stayOnPageButton")
         };
     }
 
@@ -256,6 +258,13 @@ class ReasoningApp extends BaseApp {
             });
         }
 
+        // Completion modal "Stay on Page" button
+        if (this.elements.stayOnPageButton) {
+            this.elements.stayOnPageButton.addEventListener('click', () => {
+                this.hideCompletionModal();
+            });
+        }
+
         // Navigation is now handled entirely by CarouselManager
         // Removed duplicate event listeners for prevOnomatopoeia and nextOnomatopoeia
 
@@ -282,6 +291,14 @@ class ReasoningApp extends BaseApp {
                 .replace('{completed}', completedReasoning)
                 .replace('{total}', totalOnomatopoeia);
             this.elements.progressDisplay.textContent = progressText;
+        }
+
+        // Check if all reasoning is complete and show completion modal
+        if (completedReasoning > 0 && completedReasoning === totalOnomatopoeia) {
+            // Small delay to let the user see the progress update
+            setTimeout(() => {
+                this.showCompletionModal();
+            }, 1000);
         }
     }
 
@@ -591,6 +608,18 @@ class ReasoningApp extends BaseApp {
         messageElement.className = 'slide-message saved-reasoning';
         messageElement.style.display = 'block';
         // This message stays visible (no auto-hide)
+    }
+
+    showCompletionModal() {
+        if (this.elements.reasoningCompletionModal) {
+            this.elements.reasoningCompletionModal.style.display = 'flex';
+        }
+    }
+
+    hideCompletionModal() {
+        if (this.elements.reasoningCompletionModal) {
+            this.elements.reasoningCompletionModal.style.display = 'none';
+        }
     }
 
 }

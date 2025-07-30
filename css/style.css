@@ -609,21 +609,47 @@ body {
     }
 }
 
-/* Responsive modal adjustments */
-@media (max-width: 768px) {
-    .modal-content {
-        padding: 1.5rem;
-        width: 95%;
-        max-height: 95vh;
-    }
-    
-    .modal-buttons {
-        flex-direction: column;
-    }
-    
-    .modal-buttons .button {
-        width: 100%;
-    }
+/* Completion Modal - extends modal styles */
+.completion-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.completion-content {
+    background: var(--bg-primary);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+    animation: modalFadeIn 0.3s ease-out;
+}
+
+.completion-content h2 {
+    color: var(--success-color);
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+.completion-content p {
+    margin-bottom: 1rem;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.completion-content p:last-of-type {
+    margin-bottom: 2rem;
+    font-style: italic;
+    color: var(--text-secondary);
 }
 
 /* Reasoning Page Styles */

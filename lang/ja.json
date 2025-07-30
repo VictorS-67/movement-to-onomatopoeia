@@ -185,6 +185,10 @@
         "error_saving": "理由の保存に失敗しました。もう一度お試しください。",
         "error_min_characters": "説明は最低5文字以上入力してください。",
         "prev_onomatopoeia": "前のオノマトペ",
-        "next_onomatopoeia": "次のオノマトペ"
+        "next_onomatopoeia": "次のオノマトペ",
+        "completion_title": "ご参加いただきありがとうございました！",
+        "completion_message": "すべての理由説明が完了しました。貴重な研究へのご協力をありがとうございました！",
+        "completion_note": "回答を確認または修正したい場合は、このページに留まることができます。",
+        "stay_on_page": "このページに留まる"
     }
 }
