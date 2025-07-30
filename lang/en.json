@@ -118,7 +118,9 @@
         "show_introduction": "Show Introduction",
         "hide_introduction": "Hide Introduction",
         "completion_title": "Congratulations!",
+        "completion_text": "Well done! You have finished all the videos. Let's start the second part of the experiment.",
         "continue_to_reasoning": "Continue to Reasoning",
+        "stay_on_page": "Stay on Page",
         "save_error": "Failed to save response. Please try again.",
         "audio_start_error": "Failed to start recording. Please check your microphone.",
         "audio_stop_error": "Failed to stop recording. Please try again."

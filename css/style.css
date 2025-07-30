@@ -99,6 +99,15 @@ body {
 .button:hover {
     background-color: var(--primary-hover);
 }
+.button-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+
+.button-secondary:hover {
+    background-color: #5a6268;
+}
+
 #message {
     margin-top: 1rem;
     padding: var(--spacing-sm);

@@ -147,9 +147,12 @@
     <!-- Survey Completion Modal -->
     <div id="surveyCompletion" class="modal-overlay" style="display: none;">
         <div class="modal-content">
-            <h2 id="surveyCompletionTitle">Congratulations!</h2>
-            <p id="surveyCompletionText">Well done! You have finished all the videos. Let's start the second part of the experiment.</p>
-            <button id="startReasoningButton" class="button">Continue to Part 2</button>
+            <h2 id="surveyCompletionTitle" data-lang="survey.completion_title">Congratulations!</h2>
+            <p id="surveyCompletionText" data-lang="survey.completion_text">Well done! You have finished all the videos. Let's start the second part of the experiment.</p>
+            <div class="modal-buttons">
+                <button id="stayOnPageButton" class="button button-secondary" data-lang="survey.stay_on_page">Stay on Page</button>
+                <button id="startReasoningButton" class="button" data-lang="survey.continue_to_reasoning">Continue to Part 2</button>
+            </div>
         </div>
     </div>
 

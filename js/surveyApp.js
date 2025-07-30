@@ -763,20 +763,34 @@ class SurveyApp extends BaseApp {
         // Use the new modal manager for consistent behavior and animations
         modalManager.showModal('surveyCompletion', {
             onOpen: () => {
-                // Update button text when modal opens
+                // Set up event listeners when modal opens (text is handled by data-lang attributes)
                 const continueButton = document.getElementById('startReasoningButton');
+                const stayButton = document.getElementById('stayOnPageButton');
+                
                 if (continueButton && !continueButton.dataset.listenerAttached) {
-                    continueButton.textContent = langManager.getText('survey.continue_to_reasoning');
-                    continueButton.addEventListener('click', () => {
+                    continueButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('Continue to reasoning button clicked');
                         this.startReasoningPhase();
                     });
                     continueButton.dataset.listenerAttached = 'true';
+                }
+                
+                if (stayButton && !stayButton.dataset.listenerAttached) {
+                    stayButton.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        console.log('Stay on page button clicked');
+                        this.stayOnSurveyPage();
+                    });
+                    stayButton.dataset.listenerAttached = 'true';
                 }
             }
         });
     }
 
     startReasoningPhase() {
+        console.log('Starting reasoning phase...');
+        
         // Hide the completion modal first
         modalManager.hideModal('surveyCompletion');
         
@@ -784,7 +798,16 @@ class SurveyApp extends BaseApp {
         localStorage.setItem("surveyCompleted", "true");
         
         // Redirect to reasoning page
+        console.log('Redirecting to reasoning.html...');
         window.location.href = "reasoning.html";
+    }
+
+    stayOnSurveyPage() {
+        // Simply hide the completion modal and let user continue on survey page
+        modalManager.hideModal('surveyCompletion');
+        
+        // Store completion state but don't redirect
+        localStorage.setItem("surveyCompleted", "true");
     }
 
     goToNextVideo(currentButton) {
