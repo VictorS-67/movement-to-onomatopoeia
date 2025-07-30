@@ -109,9 +109,9 @@ class ReasoningApp extends BaseApp {
                 : langManager.getText('reasoning.show_introduction');
         }
         
-        // Re-render onomatopoeia entries to update translations
+        // Update only the carousel content without reinitializing
         if (this.allOnomatopoeiaEntries.length > 0) {
-            this.displayAllOnomatopoeiaInCarousel();
+            this.updateCarouselContent();
         }
     }
 
@@ -638,6 +638,48 @@ class ReasoningApp extends BaseApp {
     hideCompletionModal() {
         if (this.elements.reasoningCompletionModal) {
             this.elements.reasoningCompletionModal.style.display = 'none';
+        }
+    }
+
+    updateCarouselContent() {
+        if (!this.elements.onomatopoeiaList) return;
+
+        // Store the current slide index to preserve user position
+        const currentIndex = this.currentOnomatopoeiaIndex;
+
+        // Clear existing content
+        this.elements.onomatopoeiaList.innerHTML = '';
+
+        // Create slides for all onomatopoeia entries with updated translations
+        this.allOnomatopoeiaEntries.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+            
+            // Check if this entry has existing reasoning
+            const existingReasoning = this.reasoningData.find(reasoning => 
+                reasoning.participantId == this.participantInfo.participantId &&
+                reasoning.video === item.video &&
+                reasoning.onomatopoeia === item.onomatopoeia &&
+                parseFloat(reasoning.startTime) === parseFloat(item.startTime) &&
+                parseFloat(reasoning.endTime) === parseFloat(item.endTime)
+            );
+            
+            // Add visual cue class if reasoning exists
+            if (existingReasoning && existingReasoning.reasoning && existingReasoning.reasoning.trim() !== '') {
+                slide.classList.add('has-reasoning');
+            }
+            
+            slide.innerHTML = this.createReasoningEntryHTML(item, index);
+            this.elements.onomatopoeiaList.appendChild(slide);
+        });
+
+        // Update the carousel to refresh its content and restore position
+        if (this.carouselManager && this.carouselManager.swiper) {
+            this.carouselManager.swiper.update();
+            // Restore the previous slide position
+            this.carouselManager.swiper.slideTo(currentIndex, 0); // 0 for no animation
+            // Re-setup event listeners for the updated slides
+            this.setupSlideEventListeners();
         }
     }
 
