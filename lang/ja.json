@@ -168,6 +168,8 @@
         "page_title": "オノマトペの説明",
         "participant_name": "参加者: ",
         "section_title": "説明するオノマトペ:",
+        "show_introduction": "説明を表示",
+        "introduction_text": "各オノマトペの理由を説明してください。コンテンツの近くにある矢印を使用してオノマトペを変更できます。「表示」ボタンを使用して、オノマトペを注釈した動画を見ることができます。",
         "reasoning_label": "なぜこのオノマトペを選んだのか説明してください:",
         "reasoning_placeholder": "理由を説明してください（最低5文字）...",
         "show_button": "表示",

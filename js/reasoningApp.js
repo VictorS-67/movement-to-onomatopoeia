@@ -31,7 +31,9 @@ class ReasoningApp extends BaseApp {
             noOnomatopoeiaText: DOMUtils.getElement("noOnomatopoeiaText"),
             prevOnomatopoeia: DOMUtils.getElement("prevOnomatopoeia"),
             nextOnomatopoeia: DOMUtils.getElement("nextOnomatopoeia"),
-            onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter")
+            onomatopoeiaCounter: DOMUtils.getElement("onomatopoeiaCounter"),
+            toggleIntroduction: DOMUtils.getElement("toggleIntroduction"),
+            introductionText: DOMUtils.getElement("introductionText")
         };
     }
 
@@ -232,6 +234,13 @@ class ReasoningApp extends BaseApp {
         // Set up common event listeners from base class
         this.setupCommonEventListeners();
 
+        // Introduction toggle
+        if (this.elements.toggleIntroduction) {
+            this.elements.toggleIntroduction.addEventListener('click', () => {
+                this.toggleIntroduction();
+            });
+        }
+
         // Navigation is now handled entirely by CarouselManager
         // Removed duplicate event listeners for prevOnomatopoeia and nextOnomatopoeia
 
@@ -313,12 +322,29 @@ class ReasoningApp extends BaseApp {
         this.elements.videoPlayer.addEventListener('timeupdate', checkTime);
     }
 
-    async saveReasoning(onomatopoeiaItem, reasoningText) {
+    async saveReasoning(onomatopoeiaItem, reasoningText, slideMessage = null, saveButton = null) {
         try {
             // Validate minimum character requirement
             if (reasoningText.length < 5) {
-                uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_min_characters'));
+                if (slideMessage) {
+                    this.showSlideMessage(slideMessage, langManager.getText('reasoning.error_min_characters'), 'error');
+                } else {
+                    uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_min_characters'));
+                }
                 return;
+            }
+
+            // Temporarily disable save button to prevent double-clicking
+            if (saveButton) {
+                saveButton.disabled = true;
+                const originalText = saveButton.textContent;
+                saveButton.textContent = 'Saving...';
+                
+                // Re-enable after 2 seconds
+                setTimeout(() => {
+                    saveButton.disabled = false;
+                    saveButton.textContent = originalText;
+                }, 2000);
             }
 
             const reasoningEntry = {
@@ -357,11 +383,26 @@ class ReasoningApp extends BaseApp {
             this.updateProgressDisplay();
 
             // Show success message
-            uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('reasoning.success_saved'));
+            if (slideMessage) {
+                this.showSlideMessage(slideMessage, langManager.getText('reasoning.success_saved'), 'success');
+            } else {
+                uiManager.showSuccess(this.elements.messageDisplay, langManager.getText('reasoning.success_saved'));
+            }
 
         } catch (error) {
             console.error('Error saving reasoning:', error);
-            uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_saving'));
+            
+            // Re-enable button on error
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = langManager.getText('reasoning.save_button');
+            }
+            
+            if (slideMessage) {
+                this.showSlideMessage(slideMessage, langManager.getText('reasoning.error_saving'), 'error');
+            } else {
+                uiManager.showError(this.elements.messageDisplay, langManager.getText('reasoning.error_saving'));
+            }
         }
     }
 
@@ -422,6 +463,7 @@ class ReasoningApp extends BaseApp {
                         data-start="${onomatopoeiaItem.startTime}"
                         data-end="${onomatopoeiaItem.endTime}"
                     >${reasoningText}</textarea>
+                    <div class="slide-message" style="display: none;"></div>
                     <div class="reasoning-actions">
                         <button class="save-reasoning-button" data-index="${index}" ${charCount < 5 ? 'disabled' : ''}>
                             ${langManager.getText('reasoning.save_button')}
@@ -464,13 +506,40 @@ class ReasoningApp extends BaseApp {
                 saveButton.addEventListener('click', () => {
                     const onomatopoeiaItem = this.allOnomatopoeiaEntries[slideIndex];
                     if (onomatopoeiaItem) {
-                        this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
+                        // Get the slide message element
+                        const slideMessage = slide.querySelector('.slide-message');
+                        this.saveReasoning(onomatopoeiaItem, textarea.value.trim(), slideMessage, saveButton);
                     } else {
                         console.error('No onomatopoeia item found for slide index', slideIndex);
                     }
                 });
             }
         });
+    }
+
+    toggleIntroduction() {
+        const isVisible = this.elements.introductionText.style.display !== 'none';
+        
+        if (isVisible) {
+            this.elements.introductionText.style.display = 'none';
+            this.elements.toggleIntroduction.textContent = langManager.getText('reasoning.show_introduction');
+        } else {
+            this.elements.introductionText.style.display = 'block';
+            this.elements.toggleIntroduction.textContent = langManager.getText('reasoning.show_introduction');
+        }
+    }
+
+    showSlideMessage(messageElement, text, type = 'info') {
+        if (!messageElement) return;
+        
+        messageElement.textContent = text;
+        messageElement.className = `slide-message ${type}`;
+        messageElement.style.display = 'block';
+        
+        // Auto-hide after 3 seconds
+        setTimeout(() => {
+            messageElement.style.display = 'none';
+        }, 3000);
     }
 
 }

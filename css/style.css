@@ -685,7 +685,7 @@ body {
     border-radius: 50%;
     width: 40px;
     height: 40px;
-    margin-top: 0;
+    margin-top: -80px; /* Move buttons higher to avoid blocking textbox */
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
 
@@ -1281,5 +1281,47 @@ body {
     .skeleton-video::before {
         font-size: 2rem;
     }
+}
+
+/* Introduction section styling */
+.introduction-section {
+    margin: 1rem 0;
+}
+
+.introduction-text {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.5rem;
+    color: #495057;
+    line-height: 1.5;
+}
+
+/* Slide message styling */
+.slide-message {
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    border-radius: 6px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.slide-message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.slide-message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.slide-message.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
 }
 

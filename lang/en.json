@@ -176,6 +176,8 @@
         "page_title": "Explain Your Onomatopoeia",
         "participant_name": "Participant: ",
         "section_title": "Onomatopoeia to Explain:",
+        "show_introduction": "Show Introduction",
+        "introduction_text": "Explain your reasoning for each onomatopoeia. You can change the onomatopoeia by using the arrows near the content. You can look at the video where you annotated the onomatopoeia by using the \"Show it\" button.",
         "reasoning_label": "Explain why you chose this onomatopoeia:",
         "reasoning_placeholder": "Please explain your reasoning (minimum 5 characters)...",
         "show_button": "Show it",
