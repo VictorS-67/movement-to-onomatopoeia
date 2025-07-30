@@ -147,11 +147,6 @@ class ReasoningApp extends BaseApp {
     displayAllOnomatopoeiaInCarousel() {
         if (!this.elements.onomatopoeiaList) return;
 
-        console.log('Creating carousel with', this.allOnomatopoeiaEntries.length, 'onomatopoeia entries:');
-        this.allOnomatopoeiaEntries.forEach((item, index) => {
-            console.log(`Entry ${index}: video=${item.video}, onomatopoeia="${item.onomatopoeia}", start=${item.startTime}, end=${item.endTime}`);
-        });
-
         // Clear existing content
         this.elements.onomatopoeiaList.innerHTML = '';
 
@@ -161,10 +156,7 @@ class ReasoningApp extends BaseApp {
             slide.className = 'swiper-slide';
             slide.innerHTML = this.createReasoningEntryHTML(item, index);
             this.elements.onomatopoeiaList.appendChild(slide);
-            console.log(`Created slide ${index} for onomatopoeia: "${item.onomatopoeia}"`);
         });
-
-        console.log('Total slides created:', this.elements.onomatopoeiaList.children.length);
 
         // Use requestAnimationFrame to ensure DOM is updated
         requestAnimationFrame(() => {
@@ -270,10 +262,6 @@ class ReasoningApp extends BaseApp {
     }
 
     initializeCarousel() {
-        console.log('Initializing carousel...');
-        const slidesInDOM = this.elements.onomatopoeiaList.querySelectorAll('.swiper-slide');
-        console.log('Slides found in DOM:', slidesInDOM.length);
-        
         const carousel = this.carouselManager.initialize(
             '.onomatopoeia-swiper',
             {
@@ -282,23 +270,13 @@ class ReasoningApp extends BaseApp {
                 speed: 300,
             },
             (slideIndex) => {
-                console.log('Slide changed to index:', slideIndex);
                 this.currentOnomatopoeiaIndex = slideIndex;
-                
-                // Debug: Show which onomatopoeia we're now viewing
-                if (this.allOnomatopoeiaEntries[slideIndex]) {
-                    const currentEntry = this.allOnomatopoeiaEntries[slideIndex];
-                    console.log(`Now viewing: "${currentEntry.onomatopoeia}" from video ${currentEntry.video}`);
-                }
-                
                 // Update video when user swipes to different onomatopoeia
                 this.updateVideoForCurrentOnomatopoeia();
             }
         );
         
         if (carousel) {
-            console.log('Carousel initialized successfully');
-            console.log('Carousel slides count:', carousel.slides ? carousel.slides.length : 'undefined');
             // Set up event listeners for all slides after carousel is initialized
             requestAnimationFrame(() => {
                 setTimeout(() => this.setupSlideEventListeners(), 50);
@@ -422,7 +400,6 @@ class ReasoningApp extends BaseApp {
 
         return `
             <div class="reasoning-entry">
-                <div class="slide-indicator">Slide ${index + 1} of ${this.allOnomatopoeiaEntries.length}</div>
                 <div class="onomatopoeia-header">
                     <div class="onomatopoeia-info">
                         <span class="onomatopoeia-text">Your onomatopoeia for video ${onomatopoeiaItem.video}: "${onomatopoeiaItem.onomatopoeia}"</span>
@@ -459,14 +436,10 @@ class ReasoningApp extends BaseApp {
     }
 
     setupSlideEventListeners() {        
-        console.log('Setting up slide event listeners');
-        
         // Set up event listeners for all slides in the carousel
         const slides = this.elements.onomatopoeiaList.querySelectorAll('.swiper-slide');
-        console.log('Found slides for event listeners:', slides.length);
         
         slides.forEach((slide, slideIndex) => {
-            console.log(`Setting up listeners for slide ${slideIndex}`);
             const showButton = slide.querySelector('.show-button');
             const textarea = slide.querySelector('.reasoning-textarea');
             const saveButton = slide.querySelector('.save-reasoning-button');
@@ -474,7 +447,6 @@ class ReasoningApp extends BaseApp {
             
             if (showButton) {
                 showButton.addEventListener('click', () => {
-                    console.log('Show button clicked for slide', slideIndex);
                     this.playOnomatopoeiaSegment(
                         parseFloat(showButton.dataset.start),
                         parseFloat(showButton.dataset.end)
@@ -490,7 +462,6 @@ class ReasoningApp extends BaseApp {
                 });
 
                 saveButton.addEventListener('click', () => {
-                    console.log('Save button clicked for slide', slideIndex);
                     const onomatopoeiaItem = this.allOnomatopoeiaEntries[slideIndex];
                     if (onomatopoeiaItem) {
                         this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
@@ -500,8 +471,6 @@ class ReasoningApp extends BaseApp {
                 });
             }
         });
-        
-        console.log('Event listeners setup complete');
     }
 
 }

@@ -14,9 +14,9 @@ class CarouselManager {
     initialize(containerSelector, options = {}, onSlideChange = null) {
         const defaultOptions = {
             slidesPerView: 1,
-            spaceBetween: 0, // Set to 0 to prevent spacing issues
-            centeredSlides: true, // Ensure slides are properly centered
-            navigation: false, // Disable automatic navigation to prevent conflicts
+            spaceBetween: 0,
+            centeredSlides: true,
+            navigation: false, // Disabled to prevent conflicts - using manual navigation
             pagination: {
                 el: '.swiper-pagination',
                 clickable: true,
@@ -34,25 +34,10 @@ class CarouselManager {
                 lastSlideMessage: 'This is the last onomatopoeia',
             },
             on: {
-                slideChange: (swiper) => {
-                    console.log('slideChange event triggered, activeIndex:', swiper.activeIndex);
-                },
-                slideChangeTransitionStart: (swiper) => {
-                    console.log('slideChangeTransitionStart event triggered, activeIndex:', swiper.activeIndex);
-                },
                 slideChangeTransitionEnd: (swiper) => {
-                    console.log('CarouselManager slideChangeTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
-                    console.log('Total slides in swiper:', swiper.slides.length);
                     if (onSlideChange) {
-                        console.log('Calling onSlideChange callback with index:', swiper.activeIndex);
                         onSlideChange(swiper.activeIndex);
                     }
-                },
-                slideNextTransitionStart: (swiper) => {
-                    console.log('slideNextTransitionStart event triggered, activeIndex:', swiper.activeIndex);
-                },
-                slideNextTransitionEnd: (swiper) => {
-                    console.log('slideNextTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
                 }
             }
         };
@@ -67,10 +52,6 @@ class CarouselManager {
             this.setupNavigationButtons(containerSelector);
             
             console.log('Carousel initialized successfully');
-            console.log('Swiper slides count:', this.swiper.slides ? this.swiper.slides.length : 'undefined');
-            console.log('Swiper realIndex:', this.swiper.realIndex);
-            console.log('Swiper activeIndex:', this.swiper.activeIndex);
-            
             return this.swiper;
         } catch (error) {
             console.error('Failed to initialize carousel:', error);
@@ -115,17 +96,11 @@ class CarouselManager {
      */
     slideNext() {
         if (this.swiper) {
-            console.log('slideNext called, current activeIndex:', this.swiper.activeIndex);
-            
-            // Manual slide control to ensure we only move by 1
             const currentIndex = this.swiper.activeIndex;
             const nextIndex = currentIndex + 1;
             
             if (nextIndex < this.swiper.slides.length) {
-                console.log(`Manually sliding to index: ${nextIndex}`);
                 this.swiper.slideTo(nextIndex);
-            } else {
-                console.log('Already at last slide');
             }
         }
     }
@@ -135,17 +110,11 @@ class CarouselManager {
      */
     slidePrev() {
         if (this.swiper) {
-            console.log('slidePrev called, current activeIndex:', this.swiper.activeIndex);
-            
-            // Manual slide control to ensure we only move by 1
             const currentIndex = this.swiper.activeIndex;
             const prevIndex = currentIndex - 1;
             
             if (prevIndex >= 0) {
-                console.log(`Manually sliding to index: ${prevIndex}`);
                 this.swiper.slideTo(prevIndex);
-            } else {
-                console.log('Already at first slide');
             }
         }
     }
@@ -234,7 +203,6 @@ class CarouselManager {
             nextButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Manual next button clicked');
                 this.slideNext();
             });
         }
@@ -243,7 +211,6 @@ class CarouselManager {
             prevButton.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('Manual prev button clicked');
                 this.slidePrev();
             });
         }
