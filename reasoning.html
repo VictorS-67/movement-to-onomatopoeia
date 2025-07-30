@@ -32,7 +32,7 @@
 
         <!-- Progress indicator -->
         <div class="progress-section">
-            <h2 id="reasoningPageTitle">Explain Your Onomatopoeia</h2>
+            <h2 id="reasoningPageTitle" data-lang="reasoning.page_title">Explain Your Onomatopoeia</h2>
             <p id="progressDisplay">Loading...</p>
         </div>
 
@@ -51,7 +51,7 @@
 
         <!-- Reasoning Section -->
         <div class="reasoning-section">
-            <h3 id="reasoningSectionTitle">Your Onomatopoeia for this video:</h3>
+            <h3 id="reasoningSectionTitle" data-lang="reasoning.section_title">Onomatopoeia to Explain:</h3>
             <div class="onomatopoeia-carousel-container">
                 <!-- Swiper -->
                 <div class="swiper onomatopoeia-swiper">
@@ -66,18 +66,11 @@
                 </div>
             </div>
             <div id="noOnomatopoeiaMessage" class="no-onomatopoeia-message" style="display: none;">
-                <p id="noOnomatopoeiaText">No onomatopoeia saved for this video.</p>
+                <p id="noOnomatopoeiaText">No onomatopoeia found.</p>
             </div>
         </div>
 
-        <!-- Video Selection Buttons (read-only) -->
-        <div class="video-buttons-container">
-            <h3 id="selectVideoTitle">Select a video:</h3>
-            <div id="videoButtons" class="video-buttons">
-                <!-- Buttons will be populated here -->
-            </div>
-        </div>
-
+        <!-- Remove video buttons since we won't need them -->
         <div id="message" class="mt-4 text-gray-700"></div>
     </div>
 

@@ -8,9 +8,11 @@ class ReasoningApp extends BaseApp {
         this.onomatopoeiaData = [];
         this.reasoningData = [];
         this.currentVideoName = null;
-        this.currentVideoOnomatopoeia = [];
         this.currentOnomatopoeiaIndex = 0;
         this.carouselManager = new CarouselManager();
+        
+        // All onomatopoeia entries for the global carousel
+        this.allOnomatopoeiaEntries = [];
     }
 
     initializeElements() {
@@ -19,7 +21,6 @@ class ReasoningApp extends BaseApp {
             buttonLogout: DOMUtils.getElement("buttonLogout"),
             videoTitle: DOMUtils.getElement("videoTitle"),
             videoPlayer: DOMUtils.getElement("myVideo"),
-            videoButtons: DOMUtils.getElement('videoButtons'),
             messageDisplay: DOMUtils.getElement("message"),
             languageSelect: DOMUtils.getElement("languageSelect"),
             reasoningPageTitle: DOMUtils.getElement("reasoningPageTitle"),
@@ -67,14 +68,8 @@ class ReasoningApp extends BaseApp {
             // Load existing reasoning data from Google Sheets
             await this.loadExistingReasoningData();
             
-            // Initialize video manager with callbacks
-            this.initializeVideoManager(
-                this.onVideoChange.bind(this), // Called when video changes
-                this.onVideoLoad.bind(this)    // Called when videos are loaded
-            );
-            
-            // Load videos using video manager
-            await this.videoManager.loadVideos(this.config);
+            // Initialize the global onomatopoeia carousel
+            this.initializeGlobalOnomatopoeiaCarousel();
             
             // Set up event listeners
             this.setupEventListeners();
@@ -84,9 +79,6 @@ class ReasoningApp extends BaseApp {
 
             // Update progress display
             this.updateProgressDisplay();
-
-            // Update video button states now that reasoning data is loaded
-            this.updateVideoButtonStates();
 
         } catch (error) {
             console.error('Failed to initialize reasoning app:', error);
@@ -101,32 +93,79 @@ class ReasoningApp extends BaseApp {
     onLanguageChange() {
         super.onLanguageChange(); // Call base class method
         this.updateProgressDisplay();
-        this.displayReasoningForCurrentVideo();
     }
 
-    // Callback for when video changes (called by VideoManager)
-    onVideoChange(videoName, videoSrc) {
-        this.currentVideoName = videoName;
+    initializeGlobalOnomatopoeiaCarousel() {
+        // Store all onomatopoeia entries for the global carousel
+        this.allOnomatopoeiaEntries = [...this.onomatopoeiaData];
         
-        // Clear any existing messages when changing videos
-        if (this.elements.messageDisplay) {
-            uiManager.clearMessage(this.elements.messageDisplay);
+        if (this.allOnomatopoeiaEntries.length === 0) {
+            console.error('No onomatopoeia entries found');
+            if (this.elements.noOnomatopoeiaMessage) {
+                this.elements.noOnomatopoeiaMessage.style.display = 'block';
+            }
+            return;
         }
+
+        // Set initial state
+        this.currentOnomatopoeiaIndex = 0;
         
-        // Display reasoning content for the new video
-        this.displayReasoningForCurrentVideo();
+        // Update video for the first onomatopoeia entry
+        this.updateVideoForCurrentOnomatopoeia();
+        
+        // Create and populate the carousel with all onomatopoeia entries
+        this.displayAllOnomatopoeiaInCarousel();
     }
-    
-    // Callback for when videos are loaded (called by VideoManager)
-    onVideoLoad() {
-        // Set current video name from first video
-        if (this.videoManager) {
-            const currentVideo = this.videoManager.getCurrentVideo();
-            this.currentVideoName = currentVideo.name;
+
+    updateVideoForCurrentOnomatopoeia() {
+        if (this.currentOnomatopoeiaIndex >= 0 && this.currentOnomatopoeiaIndex < this.allOnomatopoeiaEntries.length) {
+            const currentEntry = this.allOnomatopoeiaEntries[this.currentOnomatopoeiaIndex];
+            
+            // Update current video name
+            this.currentVideoName = currentEntry.video;
+            
+            // Update video player
+            if (this.elements.videoPlayer) {
+                this.elements.videoPlayer.src = `videos/${this.currentVideoName}`;
+                this.elements.videoPlayer.title = this.currentVideoName;
+                this.elements.videoPlayer.load(); // Reload the video
+            }
+            
+            // Update video title
+            if (this.elements.videoTitle) {
+                this.elements.videoTitle.textContent = `Video: ${this.currentVideoName}`;
+            }
+            
+            // Clear any existing messages when changing videos
+            if (this.elements.messageDisplay) {
+                uiManager.clearMessage(this.elements.messageDisplay);
+            }
+            
+            console.log(`Switched to video: ${this.currentVideoName} for onomatopoeia: ${currentEntry.onomatopoeia}`);
         }
+    }
+
+    displayAllOnomatopoeiaInCarousel() {
+        if (!this.elements.onomatopoeiaList) return;
+
+        // Clear existing content
+        this.elements.onomatopoeiaList.innerHTML = '';
+
+        // Create slides for all onomatopoeia entries
+        this.allOnomatopoeiaEntries.forEach((item, index) => {
+            const slide = document.createElement('div');
+            slide.className = 'swiper-slide';
+            slide.innerHTML = this.createReasoningEntryHTML(item, index);
+            this.elements.onomatopoeiaList.appendChild(slide);
+        });
+
+        // Initialize the carousel
+        this.initializeCarousel();
         
-        // Display reasoning for initial video
-        this.displayReasoningForCurrentVideo();
+        // Hide the no onomatopoeia message
+        if (this.elements.noOnomatopoeiaMessage) {
+            this.elements.noOnomatopoeiaMessage.style.display = 'none';
+        }
     }
 
     performAdditionalLogoutCleanup() {
@@ -210,11 +249,11 @@ class ReasoningApp extends BaseApp {
 
         // Keyboard navigation for carousel
         document.addEventListener('keydown', (event) => {
-            if (this.currentVideoOnomatopoeia.length > 1) {
-                if (event.key === 'ArrowLeft' && !this.elements.prevOnomatopoeia.disabled) {
+            if (this.allOnomatopoeiaEntries.length > 1) {
+                if (event.key === 'ArrowLeft') {
                     event.preventDefault();
                     this.navigateOnomatopoeia(-1);
-                } else if (event.key === 'ArrowRight' && !this.elements.nextOnomatopoeia.disabled) {
+                } else if (event.key === 'ArrowRight') {
                     event.preventDefault();
                     this.navigateOnomatopoeia(1);
                 }
@@ -234,45 +273,10 @@ class ReasoningApp extends BaseApp {
         }
     }
 
-    displayReasoningForCurrentVideo() {
-        // Filter onomatopoeia for current video
-        this.currentVideoOnomatopoeia = this.onomatopoeiaData.filter(item => 
-            item.video === this.currentVideoName
-        );
-
-        if (this.currentVideoOnomatopoeia.length === 0) {
-            // No onomatopoeia for this video
-            this.carouselManager.updateVisibility(false);
-            this.elements.noOnomatopoeiaMessage.style.display = 'block';
-        } else {
-            // Initialize carousel if not already done
-            if (!this.carouselManager.isInitialized()) {
-                this.initializeCarousel();
-            }
-            
-            // Create slides content
-            const slides = this.currentVideoOnomatopoeia.map((item, index) => 
-                this.createReasoningEntryHTML(item, index)
-            );
-            
-            // Update carousel with new slides
-            this.carouselManager.addSlides(slides);
-            this.carouselManager.updateVisibility(true);
-            this.elements.noOnomatopoeiaMessage.style.display = 'none';
-            
-            // Set up event listeners for the new slides
-            this.setupSlideEventListeners();
-            
-            // Reset to first slide
-            this.carouselManager.slideTo(0);
-        }
-
-        // Mark video buttons with completion status
-        this.updateVideoButtonStates();
-    }
-
     initializeCarousel() {
-        this.carouselManager.initialize(
+        console.log('Initializing carousel with', this.allOnomatopoeiaEntries.length, 'entries');
+        
+        const carousel = this.carouselManager.initialize(
             '.onomatopoeia-swiper',
             {
                 // Custom configuration can be added here
@@ -280,10 +284,20 @@ class ReasoningApp extends BaseApp {
                 speed: 300,
             },
             (slideIndex) => {
+                console.log('Slide changed to index:', slideIndex);
                 this.currentOnomatopoeiaIndex = slideIndex;
-                // Handle any additional slide change logic here
+                // Update video when user swipes to different onomatopoeia
+                this.updateVideoForCurrentOnomatopoeia();
             }
         );
+        
+        if (carousel) {
+            console.log('Carousel initialized successfully');
+            // Set up event listeners for all slides after carousel is initialized
+            setTimeout(() => this.setupSlideEventListeners(), 100);
+        } else {
+            console.error('Failed to initialize carousel');
+        }
     }
 
     navigateOnomatopoeia(direction) {
@@ -385,36 +399,11 @@ class ReasoningApp extends BaseApp {
         }
     }
 
+    // This method is no longer needed since we removed video buttons
+    // and now use a single carousel for all onomatopoeia
     updateVideoButtonStates() {
-        if (!this.videoManager) return;
-
-        // Use VideoManager for button state updates
-        this.videoManager.updateButtonCompletionStates(this.onomatopoeiaData, {
-            determineState: (videoName, onomatopoeiaData) => {
-                // Check if this video has onomatopoeia
-                const hasOnomatopoeia = onomatopoeiaData.some(item => item.video === videoName);
-                
-                if (hasOnomatopoeia) {
-                    // Check if all onomatopoeia for this video have reasoning
-                    const videoOnomatopoeia = onomatopoeiaData.filter(item => item.video === videoName);
-                    const completedReasoning = videoOnomatopoeia.filter(item => 
-                        this.reasoningData.some(reasoning => 
-                            reasoning.video === item.video &&
-                            reasoning.onomatopoeia === item.onomatopoeia &&
-                            parseFloat(reasoning.startTime) === parseFloat(item.startTime) &&
-                            parseFloat(reasoning.endTime) === parseFloat(item.endTime)
-                        )
-                    );
-                    
-                    if (completedReasoning.length === videoOnomatopoeia.length) {
-                        return 'completed'; // All reasoning completed for this video
-                    }
-                    return null; // Has onomatopoeia but not all reasoning completed
-                } else {
-                    return 'no-onomatopoeia'; // No onomatopoeia for this video
-                }
-            }
-        });
+        // Method kept for compatibility but no longer used
+        console.log('updateVideoButtonStates called but not needed in carousel mode');
     }
 
     createReasoningEntryHTML(onomatopoeiaItem, index) {
@@ -468,8 +457,11 @@ class ReasoningApp extends BaseApp {
     }
 
     setupSlideEventListeners() {
+        console.log('Setting up slide event listeners');
+        
         // Set up event listeners for all slides in the carousel
-        const slides = this.carouselManager.swiper.slides;
+        const slides = this.elements.onomatopoeiaList.querySelectorAll('.swiper-slide');
+        console.log('Found', slides.length, 'slides');
         
         slides.forEach((slide, slideIndex) => {
             const showButton = slide.querySelector('.show-button');
@@ -479,6 +471,7 @@ class ReasoningApp extends BaseApp {
             
             if (showButton) {
                 showButton.addEventListener('click', () => {
+                    console.log('Show button clicked for slide', slideIndex);
                     this.playOnomatopoeiaSegment(
                         parseFloat(showButton.dataset.start),
                         parseFloat(showButton.dataset.end)
@@ -494,8 +487,13 @@ class ReasoningApp extends BaseApp {
                 });
 
                 saveButton.addEventListener('click', () => {
-                    const onomatopoeiaItem = this.currentVideoOnomatopoeia[slideIndex];
-                    this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
+                    console.log('Save button clicked for slide', slideIndex);
+                    const onomatopoeiaItem = this.allOnomatopoeiaEntries[slideIndex];
+                    if (onomatopoeiaItem) {
+                        this.saveReasoning(onomatopoeiaItem, textarea.value.trim());
+                    } else {
+                        console.error('No onomatopoeia item found for slide index', slideIndex);
+                    }
                 });
             }
         });
