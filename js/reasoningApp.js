@@ -13,6 +13,9 @@ class ReasoningApp extends BaseApp {
         
         // All onomatopoeia entries for the global carousel
         this.allOnomatopoeiaEntries = [];
+        
+        // Track if completion modal has been shown
+        this.completionModalShown = false;
     }
 
     initializeElements() {
@@ -97,6 +100,19 @@ class ReasoningApp extends BaseApp {
     onLanguageChange() {
         super.onLanguageChange(); // Call base class method
         this.updateProgressDisplay();
+        
+        // Update introduction toggle button text based on current state
+        if (this.elements.toggleIntroduction && this.elements.introductionText) {
+            const isVisible = this.elements.introductionText.style.display !== 'none';
+            this.elements.toggleIntroduction.textContent = isVisible 
+                ? langManager.getText('reasoning.hide_introduction')
+                : langManager.getText('reasoning.show_introduction');
+        }
+        
+        // Re-render onomatopoeia entries to update translations
+        if (this.allOnomatopoeiaEntries.length > 0) {
+            this.renderOnomatopoeiaEntries();
+        }
     }
 
     initializeGlobalOnomatopoeiaCarousel() {
@@ -294,10 +310,11 @@ class ReasoningApp extends BaseApp {
         }
 
         // Check if all reasoning is complete and show completion modal
-        if (completedReasoning > 0 && completedReasoning === totalOnomatopoeia) {
+        if (completedReasoning > 0 && completedReasoning === totalOnomatopoeia && !this.completionModalShown) {
             // Small delay to let the user see the progress update
             setTimeout(() => {
                 this.showCompletionModal();
+                this.completionModalShown = true;
             }, 1000);
         }
     }
@@ -495,7 +512,9 @@ class ReasoningApp extends BaseApp {
             <div class="reasoning-entry">
                 <div class="onomatopoeia-header">
                     <div class="onomatopoeia-info">
-                        <span class="onomatopoeia-text">Your onomatopoeia for video ${onomatopoeiaItem.video}: "${onomatopoeiaItem.onomatopoeia}"</span>
+                        <span class="onomatopoeia-text">${langManager.getText('reasoning.onomatopoeia_for_video')
+                            .replace('{video}', onomatopoeiaItem.video)
+                            .replace('{onomatopoeia}', onomatopoeiaItem.onomatopoeia)}</span>
                         <span class="time-range">${langManager.getText('reasoning.time_range')
                             .replace('{start}', onomatopoeiaItem.startTime)
                             .replace('{end}', onomatopoeiaItem.endTime)}</span>
@@ -577,7 +596,7 @@ class ReasoningApp extends BaseApp {
             this.elements.toggleIntroduction.textContent = langManager.getText('reasoning.show_introduction');
         } else {
             this.elements.introductionText.style.display = 'block';
-            this.elements.toggleIntroduction.textContent = langManager.getText('reasoning.show_introduction');
+            this.elements.toggleIntroduction.textContent = langManager.getText('reasoning.hide_introduction');
         }
     }
 
