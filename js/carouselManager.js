@@ -14,7 +14,8 @@ class CarouselManager {
     initialize(containerSelector, options = {}, onSlideChange = null) {
         const defaultOptions = {
             slidesPerView: 1,
-            spaceBetween: 30,
+            spaceBetween: 0, // Set to 0 to prevent spacing issues
+            centeredSlides: true, // Ensure slides are properly centered
             navigation: {
                 nextEl: '.swiper-button-next',
                 prevEl: '.swiper-button-prev',
@@ -37,8 +38,8 @@ class CarouselManager {
             },
             on: {
                 slideChangeTransitionEnd: (swiper) => {
-                    // Use slideChangeTransitionEnd instead of slideChange to avoid double triggering
                     console.log('CarouselManager slideChangeTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
+                    console.log('Total slides in swiper:', swiper.slides.length);
                     if (onSlideChange) {
                         console.log('Calling onSlideChange callback with index:', swiper.activeIndex);
                         onSlideChange(swiper.activeIndex);
@@ -54,6 +55,10 @@ class CarouselManager {
             this.currentSlideCallback = onSlideChange;
             
             console.log('Carousel initialized successfully');
+            console.log('Swiper slides count:', this.swiper.slides ? this.swiper.slides.length : 'undefined');
+            console.log('Swiper realIndex:', this.swiper.realIndex);
+            console.log('Swiper activeIndex:', this.swiper.activeIndex);
+            
             return this.swiper;
         } catch (error) {
             console.error('Failed to initialize carousel:', error);
@@ -98,7 +103,9 @@ class CarouselManager {
      */
     slideNext() {
         if (this.swiper) {
+            console.log('slideNext called, current activeIndex:', this.swiper.activeIndex);
             this.swiper.slideNext();
+            console.log('After slideNext, new activeIndex:', this.swiper.activeIndex);
         }
     }
 
@@ -107,7 +114,9 @@ class CarouselManager {
      */
     slidePrev() {
         if (this.swiper) {
+            console.log('slidePrev called, current activeIndex:', this.swiper.activeIndex);
             this.swiper.slidePrev();
+            console.log('After slidePrev, new activeIndex:', this.swiper.activeIndex);
         }
     }
 
