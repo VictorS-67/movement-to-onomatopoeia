@@ -8,6 +8,7 @@ class SurveyApp extends BaseApp {
         this.filteredData = [];
         this.currentVideoName = null;
         this.introExpanded = false; // Track introduction toggle state
+        this.completionModalShown = false; // Prevent completion modal from showing multiple times per session
         
         // Initialize audio recording service
         this.initializeAudioService();
@@ -772,17 +773,15 @@ class SurveyApp extends BaseApp {
         return allAddressed && allButtons.length > 0;
     }
 
-    // Check if all videos are completed and show completion modal if needed
-    checkAndShowCompletionModal() {
-        if (this.checkAllVideosCompleted()) {
-            // Small delay to ensure UI updates are complete
-            setTimeout(() => {
-                this.showCompletionModal();
-            }, 100);
-        }
-    }
-
     showCompletionModal() {
+        // Prevent showing the modal multiple times per session
+        if (this.completionModalShown) {
+            return;
+        }
+        
+        // Mark modal as shown
+        this.completionModalShown = true;
+        
         // Use the new modal manager for consistent behavior and animations
         modalManager.showModal('surveyCompletion', {
             onOpen: () => {
