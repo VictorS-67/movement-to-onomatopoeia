@@ -512,6 +512,9 @@ class SurveyApp extends BaseApp {
 
             this.resetDisplayForCurrentVideo();
             
+            // Check if all videos are completed after saving
+            this.checkAndShowCompletionModal();
+            
         } catch (error) {
             console.error('Error saving onomatopoeia:', error);
             this.showError(langManager.getText('survey.save_error') || 'Failed to save response');
@@ -738,6 +741,16 @@ class SurveyApp extends BaseApp {
         }
     }
 
+    // Check if all videos are completed and show completion modal if needed
+    checkAndShowCompletionModal() {
+        if (this.checkAllVideosCompleted()) {
+            // Small delay to ensure UI updates are complete
+            setTimeout(() => {
+                this.showCompletionModal();
+            }, 100);
+        }
+    }
+
     checkAllVideosCompleted() {
         if (!this.elements.videoButtons) return false;
         
@@ -757,6 +770,16 @@ class SurveyApp extends BaseApp {
         });
         
         return allAddressed && allButtons.length > 0;
+    }
+
+    // Check if all videos are completed and show completion modal if needed
+    checkAndShowCompletionModal() {
+        if (this.checkAllVideosCompleted()) {
+            // Small delay to ensure UI updates are complete
+            setTimeout(() => {
+                this.showCompletionModal();
+            }, 100);
+        }
     }
 
     showCompletionModal() {
