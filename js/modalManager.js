@@ -280,6 +280,16 @@ class ModalManager {
                         modalContent.focus();
                     }
                     
+                    // Call onOpen callback if provided
+                    const modalData = this.activeModals.get(modal.id);
+                    if (modalData && modalData.onOpen && typeof modalData.onOpen === 'function') {
+                        try {
+                            modalData.onOpen();
+                        } catch (error) {
+                            console.error('Error in modal onOpen callback:', error);
+                        }
+                    }
+                    
                     resolve();
                 }, config.animationDuration);
             });

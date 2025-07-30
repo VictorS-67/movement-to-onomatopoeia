@@ -770,7 +770,6 @@ class SurveyApp extends BaseApp {
                 if (continueButton && !continueButton.dataset.listenerAttached) {
                     continueButton.addEventListener('click', (e) => {
                         e.preventDefault();
-                        console.log('Continue to reasoning button clicked');
                         this.startReasoningPhase();
                     });
                     continueButton.dataset.listenerAttached = 'true';
@@ -779,7 +778,6 @@ class SurveyApp extends BaseApp {
                 if (stayButton && !stayButton.dataset.listenerAttached) {
                     stayButton.addEventListener('click', (e) => {
                         e.preventDefault();
-                        console.log('Stay on page button clicked');
                         this.stayOnSurveyPage();
                     });
                     stayButton.dataset.listenerAttached = 'true';
@@ -789,8 +787,6 @@ class SurveyApp extends BaseApp {
     }
 
     startReasoningPhase() {
-        console.log('Starting reasoning phase...');
-        
         // Hide the completion modal first
         modalManager.hideModal('surveyCompletion');
         
@@ -798,7 +794,6 @@ class SurveyApp extends BaseApp {
         localStorage.setItem("surveyCompleted", "true");
         
         // Redirect to reasoning page
-        console.log('Redirecting to reasoning.html...');
         window.location.href = "reasoning.html";
     }
 
