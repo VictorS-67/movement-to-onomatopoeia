@@ -37,6 +37,12 @@ class CarouselManager {
                 lastSlideMessage: 'This is the last onomatopoeia',
             },
             on: {
+                slideChange: (swiper) => {
+                    console.log('slideChange event triggered, activeIndex:', swiper.activeIndex);
+                },
+                slideChangeTransitionStart: (swiper) => {
+                    console.log('slideChangeTransitionStart event triggered, activeIndex:', swiper.activeIndex);
+                },
                 slideChangeTransitionEnd: (swiper) => {
                     console.log('CarouselManager slideChangeTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
                     console.log('Total slides in swiper:', swiper.slides.length);
@@ -44,6 +50,12 @@ class CarouselManager {
                         console.log('Calling onSlideChange callback with index:', swiper.activeIndex);
                         onSlideChange(swiper.activeIndex);
                     }
+                },
+                slideNextTransitionStart: (swiper) => {
+                    console.log('slideNextTransitionStart event triggered, activeIndex:', swiper.activeIndex);
+                },
+                slideNextTransitionEnd: (swiper) => {
+                    console.log('slideNextTransitionEnd event triggered, activeIndex:', swiper.activeIndex);
                 }
             }
         };
@@ -104,8 +116,17 @@ class CarouselManager {
     slideNext() {
         if (this.swiper) {
             console.log('slideNext called, current activeIndex:', this.swiper.activeIndex);
-            this.swiper.slideNext();
-            console.log('After slideNext, new activeIndex:', this.swiper.activeIndex);
+            
+            // Manual slide control to ensure we only move by 1
+            const currentIndex = this.swiper.activeIndex;
+            const nextIndex = currentIndex + 1;
+            
+            if (nextIndex < this.swiper.slides.length) {
+                console.log(`Manually sliding to index: ${nextIndex}`);
+                this.swiper.slideTo(nextIndex);
+            } else {
+                console.log('Already at last slide');
+            }
         }
     }
 
@@ -115,8 +136,17 @@ class CarouselManager {
     slidePrev() {
         if (this.swiper) {
             console.log('slidePrev called, current activeIndex:', this.swiper.activeIndex);
-            this.swiper.slidePrev();
-            console.log('After slidePrev, new activeIndex:', this.swiper.activeIndex);
+            
+            // Manual slide control to ensure we only move by 1
+            const currentIndex = this.swiper.activeIndex;
+            const prevIndex = currentIndex - 1;
+            
+            if (prevIndex >= 0) {
+                console.log(`Manually sliding to index: ${prevIndex}`);
+                this.swiper.slideTo(prevIndex);
+            } else {
+                console.log('Already at first slide');
+            }
         }
     }
 
