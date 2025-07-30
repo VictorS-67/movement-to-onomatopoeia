@@ -240,21 +240,8 @@ class ReasoningApp extends BaseApp {
         // Set up common event listeners from base class
         this.setupCommonEventListeners();
 
-        // Video button interactions are handled by VideoManager
-        // No need to set up manual event listeners
-
-        // Carousel navigation
-        if (this.elements.prevOnomatopoeia) {
-            this.elements.prevOnomatopoeia.addEventListener('click', () => {
-                this.navigateOnomatopoeia(-1);
-            });
-        }
-
-        if (this.elements.nextOnomatopoeia) {
-            this.elements.nextOnomatopoeia.addEventListener('click', () => {
-                this.navigateOnomatopoeia(1);
-            });
-        }
+        // Navigation is now handled entirely by CarouselManager
+        // Removed duplicate event listeners for prevOnomatopoeia and nextOnomatopoeia
 
         // Keyboard navigation for carousel
         document.addEventListener('keydown', (event) => {
