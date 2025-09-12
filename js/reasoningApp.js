@@ -214,7 +214,8 @@ class ReasoningApp extends BaseApp {
                     startTime: parseFloat(item.startTime),
                     endTime: parseFloat(item.endTime),
                     answeredTimestamp: item.answeredTimestamp,
-                    reasoning: item.reasoning
+                    reasoning: item.reasoning,
+                    reasoningTimestamp: item.reasoningTimestamp
                 }));
 
             // Merge with local data, prioritizing sheet data for conflicts
