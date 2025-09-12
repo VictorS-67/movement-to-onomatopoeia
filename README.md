@@ -71,8 +71,8 @@ Create a Google Cloud project and service account:
 ```
 
 **Required Google Sheets structure**:
-- **Participants**: Email, Name, Age, Gender, MovementPractice, NativeLanguage, ParticipantID
-- **Onomatopoeia**: ParticipantID, VideoName, Onomatopoeia, Timestamp, VideoSecond, HasAudio, AudioFileName, SubmissionTime
+- **Participants**: participantId, email, name, age, gender, movementPractice, nativeLanguage, signUpDate
+- **Onomatopoeia**: participantId, participantName, video , onomatopoeia, startTime, endTime, answeredTimestamp, HasAudio, AudioFileName, reasoning, reasoningTimestamp
 - **SelectedVideos**: SelectedVideoName
 
 ### 3. Environment Variables
