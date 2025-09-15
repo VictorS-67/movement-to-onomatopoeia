@@ -327,7 +327,8 @@ class GoogleSheetsService {
             answeredTimestamp: 6,
             hasAudio: 7,
             audioFileName: 8,
-            reasoning: 9
+            reasoning: 9,
+            reasoningTimestamp: 10
         };
 
         return results.map(result => 
@@ -345,14 +346,14 @@ class GoogleSheetsService {
             endTime: 5,
             answeredTimestamp: 6,
             hasAudio: 7,
-            audioFileName: 8
+            audioFileName: 8,
         };
 
         const row = this.transformObjectToRow(onomatopoeiaData, onomatopoeiaMapping);
         return await this.appendSheetData(spreadsheetId, sheetName, row);
     }
 
-    async updateReasoning(spreadsheetId, sheetName, participantId, video, onomatopoeia, startTime, endTime, reasoning) {
+    async updateReasoning(spreadsheetId, sheetName, participantId, video, onomatopoeia, startTime, endTime, reasoning, reasoningTimestamp) {
         // Find the matching row
         const data = await this.getSheetData(spreadsheetId, sheetName);
         
@@ -369,8 +370,8 @@ class GoogleSheetsService {
         }
 
         // Update the reasoning column (column J, index 9)
-        const range = `${sheetName}!J${matchingRow.rowIndex + 1}`;
-        return await this.updateSheetData(spreadsheetId, range, [[reasoning]]);
+        const range = `${sheetName}!J${matchingRow.rowIndex + 1}:K${matchingRow.rowIndex + 1}`;
+        return await this.updateSheetData(spreadsheetId, range, [[reasoning, reasoningTimestamp]]);
     }
 }
 

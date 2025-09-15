@@ -231,7 +231,8 @@ class ReasoningApp extends BaseApp {
                     startTime: parseFloat(item.startTime),
                     endTime: parseFloat(item.endTime),
                     answeredTimestamp: item.answeredTimestamp,
-                    reasoning: item.reasoning
+                    reasoning: item.reasoning,
+                    reasoningTimestamp: item.reasoningTimestamp
                 }));
 
             // Merge with local data, prioritizing sheet data for conflicts
@@ -405,7 +406,8 @@ class ReasoningApp extends BaseApp {
                 startTime: onomatopoeiaItem.startTime,
                 endTime: onomatopoeiaItem.endTime,
                 reasoning: reasoningText,
-                answeredTimestamp: obtainDate()
+                answeredTimestamp: onomatopoeiaItem.answeredTimestamp, // Use original timestamp
+                reasoningTimestamp: obtainDate() // New timestamp for when reasoning was provided
             };
 
             // Save to Google Sheets (add reasoning column to existing Onomatopoeia sheet)
@@ -477,7 +479,8 @@ class ReasoningApp extends BaseApp {
                 reasoningEntry.onomatopoeia,
                 reasoningEntry.startTime,
                 reasoningEntry.endTime,
-                reasoningEntry.reasoning
+                reasoningEntry.reasoning,
+                reasoningEntry.reasoningTimestamp
             );
         } catch (error) {
             console.error('Error saving reasoning to sheet:', error);
