@@ -182,7 +182,7 @@
         "video_title": "Video",
         "show_introduction": "Show Introduction",
         "hide_introduction": "Hide Introduction",
-        "introduction_text": "Please explain your reasoning for each onomatopoeia you entered. You can change the onomatopoeia by using the arrows on the left and right of the text entry area, or by swiping the text entry area left or right. You can look at the part of the video where you annotated the onomatopoeia by using the \"Show it\" button.",
+        "introduction_text": "Please explain your reasoning for each onomatopoeia you entered. You can pass from one onomatopoeia to the other by using the arrows on the left and right of the text entry area, or by swiping the text entry area left or right. You can look at the part of the video where you annotated the onomatopoeia by using the \"Show it\" button.",
         "onomatopoeia_for_video": "Your onomatopoeia for video {video}: \"{onomatopoeia}\"",
         "reasoning_label": "Explain why you chose this onomatopoeia:",
         "reasoning_placeholder": "Please explain your reasoning (minimum 5 characters)...",
@@ -197,7 +197,7 @@
         "error_saving": "Failed to save reasoning. Please try again.",
         "error_min_characters": "Please provide at least 5 characters for your explanation.",
         "completion_title": "Thank You for Your Participation!",
-        "completion_message": "You have completed all reasoning explanations. Thank you for your valuable contribution to our research!",
+        "completion_message": "You have completed all reasoning explanations. All your data have been recorded, feel free to leave the website anytime. Thank you for your valuable contribution to our research!",
         "completion_note": "You can stay on this page if you wish to review or modify any of your answers.",
         "stay_on_page": "Stay on Page"
     }
