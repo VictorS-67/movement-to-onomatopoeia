@@ -364,6 +364,8 @@ class GoogleSheetsService {
             4: (value) => parseFloat(value) === parseFloat(startTime),
             5: (value) => parseFloat(value) === parseFloat(endTime)
         });
+        console.log("Matching row found:", matchingRow);
+        console.log("updated data:", [reasoning, reasoningTimestamp]);
 
         if (!matchingRow) {
             throw new Error("Matching onomatopoeia entry not found in sheet");
