@@ -4,7 +4,7 @@
     },
     "welcome": {
         "title": "Welcome to the Movement to Onomatopoeia Study",
-        "introduction": "Thank you for agreeing to participate in this survey. As a dancer or a movement practitioner we consider you an expert and it is in this capacity that we would like you to help our research on movement onomatopoeia in Japanese. Onomatopoeia are sounds such as XXXX or YYYY that, while not being officially a word in Japanese, can convey meaning (animal sound, feeling, sensation, movement, shape, texture…) through the quality of the sound itself.",
+        "introduction": "Thank you for agreeing to participate in this survey. As a dancer or a movement practitioner we consider you an expert and it is in this capacity that we would like you to help our research on movement onomatopoeia in Japanese. Onomatopoeia are sounds such as \"bang\" or \"whoosh\" that, while not being officially a word in Japanese, can convey meaning (animal sound, feeling, sensation, movement, shape, texture…) through the quality of the sound itself.",
         "description": "We will be presenting you short animations (based on movement capture of actual persons). Each animation depicts an expressive whole body movement."
     },
     "instructions": {
@@ -180,7 +180,7 @@
         "participant_name": "Participant: ",
         "section_title": "Onomatopoeia to Explain:",
         "show_introduction": "Show Introduction",
-        "introduction_text": "Please explain your reasoning for each onomatopoeia you entered. You can change the onomatopoeia by using the arrows on the left and right of the text entry area, or by swiping the text entry area left or right. You can look at the part of the video where you annotated the onomatopoeia by using the \"Show it\" button.",
+        "introduction_text": "Please explain your reasoning for each onomatopoeia you entered. You can pass from one onomatopoeia to another by using the arrows on the left and right of the text entry area, or by swiping the text entry area left or right. You can look at the part of the video where you annotated the onomatopoeia by using the \"Show it\" button.",
         "reasoning_label": "Explain why you chose this onomatopoeia:",
         "reasoning_placeholder": "Please explain your reasoning (minimum 5 characters)...",
         "show_button": "Show it",
@@ -195,7 +195,7 @@
         "prev_onomatopoeia": "Previous onomatopoeia",
         "next_onomatopoeia": "Next onomatopoeia",
         "completion_title": "Thank You for Your Participation!",
-        "completion_message": "You have completed all reasoning explanations. Thank you for your valuable contribution to our research!",
+        "completion_message": "You have completed all reasoning explanations. All your data have been recorded, feel free to leave the website anytime. Thank you for your valuable contribution to our research!",
         "completion_note": "You can stay on this page if you wish to review or modify any of your answers.",
         "stay_on_page": "Stay on Page"
     }
